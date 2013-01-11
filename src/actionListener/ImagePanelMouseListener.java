@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package helper;
+package actionListener;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -12,7 +12,7 @@ import java.awt.event.MouseMotionListener;
  * @author Vy Thuy Nguyen
  * @version 1.0 Jan 10, 2013 Last modified:
  */
-class MainWindowMouseListener implements MouseMotionListener, MouseListener
+public class ImagePanelMouseListener implements MouseMotionListener, MouseListener
 {
 
     @Override

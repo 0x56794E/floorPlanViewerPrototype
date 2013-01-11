@@ -5,11 +5,15 @@
 
 package helper;
 
+import actionListener.ImagePanelMouseListener;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
@@ -32,12 +36,19 @@ public class ImagePanel extends JPanel
         {
           JOptionPane.showMessageDialog(this, "File Not Found", "Error!", JOptionPane.ERROR_MESSAGE);
         }
+        
+        //Mouse listener
+        ImagePanelMouseListener mouseListener = new ImagePanelMouseListener();
+        this.addMouseListener(mouseListener);
+        this.addMouseMotionListener(mouseListener);
+        
+        JLabel lb = new JLabel(new ImageIcon(image));
+        add(lb);
     }
 
-    @Override
     public void paintComponent(Graphics g) 
     {
         super.paintComponent(g);
-        g.drawImage(image, 0, 0, null);             
+        //g.drawImage(image, 0, 0, null);             
     }
 }
