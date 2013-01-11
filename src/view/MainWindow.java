@@ -15,6 +15,8 @@ import java.awt.MouseInfo;
 import java.awt.PointerInfo;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.HierarchyBoundsListener;
+import java.awt.event.HierarchyEvent;
 import java.io.File;
 import java.util.ArrayList;
 import javax.swing.*;
@@ -28,11 +30,10 @@ import javax.swing.border.TitledBorder;
 public class MainWindow extends JFrame 
 {
     private JPanel mainPn = new JPanel();
-    private JPanel imagePanel = new JPanel();
+    private ImagePanel imagePanel;
     private JButton selectFileBtn = new JButton("Select Floor Plan");
     private JFrame fileChooserWindow = null;
     
-    private ArrayList<Point> selectedPoints = new ArrayList<Point>();
     private JList pointsContainer;
     private DefaultListModel listModel = new DefaultListModel();
     
@@ -51,7 +52,7 @@ public class MainWindow extends JFrame
         
         this.setVisible(true);
         this.setDefaultCloseOperation(this.EXIT_ON_CLOSE);
-        this.setSize(800, 700);
+        this.setSize(880, 700);
         this.setLocationRelativeTo(null);
         
         
@@ -63,11 +64,11 @@ public class MainWindow extends JFrame
         JPanel sub = new JPanel();
         TitledBorder b = new TitledBorder("Floor plan");
         sub.setBorder(b);
-        sub.setMinimumSize(new Dimension(540, 500));
-        sub.setPreferredSize(new Dimension(540, 500));
-        scrollPane.setSize(new Dimension(540, 500));
-        scrollPane.setPreferredSize(new Dimension(540, 500));
-        scrollPane.setViewportView(imagePanel);
+        sub.setMinimumSize(new Dimension(600, 560));
+        sub.setPreferredSize(new Dimension(600, 560));
+        updateScrollPaneSize();
+        
+        //scrollPane.setViewportView(imagePanel);
         
         sub.add(scrollPane);
         mainPn.add(sub, BorderLayout.CENTER);
@@ -106,25 +107,49 @@ public class MainWindow extends JFrame
         btnPn.add(selectFileBtn);
         mainPn.add(btnPn, BorderLayout.SOUTH);   
         selectFileBtn.addActionListener(selectFileHandler);
-    }
-    
-    public void updateMainPanel()
-    {
-        MainWindow.this.add(mainPn);
-        mainPn.setLayout(new BorderLayout());
-        mainPn.add(imagePanel, BorderLayout.CENTER);
-        mainPn.add(selectFileBtn, BorderLayout.SOUTH);
-    }
-    
-    private void initMainPanel()
-    {
         
+        getContentPane().addHierarchyBoundsListener(new HierarchyBoundsListener(){
+ 
+            @Override
+            public void ancestorMoved(HierarchyEvent e) {
+               // System.out.println(e);              
+            }
+            
+            @Override
+            public void ancestorResized(HierarchyEvent e) {
+                updateScrollPaneSize();
+                 
+            }           
+        });
+
     }
+    
+    public void addPoint(Point p)
+    {
+        listModel.addElement(p);
+    }
+    
+    public void removePoint(Point p)
+    {
+        listModel.removeElement(p);
+    }
+    
+    public void clearAll()
+    {
+        listModel.clear();
+    }
+    
+    private void updateScrollPaneSize()
+    {
+        scrollPane.setSize(new Dimension(this.getWidth() - 260, this.getHeight() - 120));
+        scrollPane.setPreferredSize(new Dimension (this.getWidth() - 260, this.getHeight() - 120));
+    }
+    
     
     public void loadFloorPlan(File file)
     {
-        scrollPane.getViewport().remove(imagePanel);
-        imagePanel = new ImagePanel(file);
+        //scrollPane.getViewport().remove(imagePanel);
+        imagePanel = new ImagePanel(file, this);
         scrollPane.setViewportView(imagePanel);
         imagePanel.repaint();
         MainWindow.this.validate();
@@ -133,7 +158,6 @@ public class MainWindow extends JFrame
     
     private class MainWindowButtonListener implements ActionListener
     {
-
         @Override
         public void actionPerformed(ActionEvent e)
         {
@@ -149,7 +173,15 @@ public class MainWindow extends JFrame
             }
             else if (e.getSource() == removeBtn)
             {
-                System.out.println("Current imagePanel size = " + imagePanel.getSize());
+               
+                if (imagePanel != null && !listModel.isEmpty())
+                    for (Object p : pointsContainer.getSelectedValuesList())
+                        imagePanel.removePoint((Point)p);
+            }
+            else if (e.getSource() == clearAllBtn)
+            {
+                if (imagePanel != null && !listModel.isEmpty())
+                    imagePanel.clearAll();
             }
         }
 

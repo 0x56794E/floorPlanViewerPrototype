@@ -80,4 +80,20 @@ public class Point
         String str = this.toString();
         return str.hashCode();
     }
+    
+    @Override
+    public boolean equals (Object rhs)
+    {
+        if (rhs == null || !(rhs instanceof Point))
+            return false;
+        else
+        {
+            Point rhsP = (Point)rhs;
+            if (rhsP.x == this.x && rhsP.y == this.y)
+                return true;
+            else
+                return false;
+        }
+        
+    }
 }

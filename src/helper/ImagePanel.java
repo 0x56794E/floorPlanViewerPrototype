@@ -6,16 +6,20 @@
 package helper;
 
 import actionListener.ImagePanelMouseListener;
+import entity.Point;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import view.MainWindow;
 
 /**
  * @author              Vy Thuy Nguyen
@@ -25,8 +29,10 @@ import javax.swing.JPanel;
 public class ImagePanel extends JPanel
 {
     private BufferedImage image;
+    private HashSet<Point> selectedPoints = new HashSet<Point>();
+    private MainWindow mainFr;
     
-    public ImagePanel(File file)
+    public ImagePanel(File file, MainWindow mf)
     {
         try
         {
@@ -36,6 +42,8 @@ public class ImagePanel extends JPanel
         {
           JOptionPane.showMessageDialog(this, "File Not Found", "Error!", JOptionPane.ERROR_MESSAGE);
         }
+        
+        mainFr = mf;
         
         //Mouse listener
         ImagePanelMouseListener mouseListener = new ImagePanelMouseListener();
@@ -50,5 +58,24 @@ public class ImagePanel extends JPanel
     {
         super.paintComponent(g);
         //g.drawImage(image, 0, 0, null);             
+    }
+    
+    public void addPoint(int x, int y)
+    {
+        Point p = new Point(x, y);
+        selectedPoints.add(p);
+        mainFr.addPoint(p);
+    }
+    
+    public void removePoint(Point p)
+    {
+        selectedPoints.remove(p);
+        mainFr.removePoint(p);
+    }
+    
+    public void clearAll()
+    {
+        selectedPoints.clear();
+        mainFr.clearAll();
     }
 }

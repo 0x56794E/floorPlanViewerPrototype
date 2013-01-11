@@ -20,7 +20,7 @@ public class Main2
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args)
+    public int main2()
     {
         //Prototype testing
         Map<String, String> properties = new HashMap<String, String>();
@@ -58,5 +58,7 @@ public class Main2
         // Close the database connection:
         em.close();
         emf.close();
+        
+        return 0;
     }
 }

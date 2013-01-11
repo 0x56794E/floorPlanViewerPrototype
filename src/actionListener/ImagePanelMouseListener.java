@@ -4,6 +4,7 @@
  */
 package actionListener;
 
+import helper.ImagePanel;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -32,6 +33,8 @@ public class ImagePanelMouseListener implements MouseMotionListener, MouseListen
     public void mouseClicked(MouseEvent e)
     {
         //throw new UnsupportedOperationException("Not supported yet.");
+        ImagePanel ip = (ImagePanel)e.getSource();
+        ip.addPoint(e.getX(), e.getY());
         System.out.println("Current pos: (" + e.getX() + ", " + e.getY() + ")");
     }
 
