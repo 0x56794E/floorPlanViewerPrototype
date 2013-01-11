@@ -16,10 +16,10 @@ import javax.persistence.Persistence;
  * @version             1.0 Jan 10, 2013
  * Last modified:       
  */
-public class DataBaseConnectionService 
+public class DatabaseService 
 {
     private static Map<String, String> properties = new HashMap<String, String>();
-    private static String dbName = "FloorPlanViewerDB";
+    private static String dbName = "FloorPlanViewerDB.odb";
     private static String partialURL = "$objectdb/db/";
     private static EntityManagerFactory emf;
     private static EntityManager em;
@@ -42,5 +42,14 @@ public class DataBaseConnectionService
             em = emf.createEntityManager();
         }        
         return em;
+    }
+    
+    public static void cleanup()
+    {
+        if (em != null && emf != null)
+        {
+            em.close();
+            emf.close();
+        }
     }
 }

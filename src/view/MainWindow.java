@@ -8,6 +8,9 @@ package view;
 import entity.Point;
 import helper.ImagePanel;
 import actionListener.ImagePanelMouseListener;
+import entity.FloorPlan;
+import helper.DatabaseService;
+import helper.DrawingPanel;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -17,8 +20,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.HierarchyBoundsListener;
 import java.awt.event.HierarchyEvent;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.Enumeration;
+import javax.persistence.EntityManager;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
@@ -29,26 +36,35 @@ import javax.swing.border.TitledBorder;
  */
 public class MainWindow extends JFrame 
 {
-    private JPanel mainPn = new JPanel();
-    private ImagePanel imagePanel;
+    //Bottom bts
+    private JButton saveToFile = new JButton("Save to File");
+    private JButton saveToDB = new JButton("Save to Database");
     private JButton selectFileBtn = new JButton("Select Floor Plan");
+    
+    private JPanel mainPn = new JPanel();
     private JFrame fileChooserWindow = null;
     
     private JList pointsContainer;
     private DefaultListModel listModel = new DefaultListModel();
+    private JScrollPane listScrollPane = new JScrollPane();
     
     private JButton removeBtn = new JButton("Remove");
     private JButton clearAllBtn = new JButton("Clear All");
     
     private JScrollPane scrollPane = new JScrollPane();
-    private PointerInfo cursor = MouseInfo.getPointerInfo();
+    private ImagePanel imagePanel;
+    private DrawingPanel drawingPanel;
     
     //public MainWindow(EntityManagerFactory emf)
     public MainWindow()      
     {
-        ActionListener selectFileHandler = new MainWindowButtonListener();   
-        removeBtn.addActionListener(selectFileHandler);
-        clearAllBtn.addActionListener(selectFileHandler);
+        ActionListener btHandler = new MainWindowButtonListener();   
+        removeBtn.addActionListener(btHandler);
+        clearAllBtn.addActionListener(btHandler);
+        saveToFile.addActionListener(btHandler);
+        saveToDB.addActionListener(btHandler);
+        selectFileBtn.addActionListener(btHandler);
+        
         
         this.setVisible(true);
         this.setDefaultCloseOperation(this.EXIT_ON_CLOSE);
@@ -83,18 +99,12 @@ public class MainWindow extends JFrame
         
          //JList setup
         pointsContainer = new JList(listModel);
-        pointsContainer.setLayoutOrientation(JList.VERTICAL_WRAP);
+        pointsContainer.setLayoutOrientation(JList.VERTICAL);
         pointsContainer.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-       // pointsContainer.setOpaque(true);
-        sub0.add(pointsContainer, BorderLayout.CENTER);
         
-        //add bunch of point
-       // for (int i = 0; i < 100; ++i)
-       //{
-        //    Point p = new Point(i, 2 * i);
-        //    selectedPoints.add(p);
-        //    listModel.addElement(p);
-        //}
+        listScrollPane.setViewportView(pointsContainer);
+        sub0.add(listScrollPane);
+        
         JPanel sub1 = new JPanel();
         sub1.add(removeBtn);
         sub1.add(clearAllBtn);
@@ -105,9 +115,11 @@ public class MainWindow extends JFrame
         //Select Button
         JPanel btnPn = new JPanel();
         btnPn.add(selectFileBtn);
+        btnPn.add(saveToFile);
+        btnPn.add(saveToDB);
         mainPn.add(btnPn, BorderLayout.SOUTH);   
-        selectFileBtn.addActionListener(selectFileHandler);
         
+        //Resize listener
         getContentPane().addHierarchyBoundsListener(new HierarchyBoundsListener(){
  
             @Override
@@ -150,8 +162,23 @@ public class MainWindow extends JFrame
     {
         //scrollPane.getViewport().remove(imagePanel);
         imagePanel = new ImagePanel(file, this);
-        scrollPane.setViewportView(imagePanel);
+        drawingPanel = new DrawingPanel(imagePanel); //glass
         imagePanel.repaint();
+        //imagePanel.setOpaque(true);
+        //drawingPanel.setOpaque(false);
+        
+        //JPanel sub = new JPanel();
+        //JLayeredPane lp = new JLayeredPane();
+        //lp.add(imagePanel, Integer.valueOf(1));
+       // lp.add(drawingPanel, Integer.valueOf(2));
+        
+        //drawingPanel.setBounds(10, 10, 100, 100);
+        //imagePanel.setBounds(0, 0, 100, 100);
+        //System.out.println("imgPn size = " + imagePanel.lb.getSize());
+        //sub.add(lp);
+        
+        scrollPane.setViewportView(imagePanel);
+        MainWindow.this.pack();
         MainWindow.this.validate();
     }
    
@@ -182,6 +209,79 @@ public class MainWindow extends JFrame
             {
                 if (imagePanel != null && !listModel.isEmpty())
                     imagePanel.clearAll();
+            }
+            else if (e.getSource() == saveToFile)
+            {
+                if (imagePanel != null)
+                {
+                    int option = JOptionPane.YES_OPTION;
+                    System.out.println("size = " + listModel.capacity());
+                    if (listModel.isEmpty())
+                    {
+                        option = JOptionPane.showConfirmDialog(null, 
+                                                               "There's nothing to save! Do you want to proceed anyways?\nWarning: This will result in erase previously saved data if there is any.", 
+                                                               "Proceed?", 
+                                                               JOptionPane.YES_NO_OPTION, 
+                                                               JOptionPane.QUESTION_MESSAGE);
+                    }
+                    if (option == JOptionPane.YES_OPTION)
+                    {
+                        try
+                        {
+                            // Create file 
+                            FileWriter fstream = new FileWriter(imagePanel.fileName + "-points.txt");
+                            BufferedWriter out = new BufferedWriter(fstream);
+                            Enumeration iter = listModel.elements();
+
+                            while (iter.hasMoreElements())
+                            {
+                                out.write(iter.nextElement().toString());
+                                out.write(";\r\n");
+                            }
+
+                            //Close the output stream
+                            out.close();
+                            
+                            JOptionPane.showMessageDialog(null, "Sucessfully Saved To File");
+                        }
+                        catch (Exception exc) //Catch exception if any
+                        {
+                            System.err.println("Error: " + exc.getMessage());
+                            
+                        }
+                    }
+                }
+                else
+                {
+                    JOptionPane.showMessageDialog(null, "Please select a floor plan first.", "No Floor Plan Found", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+            else if (e.getSource() == saveToDB)
+            {
+                EntityManager em = DatabaseService.getEntityManager();
+                    
+                    if (imagePanel != null)
+                    {
+                        em.getTransaction().begin();
+                        FloorPlan fp = new FloorPlan(imagePanel.absPath, 0, 0);
+                        Enumeration iter = listModel.elements();
+                        while (iter.hasMoreElements())
+                        {
+                            Point p = (Point)iter.nextElement();
+                            p.setFloorPlan(fp);
+                            em.persist(p);
+                        }
+                        em.persist(fp);
+                        em.getTransaction().commit();
+                        DatabaseService.cleanup();
+                        
+                        JOptionPane.showMessageDialog(null, "Successfully Saved To Database");
+                    }
+                    else
+                    {
+                        JOptionPane.showMessageDialog(null, "Please select a floor plan first.", "No Floor Plan Found", JOptionPane.ERROR_MESSAGE);
+                    }
+                    
             }
         }
 

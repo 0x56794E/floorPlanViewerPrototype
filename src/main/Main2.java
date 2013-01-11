@@ -5,6 +5,7 @@
 package main;
 
 import entity.TestPoint;
+import helper.DatabaseService;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,17 +21,19 @@ public class Main2
     /**
      * @param args the command line arguments
      */
-    public int main2()
+    public static void main(String[] args)
     {
         //Prototype testing
         Map<String, String> properties = new HashMap<String, String>();
         //properties.put("javax.persistence.jdbc.user", "foobar");
         //properties.put("javax.persistence.jdbc.password", "foobar");
-        
+        /*
         EntityManagerFactory emf =
                 Persistence.createEntityManagerFactory("$objectdb/db/testDB.odb", properties);
         EntityManager em = emf.createEntityManager();
+        */
         
+        EntityManager em = DatabaseService.getEntityManager();
         // Store 1000 Point objects in the database:
         em.getTransaction().begin();
         for (int i = 0; i < 1000; i++) {
@@ -56,9 +59,9 @@ public class Main2
         }
  
         // Close the database connection:
-        em.close();
-        emf.close();
+       // em.close();
+        //emf.close();
+        DatabaseService.cleanup();
         
-        return 0;
     }
 }

@@ -16,7 +16,7 @@ import javax.persistence.*;
  * Last modified:       
  */
 @Entity
-public class FloorPlan 
+public class FloorPlan implements Serializable 
 {
     private static final long serialVersionUID = 1L;
     

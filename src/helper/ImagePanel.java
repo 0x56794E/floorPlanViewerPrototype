@@ -29,11 +29,16 @@ import view.MainWindow;
 public class ImagePanel extends JPanel
 {
     private BufferedImage image;
-    private HashSet<Point> selectedPoints = new HashSet<Point>();
-    private MainWindow mainFr;
+    MainWindow mainFr;
+    public JLabel lb;
+    public String fileName;
+    public String absPath;
     
+    //private HashSet<Point> selectedPoints = new HashSet<Point>();
+    private ArrayList<Point> selectedPoints = new ArrayList<Point>();
     public ImagePanel(File file, MainWindow mf)
     {
+        
         try
         {
             image = ImageIO.read(file);
@@ -43,6 +48,9 @@ public class ImagePanel extends JPanel
           JOptionPane.showMessageDialog(this, "File Not Found", "Error!", JOptionPane.ERROR_MESSAGE);
         }
         
+        absPath = file.getPath();
+        System.out.println("path = " + absPath);
+        fileName = file.getName();
         mainFr = mf;
         
         //Mouse listener
@@ -50,7 +58,7 @@ public class ImagePanel extends JPanel
         this.addMouseListener(mouseListener);
         this.addMouseMotionListener(mouseListener);
         
-        JLabel lb = new JLabel(new ImageIcon(image));
+        lb = new JLabel(new ImageIcon(image));
         add(lb);
     }
 
@@ -64,7 +72,8 @@ public class ImagePanel extends JPanel
     {
         Point p = new Point(x, y);
         selectedPoints.add(p);
-        mainFr.addPoint(p);
+       mainFr.addPoint(p);
+        this.repaint();
     }
     
     public void removePoint(Point p)
@@ -76,6 +85,6 @@ public class ImagePanel extends JPanel
     public void clearAll()
     {
         selectedPoints.clear();
-        mainFr.clearAll();
+       mainFr.clearAll();
     }
 }

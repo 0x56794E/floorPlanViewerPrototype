@@ -5,6 +5,7 @@
 
 package entity;
 
+import java.io.Serializable;
 import javax.persistence.*;
 
 /**
@@ -12,7 +13,8 @@ import javax.persistence.*;
  * @version             1.0 Jan 10, 2013
  * Last modified:       
  */
-public class Point
+@Entity
+public class Point implements Serializable 
 {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -24,6 +26,10 @@ public class Point
     private int x; //relative to the origin
     private int y;
 
+    public Point()
+    {
+        
+    }
     public Point(int x, int y)
     {
         this.x = x;
