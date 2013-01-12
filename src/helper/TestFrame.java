@@ -23,6 +23,7 @@ import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 /**
@@ -53,8 +54,17 @@ public class TestFrame extends JFrame
             {
                 try
                 {
+                    ImageIcon i = new ImageIcon(testPn.background);
+                    Graphics g = i.getImage().getGraphics();
+                    
+                    g.setColor(Color.RED);
+                    for (Point p : testPn.clickPoints)
+                        g.fillOval(p.getX() - 4, p.getY() - 4, 8, 8);
+                    
                     File outputFile = new File("marked_floorplan.jpg");
                     ImageIO.write(testPn.background, "jpg", outputFile);
+                    
+                    JOptionPane.showMessageDialog(null, "Successfully Exported Image", "Done!", JOptionPane.INFORMATION_MESSAGE);
 
                 } catch (IOException exc)
                 {
@@ -72,7 +82,7 @@ public class TestFrame extends JFrame
     private class TestPane extends JPanel
     {
         public BufferedImage background;
-        private List<Point> clickPoints;
+        public List<Point> clickPoints;
         
         public TestPane()
         {
@@ -106,8 +116,8 @@ public class TestFrame extends JFrame
         @Override
         protected void paintComponent(Graphics g)
         {
-            ImageIcon i = new ImageIcon(background);
-            Graphics origImgGraphics = i.getImage().getGraphics();
+            //ImageIcon i = new ImageIcon(background);
+            //Graphics origImgGraphics = i.getImage().getGraphics();
             super.paintComponent(g);
             if (background != null)
             {
@@ -116,9 +126,9 @@ public class TestFrame extends JFrame
                 g.drawImage(background, x, y, this);
             }
             
-            origImgGraphics.setColor(Color.RED);
+            g.setColor(Color.RED);
             for (Point p : clickPoints)
-                origImgGraphics.fillOval(p.getX() - 4, p.getY() - 4, 8, 8);
+                g.fillOval(p.getX() - 4, p.getY() - 4, 8, 8);
         }
     }
 }
