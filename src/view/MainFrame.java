@@ -73,12 +73,14 @@ public class MainFrame extends JFrame
         this.setSize(880, 700);
         this.setLocationRelativeTo(null);
         
-        //Menu
+        //=======================Menu=================
         JMenuBar menuBar = new JMenuBar();
+        MenuListener menuHandler = new MenuListener();
         
-        //////File Menu
+        //File Menu
         JMenu fileMenu = new JMenu("File");
         
+        newItem.addActionListener(menuHandler);
         newItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
         fileMenu.add(newItem);
         fileMenu.addSeparator();
@@ -147,13 +149,15 @@ public class MainFrame extends JFrame
     
  
     
-    private class MainWindowMenuListener implements ActionListener
+    private class MenuListener implements ActionListener
     {
         @Override
         public void actionPerformed(ActionEvent e)
         {
             if (e.getSource() == newItem)
             {
+                System.out.println("Bringing up file chooser");
+                       
                 //Bring up floor plan chooser popup window
                 if (floorPlanChooserFr == null)
                     floorPlanChooserFr = new FileChooserWindow(mainPn, new ImageFileFilter());

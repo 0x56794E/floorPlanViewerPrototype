@@ -55,8 +55,10 @@ public class FileChooserWindow extends JFrame
     public FileChooserWindow(FileGUIContainer fgc, FileFilter filter)
     {
         fileGUIContainer = fgc;
+        JFrame.setDefaultLookAndFeelDecorated(true);
         this.setSize(550, 450);
         this.setLocationRelativeTo(null);
+        
         
         JPanel pn = new JPanel();
         pn.setLayout(new BorderLayout());
@@ -68,6 +70,7 @@ public class FileChooserWindow extends JFrame
         
         //action listener
         fileChooser.addActionListener(new FileChooserHandler());
+        //this.pack();
     }
     
     private class FileChooserHandler implements ActionListener
