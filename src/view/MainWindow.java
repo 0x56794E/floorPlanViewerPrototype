@@ -162,20 +162,7 @@ public class MainWindow extends JFrame
     {
         //scrollPane.getViewport().remove(imagePanel);
         imagePanel = new ImagePanel(file, this);
-        drawingPanel = new DrawingPanel(imagePanel); //glass
         imagePanel.repaint();
-        //imagePanel.setOpaque(true);
-        //drawingPanel.setOpaque(false);
-        
-        //JPanel sub = new JPanel();
-        //JLayeredPane lp = new JLayeredPane();
-        //lp.add(imagePanel, Integer.valueOf(1));
-       // lp.add(drawingPanel, Integer.valueOf(2));
-        
-        //drawingPanel.setBounds(10, 10, 100, 100);
-        //imagePanel.setBounds(0, 0, 100, 100);
-        //System.out.println("imgPn size = " + imagePanel.lb.getSize());
-        //sub.add(lp);
         
         scrollPane.setViewportView(imagePanel);
         MainWindow.this.pack();

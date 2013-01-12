@@ -7,6 +7,8 @@ package helper;
 
 import actionListener.ImagePanelMouseListener;
 import entity.Point;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -58,14 +60,22 @@ public class ImagePanel extends JPanel
         this.addMouseListener(mouseListener);
         this.addMouseMotionListener(mouseListener);
         
-        lb = new JLabel(new ImageIcon(image));
-        add(lb);
+        ImageIcon icon = new ImageIcon(image);
+        lb = new JLabel(icon);
+        //System.out.println("img size = " + icon.getIconWidth());
+        this.setPreferredSize(new Dimension(icon.getIconWidth(), icon.getIconHeight()));
+        //add(lb);
     }
 
     public void paintComponent(Graphics g) 
     {
         super.paintComponent(g);
-        //g.drawImage(image, 0, 0, null);             
+        g.drawImage(image, 0, 0, null);     
+        
+        g.setColor(Color.RED);
+        for (Point p : selectedPoints)
+            g.fillOval(p.getX() - 4, p.getY() - 4, 8, 8);
+
     }
     
     public void addPoint(int x, int y)
