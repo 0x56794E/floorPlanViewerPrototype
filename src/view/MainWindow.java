@@ -37,9 +37,10 @@ import javax.swing.border.TitledBorder;
 public class MainWindow extends JFrame 
 {
     //Bottom bts
-    private JButton saveToFile = new JButton("Save to File");
-    private JButton saveToDB = new JButton("Save to Database");
+    private JButton saveToFileBtn = new JButton("Save to File");
+    private JButton saveToDBBtn = new JButton("Save to Database");
     private JButton selectFileBtn = new JButton("Select Floor Plan");
+    private JButton exportBtn = new JButton("Export Floor Plan");
     
     private JPanel mainPn = new JPanel();
     private JFrame fileChooserWindow = null;
@@ -61,10 +62,10 @@ public class MainWindow extends JFrame
         ActionListener btHandler = new MainWindowButtonListener();   
         removeBtn.addActionListener(btHandler);
         clearAllBtn.addActionListener(btHandler);
-        saveToFile.addActionListener(btHandler);
-        saveToDB.addActionListener(btHandler);
+        saveToFileBtn.addActionListener(btHandler);
+        saveToDBBtn.addActionListener(btHandler);
         selectFileBtn.addActionListener(btHandler);
-        
+        exportBtn.addActionListener(btHandler);
         
         this.setVisible(true);
         this.setDefaultCloseOperation(this.EXIT_ON_CLOSE);
@@ -115,8 +116,9 @@ public class MainWindow extends JFrame
         //Select Button
         JPanel btnPn = new JPanel();
         btnPn.add(selectFileBtn);
-        btnPn.add(saveToFile);
-        btnPn.add(saveToDB);
+        btnPn.add(saveToFileBtn);
+        btnPn.add(saveToDBBtn);
+        btnPn.add(exportBtn);
         mainPn.add(btnPn, BorderLayout.SOUTH);   
         
         //Resize listener
@@ -197,7 +199,7 @@ public class MainWindow extends JFrame
                 if (imagePanel != null && !listModel.isEmpty())
                     imagePanel.clearAll();
             }
-            else if (e.getSource() == saveToFile)
+            else if (e.getSource() == saveToFileBtn)
             {
                 if (imagePanel != null)
                 {
@@ -243,7 +245,7 @@ public class MainWindow extends JFrame
                     JOptionPane.showMessageDialog(null, "Please select a floor plan first.", "No Floor Plan Found", JOptionPane.ERROR_MESSAGE);
                 }
             }
-            else if (e.getSource() == saveToDB)
+            else if (e.getSource() == saveToDBBtn)
             {
                 EntityManager em = DatabaseService.getEntityManager();
                     
@@ -268,6 +270,19 @@ public class MainWindow extends JFrame
                     {
                         JOptionPane.showMessageDialog(null, "Please select a floor plan first.", "No Floor Plan Found", JOptionPane.ERROR_MESSAGE);
                     }
+                    
+            }
+            else if (e.getSource() == exportBtn)
+            {
+                if (imagePanel != null)
+                {   
+                    
+                    imagePanel.exportImage();
+                }
+                else
+                {
+                    JOptionPane.showMessageDialog(null, "Please select a floor plan first.", "No Floor Plan Found", JOptionPane.ERROR_MESSAGE);
+                }
                     
             }
         }

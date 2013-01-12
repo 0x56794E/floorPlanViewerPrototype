@@ -35,6 +35,7 @@ public class ImagePanel extends JPanel
     public JLabel lb;
     public String fileName;
     public String absPath;
+    ImageIcon icon;
     
     //private HashSet<Point> selectedPoints = new HashSet<Point>();
     private ArrayList<Point> selectedPoints = new ArrayList<Point>();
@@ -60,13 +61,33 @@ public class ImagePanel extends JPanel
         this.addMouseListener(mouseListener);
         this.addMouseMotionListener(mouseListener);
         
-        ImageIcon icon = new ImageIcon(image);
-        lb = new JLabel(icon);
+        icon = new ImageIcon(image);
         //System.out.println("img size = " + icon.getIconWidth());
         this.setPreferredSize(new Dimension(icon.getIconWidth(), icon.getIconHeight()));
-        //add(lb);
+        
     }
 
+    public void exportImage()
+    {
+        Graphics g = icon.getImage().getGraphics();
+                    
+        g.setColor(Color.RED);
+        for (Point p : selectedPoints)
+            g.fillOval(p.getX() - 4, p.getY() - 4, 8, 8);
+                   
+        try
+        {
+            File outputFile = new File("modified-" + fileName);
+            ImageIO.write(image, "jpg", outputFile);
+            JOptionPane.showMessageDialog(null, "Successfully Exported Image", "Done!", JOptionPane.INFORMATION_MESSAGE);
+
+        }
+        catch(IOException exc)
+        {
+            exc.printStackTrace();
+        }
+    }
+    
     public void paintComponent(Graphics g) 
     {
         super.paintComponent(g);
