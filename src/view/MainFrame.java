@@ -42,7 +42,7 @@ import javax.swing.border.TitledBorder;
  * @version             1.0 Jan 9, 2013
  * Last modified:       
  */
-public class MainWindow extends JFrame 
+public class MainFrame extends JFrame 
 {
     //Bottom bts
     private JButton saveToFileBtn = new JButton("Save to File");
@@ -66,8 +66,8 @@ public class MainWindow extends JFrame
     private JPanel mainPn = new JPanel();
     private JFrame fileChooserWindow = null;
     
-    private JList pointsContainer;
-    private DefaultListModel listModel = new DefaultListModel();
+    private JList pointList;
+    private DefaultListModel plListModel = new DefaultListModel();
     private JScrollPane listScrollPane = new JScrollPane();
     
     private JButton removeBtn = new JButton("Remove");
@@ -78,7 +78,7 @@ public class MainWindow extends JFrame
     private DrawingPanel drawingPanel;
     
     //public MainWindow(EntityManagerFactory emf)
-    public MainWindow()      
+    public MainFrame()      
     {
         ActionListener btHandler = new MainWindowButtonListener();   
         removeBtn.addActionListener(btHandler);
@@ -156,28 +156,58 @@ public class MainWindow extends JFrame
         sub.add(scrollPane);
         mainPn.add(sub, BorderLayout.CENTER);
         
-        //Selected points
+        //Selected points & existing sets
+        JPanel leftPane = new JPanel();
+        leftPane.setLayout(new BorderLayout());
+                
+        JPanel selectedPointsPn = new JPanel();
+        selectedPointsPn.setLayout(new BorderLayout());
         TitledBorder b0 = new TitledBorder("Selected Points");
-        JPanel sub0 = new JPanel();
-        sub0.setLayout(new BorderLayout());
-        sub0.setPreferredSize(new Dimension(200, 700));
-        sub0.setMinimumSize(new Dimension(200, 700));
-        sub0.setBorder(b0);
+        selectedPointsPn.setPreferredSize(new Dimension(200, 450));
+        selectedPointsPn.setMinimumSize(new Dimension(200, 450));
+        selectedPointsPn.setBorder(b0);
         
          //JList setup
-        pointsContainer = new JList(listModel);
-        pointsContainer.setLayoutOrientation(JList.VERTICAL);
-        pointsContainer.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        pointList = new JList(plListModel);
+        pointList.setLayoutOrientation(JList.VERTICAL);
+        pointList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        pointList.setSize(150, 280);
+        pointList.setPreferredSize(new Dimension(150, 430));
         
-        listScrollPane.setViewportView(pointsContainer);
-        sub0.add(listScrollPane);
+        listScrollPane.setViewportView(pointList);
+        selectedPointsPn.add(listScrollPane, BorderLayout.CENTER);
+        
+        
+        //Existing list
+        JPanel existingListPn = new JPanel();
+        existingListPn.setLayout(new BorderLayout());
+        TitledBorder b1 = new TitledBorder("Existing Point Lists");
+        existingListPn.setPreferredSize(new Dimension(200, 150));
+        existingListPn.setMinimumSize(new Dimension(200, 150));
+        existingListPn.setBorder(b1);
+        
+        //JList containing existing lists
+        ListModel listJListModel = new DefaultListModel();
+        JList listsContainer = new JList(listJListModel);
+        listsContainer.setLayoutOrientation(JList.VERTICAL);
+        listsContainer.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        listsContainer.setSize(150, 280);
+        listsContainer.setPreferredSize(new Dimension(150, 130));
+        
+        JScrollPane listSrcollPane2 = new JScrollPane();
+        listSrcollPane2.setViewportView(listsContainer);
+        existingListPn.add(listSrcollPane2, BorderLayout.CENTER);
+        leftPane.add(existingListPn, BorderLayout.NORTH);
+                
         
         JPanel sub1 = new JPanel();
         sub1.add(removeBtn);
-        sub1.add(clearAllBtn);
-        sub0.add(sub1, BorderLayout.SOUTH);
+        sub1.add(clearAllBtn);        
+        selectedPointsPn.add(sub1, BorderLayout.SOUTH);
         
-        mainPn.add(sub0, BorderLayout.EAST);
+        
+        leftPane.add(selectedPointsPn, BorderLayout.CENTER);
+        mainPn.add(leftPane, BorderLayout.EAST);
         
         //Select Button
         JPanel btnPn = new JPanel();
@@ -202,22 +232,27 @@ public class MainWindow extends JFrame
             }           
         });
 
+        
+        
+        
+        
+        
         pack();
     }
     
     public void addPoint(Point p)
     {
-        listModel.addElement(p);
+        plListModel.addElement(p);
     }
     
     public void removePoint(Point p)
     {
-        listModel.removeElement(p);
+        plListModel.removeElement(p);
     }
     
     public void clearAll()
     {
-        listModel.clear();
+        plListModel.clear();
     }
     
     private void updateScrollPaneSize()
@@ -234,8 +269,8 @@ public class MainWindow extends JFrame
         imagePanel.repaint();
         
         scrollPane.setViewportView(imagePanel);
-        MainWindow.this.pack();
-        MainWindow.this.validate();
+        MainFrame.this.pack();
+        MainFrame.this.validate();
     }
    
     
@@ -265,7 +300,7 @@ public class MainWindow extends JFrame
                 //Bring up file chooser popup window
                 if (fileChooserWindow == null)
                 {
-                    fileChooserWindow = new FileChooserWindow(MainWindow.this);
+                    fileChooserWindow = new FileChooserWindow(MainFrame.this);
                 }
                     
                 fileChooserWindow.setVisible(true);
@@ -273,13 +308,13 @@ public class MainWindow extends JFrame
             else if (e.getSource() == removeBtn)
             {
                
-                if (imagePanel != null && !listModel.isEmpty())
-                    for (Object p : pointsContainer.getSelectedValuesList())
+                if (imagePanel != null && !plListModel.isEmpty())
+                    for (Object p : pointList.getSelectedValuesList())
                         imagePanel.removePoint((Point)p);
             }
             else if (e.getSource() == clearAllBtn)
             {
-                if (imagePanel != null && !listModel.isEmpty())
+                if (imagePanel != null && !plListModel.isEmpty())
                     imagePanel.clearAll();
             }
             else if (e.getSource() == saveToFileBtn)
@@ -287,8 +322,8 @@ public class MainWindow extends JFrame
                 if (imagePanel != null)
                 {
                     int option = JOptionPane.YES_OPTION;
-                    System.out.println("size = " + listModel.capacity());
-                    if (listModel.isEmpty())
+                    System.out.println("size = " + plListModel.capacity());
+                    if (plListModel.isEmpty())
                     {
                         option = JOptionPane.showConfirmDialog(null, 
                                                                "There's nothing to save! Do you want to proceed anyways?\nWarning: This will result in erase previously saved data if there is any.", 
@@ -303,7 +338,7 @@ public class MainWindow extends JFrame
                             // Create file 
                             FileWriter fstream = new FileWriter(imagePanel.fileName + "-points.txt");
                             BufferedWriter out = new BufferedWriter(fstream);
-                            Enumeration iter = listModel.elements();
+                            Enumeration iter = plListModel.elements();
 
                             while (iter.hasMoreElements())
                             {
@@ -336,7 +371,7 @@ public class MainWindow extends JFrame
                     {
                         em.getTransaction().begin();
                         FloorPlan fp = new FloorPlan(imagePanel.absPath, 0, 0);
-                        Enumeration iter = listModel.elements();
+                        Enumeration iter = plListModel.elements();
                         while (iter.hasMoreElements())
                         {
                             Point p = (Point)iter.nextElement();

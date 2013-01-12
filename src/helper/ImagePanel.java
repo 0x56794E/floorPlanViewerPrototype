@@ -36,7 +36,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import view.MainWindow;
+import view.MainFrame;
 
 /**
  * @author              Vy Thuy Nguyen
@@ -47,7 +47,7 @@ public class ImagePanel extends JPanel
 {
     private BufferedImage pinImg;
     private BufferedImage image;
-    MainWindow mainFr;
+    MainFrame mainFr;
     public JLabel lb;
     public String fileName;
     public String absPath;
@@ -55,7 +55,7 @@ public class ImagePanel extends JPanel
     
     //private HashSet<Point> selectedPoints = new HashSet<Point>();
     private ArrayList<Point> selectedPoints = new ArrayList<Point>();
-    public ImagePanel(File file, MainWindow mf)
+    public ImagePanel(File file, MainFrame mf)
     {
         try
         {

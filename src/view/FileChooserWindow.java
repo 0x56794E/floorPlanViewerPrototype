@@ -40,9 +40,9 @@ public class FileChooserWindow extends JFrame
 {
     private JFileChooser fileChooser = new JFileChooser();
     private JPanel mainPn = new JPanel();
-    private MainWindow mainFr;
+    private MainFrame mainFr;
     
-    public FileChooserWindow(MainWindow mf)
+    public FileChooserWindow(MainFrame mf)
     {
         this.mainFr = mf;
         

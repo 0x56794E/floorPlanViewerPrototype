@@ -20,7 +20,7 @@
 
 package main;
 
-import view.MainWindow;
+import view.MainFrame;
 
 /**
  * @author              Vy Thuy Nguyen
@@ -31,6 +31,6 @@ public class Main
 {
     public static void main (String[] args)
     {
-        MainWindow window = new MainWindow();
+        MainFrame window = new MainFrame();
     }
 }
