@@ -20,20 +20,8 @@
 
 package view;
 
-import entity.Point;
-import actionListener.ImagePanelMouseListener;
-import entity.FloorPlan;
-import util.DatabaseService;
-import java.awt.*;
 import java.awt.event.*;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import javax.persistence.EntityManager;
 import javax.swing.*;
-import javax.swing.border.TitledBorder;
 import util.FileChooserWindow;
 import util.ImageFileFilter;
 
@@ -56,23 +44,43 @@ public class MainFrame extends JFrame
     private JMenuItem aboutItem = new JMenuItem("About");
     private JMenuItem reportItem = new JMenuItem("Report Issue");
     
-    
     private MainPanel mainPn;
     private JFrame floorPlanChooserFr = null;
     
     public MainFrame()      
-    {
-        /*
-        this.setUndecorated(true);
-        this.setOpacity(0.9f);
-        */
-        
-        JFrame.setDefaultLookAndFeelDecorated(true);
+    {  
+        JFrame.setDefaultLookAndFeelDecorated(false);
         this.setVisible(true);
         this.setDefaultCloseOperation(this.EXIT_ON_CLOSE);
         this.setSize(880, 700);
         this.setLocationRelativeTo(null);
         
+        //Set up menu
+        setupMenu();
+        
+        //Init Main panel
+        mainPn = new MainPanel(this);   
+        this.updateImageCanvasSize();
+        this.add(mainPn);
+       
+        //Resize listener
+        getContentPane().addHierarchyBoundsListener(new HierarchyBoundsListener(){
+            @Override
+            public void ancestorMoved(HierarchyEvent e) {
+               // System.out.println(e);              
+            }
+            
+            @Override
+            public void ancestorResized(HierarchyEvent e) {
+                updateImageCanvasSize();                 
+            }           
+        });    
+        
+        pack();
+    }
+ 
+    private void setupMenu()
+    {
         //=======================Menu=================
         JMenuBar menuBar = new JMenuBar();
         MenuListener menuHandler = new MenuListener();
@@ -104,50 +112,21 @@ public class MainFrame extends JFrame
         
         menuBar.add(fileMenu);
         
-        ////end File Menu
+        //end File Menu
         
-        ////Help Menu
+        //Help Menu
         JMenu helpMenu = new JMenu("Help");
         helpMenu.add(reportItem);
         helpMenu.add(aboutItem);
         menuBar.add(helpMenu);
         
-        this.setJMenuBar(menuBar);        
-        
-        //Init Main panel
-        mainPn = new MainPanel(this);   
-        this.updateImageCanvasSize();
-        this.add(mainPn);
-       
-        
-        //Resize listener
-        getContentPane().addHierarchyBoundsListener(new HierarchyBoundsListener(){
- 
-            @Override
-            public void ancestorMoved(HierarchyEvent e) {
-               // System.out.println(e);              
-            }
-            
-            @Override
-            public void ancestorResized(HierarchyEvent e) {
-                updateImageCanvasSize();                 
-            }           
-        });    
-        
-        
-        
-        
-        pack();
+        this.setJMenuBar(menuBar);    
     }
- 
     
     private void updateImageCanvasSize()
     {
         mainPn.updateImagePanelScrollPaneSize(this.getWidth() - 300, this.getHeight() - 100);
     }
-    
-    
- 
     
     private class MenuListener implements ActionListener
     {

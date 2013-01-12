@@ -32,6 +32,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashSet;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -92,10 +93,12 @@ public class ImagePanel extends JPanel
         Graphics g = icon.getImage().getGraphics();
         g.setColor(Color.RED);
        
+        
         Point p;
-        while (mainPn.getMarkedPoints().hasMoreElements())
+        Enumeration<Point> iter = mainPn.getMarkedPoints();
+        while (iter.hasMoreElements())
         {
-            p = mainPn.getMarkedPoints().nextElement();
+            p = iter.nextElement();
             g.fillOval(p.getX() - 4, p.getY() - 4, 8, 8);
         }
         
@@ -119,9 +122,10 @@ public class ImagePanel extends JPanel
         g.setColor(Color.RED);
         
         Point p;
-        while (mainPn.getMarkedPoints().hasMoreElements())
+        Enumeration<Point> iter = mainPn.getMarkedPoints();
+        while (iter.hasMoreElements())
         {
-            p = mainPn.getMarkedPoints().nextElement();
+            p = iter.nextElement();
             g.drawImage(pinImg, p.getX() - 12, p.getY() - 12, null);
         }
     }

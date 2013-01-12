@@ -41,36 +41,37 @@ public class FileChooserWindow extends JFrame
     public FileChooserWindow(FileGUIContainer fgc)
     {
         fileGUIContainer = fgc;
-        this.setSize(550, 450);
-        this.setLocationRelativeTo(null);
-        
-        JPanel pn = new JPanel();
-        pn.setLayout(new BorderLayout());
-        pn.add(fileChooser, BorderLayout.CENTER);
-        
-        //action listener
-        fileChooser.addActionListener(new FileChooserHandler());
+        initView();              
     }
     
     public FileChooserWindow(FileGUIContainer fgc, FileFilter filter)
     {
         fileGUIContainer = fgc;
+        initView();
+        
+        //File filter
+        fileChooser.addChoosableFileFilter(filter);
+        fileChooser.setAcceptAllFileFilterUsed(false);
+      
+    }
+    
+    private void initView()
+    {
         JFrame.setDefaultLookAndFeelDecorated(true);
+        
         this.setSize(550, 450);
         this.setLocationRelativeTo(null);
-        
+        this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         
         JPanel pn = new JPanel();
         pn.setLayout(new BorderLayout());
         pn.add(fileChooser, BorderLayout.CENTER);
         
-        //File filter
-        fileChooser.addChoosableFileFilter(filter);
-        fileChooser.setAcceptAllFileFilterUsed(false);
+        this.add(pn);
         
         //action listener
         fileChooser.addActionListener(new FileChooserHandler());
-        //this.pack();
+        
     }
     
     private class FileChooserHandler implements ActionListener

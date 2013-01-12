@@ -115,6 +115,11 @@ public class MainPanel extends JPanel
     public MainPanel(MainFrame mf)
     {
         mainFr = mf;
+        initView();
+    }
+   
+    private void initView()
+    {
         this.setLayout(new BorderLayout());
         
         //================ Init Components ================
@@ -177,7 +182,6 @@ public class MainPanel extends JPanel
         
         this.add(leftPane, BorderLayout.EAST);
     }
-   
     
     public void updateImagePanelScrollPaneSize(int width, int height)
     {
@@ -206,6 +210,7 @@ public class MainPanel extends JPanel
     {
         pointListModel.addElement(p);
         imagePanel.repaint();
+        System.out.println("Done adding point");
     }
     
     /**
