@@ -18,7 +18,7 @@
  * Boston, MA  02110-1301, USA.
  */
 
-package helper;
+package view;
 
 import actionListener.ImagePanelMouseListener;
 import entity.Point;
@@ -26,6 +26,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -47,15 +49,17 @@ public class ImagePanel extends JPanel
 {
     private BufferedImage pinImg;
     private BufferedImage image;
-    MainFrame mainFr;
+
     public JLabel lb;
     public String fileName;
     public String absPath;
     ImageIcon icon;
     
+    private MainPanel mainPn;
+    
     //private HashSet<Point> selectedPoints = new HashSet<Point>();
-    private ArrayList<Point> selectedPoints = new ArrayList<Point>();
-    public ImagePanel(File file, MainFrame mf)
+    //private ArrayList<Point> selectedPoints = new ArrayList<Point>();
+    public ImagePanel(File file, MainPanel mp)
     {
         try
         {
@@ -70,7 +74,7 @@ public class ImagePanel extends JPanel
         absPath = file.getPath();
         System.out.println("path = " + absPath);
         fileName = file.getName();
-        mainFr = mf;
+        mainPn = mp;
         
         //Mouse listener
         ImagePanelMouseListener mouseListener = new ImagePanelMouseListener();
@@ -86,11 +90,15 @@ public class ImagePanel extends JPanel
     public void exportImage()
     {
         Graphics g = icon.getImage().getGraphics();
-                    
         g.setColor(Color.RED);
-        for (Point p : selectedPoints)
+       
+        Point p;
+        while (mainPn.getMarkedPoints().hasMoreElements())
+        {
+            p = mainPn.getMarkedPoints().nextElement();
             g.fillOval(p.getX() - 4, p.getY() - 4, 8, 8);
-                   
+        }
+        
         try
         {
             File outputFile = new File("modified-" + fileName);
@@ -108,35 +116,37 @@ public class ImagePanel extends JPanel
     {
         super.paintComponent(g);
         g.drawImage(image, 0, 0, null);     
-        
         g.setColor(Color.RED);
-        for (Point p : selectedPoints)
-            //g.fillOval(p.getX() - 4, p.getY() - 4, 8, 8);
+        
+        Point p;
+        while (mainPn.getMarkedPoints().hasMoreElements())
+        {
+            p = mainPn.getMarkedPoints().nextElement();
             g.drawImage(pinImg, p.getX() - 12, p.getY() - 12, null);
-
+        }
     }
     
+    /**
+     * To be called from click handler 
+     * @param x
+     * @param y 
+     */
     public void addPoint(int x, int y)
     {
         Point p = new Point(x, y);
-        selectedPoints.add(p);
-        mainFr.addPoint(p);
-        this.repaint();
+        mainPn.addPoint(p);        
     }
     
+    /*
     public void removePoint(Point p)
     {
-        selectedPoints.remove(p);
-        mainFr.removePoint(p);
-        this.repaint();
+        mainPn.removePoint(p);
     }
     
     public void clearAll()
     {
-        selectedPoints.clear();
-        mainFr.clearAll();
-        this.repaint();
+        mainPn.clearAll();
     }
-    
+    */
    
 }

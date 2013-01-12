@@ -21,11 +21,9 @@
 package view;
 
 import entity.Point;
-import helper.ImagePanel;
 import actionListener.ImagePanelMouseListener;
 import entity.FloorPlan;
-import helper.DatabaseService;
-import helper.DrawingPanel;
+import util.DatabaseService;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.BufferedWriter;
@@ -36,6 +34,8 @@ import java.util.Enumeration;
 import javax.persistence.EntityManager;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+import util.FileChooserWindow;
+import util.ImageFileFilter;
 
 /**
  * @author              Vy Thuy Nguyen
@@ -44,12 +44,6 @@ import javax.swing.border.TitledBorder;
  */
 public class MainFrame extends JFrame 
 {
-    //Bottom bts
-    private JButton saveToFileBtn = new JButton("Save to File");
-    private JButton saveToDBBtn = new JButton("Save to Database");
-    private JButton selectFileBtn = new JButton("Select Floor Plan");
-    private JButton exportBtn = new JButton("Export Floor Plan");
-    
     //File Menu
     private JMenuItem newItem = new JMenuItem("New Floor Plan...");
     private JMenuItem saveToFileItem = new JMenuItem("Save to File");
@@ -63,36 +57,16 @@ public class MainFrame extends JFrame
     private JMenuItem reportItem = new JMenuItem("Report Issue");
     
     
-    private JPanel mainPn = new JPanel();
-    private JFrame fileChooserWindow = null;
+    private MainPanel mainPn;
+    private JFrame floorPlanChooserFr = null;
     
-    private JList pointList;
-    private DefaultListModel plListModel = new DefaultListModel();
-    private JScrollPane listScrollPane = new JScrollPane();
-    
-    private JButton removeBtn = new JButton("Remove");
-    private JButton clearAllBtn = new JButton("Clear All");
-    
-    private JScrollPane scrollPane = new JScrollPane();
-    private ImagePanel imagePanel;
-    private DrawingPanel drawingPanel;
-    
-    //public MainWindow(EntityManagerFactory emf)
     public MainFrame()      
     {
-        ActionListener btHandler = new MainWindowButtonListener();   
-        removeBtn.addActionListener(btHandler);
-        clearAllBtn.addActionListener(btHandler);
-        saveToFileBtn.addActionListener(btHandler);
-        saveToDBBtn.addActionListener(btHandler);
-        selectFileBtn.addActionListener(btHandler);
-        exportBtn.addActionListener(btHandler);
-        
         /*
-        
         this.setUndecorated(true);
         this.setOpacity(0.9f);
         */
+        
         JFrame.setDefaultLookAndFeelDecorated(true);
         this.setVisible(true);
         this.setDefaultCloseOperation(this.EXIT_ON_CLOSE);
@@ -136,86 +110,13 @@ public class MainFrame extends JFrame
         helpMenu.add(aboutItem);
         menuBar.add(helpMenu);
         
-        this.setJMenuBar(menuBar);
-        
+        this.setJMenuBar(menuBar);        
         
         //Init Main panel
+        mainPn = new MainPanel(this);   
+        this.updateImageCanvasSize();
         this.add(mainPn);
-        mainPn.setLayout(new BorderLayout());
-        
-        //Image canvas
-        JPanel sub = new JPanel();
-        TitledBorder b = new TitledBorder("Floor plan");
-        sub.setBorder(b);
-        sub.setMinimumSize(new Dimension(600, 560));
-        sub.setPreferredSize(new Dimension(600, 560));
-        updateScrollPaneSize();
-        
-        //scrollPane.setViewportView(imagePanel);
-        
-        sub.add(scrollPane);
-        mainPn.add(sub, BorderLayout.CENTER);
-        
-        //Selected points & existing sets
-        JPanel leftPane = new JPanel();
-        leftPane.setLayout(new BorderLayout());
-                
-        JPanel selectedPointsPn = new JPanel();
-        selectedPointsPn.setLayout(new BorderLayout());
-        TitledBorder b0 = new TitledBorder("Selected Points");
-        selectedPointsPn.setPreferredSize(new Dimension(200, 450));
-        selectedPointsPn.setMinimumSize(new Dimension(200, 450));
-        selectedPointsPn.setBorder(b0);
-        
-         //JList setup
-        pointList = new JList(plListModel);
-        pointList.setLayoutOrientation(JList.VERTICAL);
-        pointList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        pointList.setSize(150, 280);
-        pointList.setPreferredSize(new Dimension(150, 430));
-        
-        listScrollPane.setViewportView(pointList);
-        selectedPointsPn.add(listScrollPane, BorderLayout.CENTER);
-        
-        
-        //Existing list
-        JPanel existingListPn = new JPanel();
-        existingListPn.setLayout(new BorderLayout());
-        TitledBorder b1 = new TitledBorder("Existing Point Lists");
-        existingListPn.setPreferredSize(new Dimension(200, 150));
-        existingListPn.setMinimumSize(new Dimension(200, 150));
-        existingListPn.setBorder(b1);
-        
-        //JList containing existing lists
-        ListModel listJListModel = new DefaultListModel();
-        JList listsContainer = new JList(listJListModel);
-        listsContainer.setLayoutOrientation(JList.VERTICAL);
-        listsContainer.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        listsContainer.setSize(150, 280);
-        listsContainer.setPreferredSize(new Dimension(150, 130));
-        
-        JScrollPane listSrcollPane2 = new JScrollPane();
-        listSrcollPane2.setViewportView(listsContainer);
-        existingListPn.add(listSrcollPane2, BorderLayout.CENTER);
-        leftPane.add(existingListPn, BorderLayout.NORTH);
-                
-        
-        JPanel sub1 = new JPanel();
-        sub1.add(removeBtn);
-        sub1.add(clearAllBtn);        
-        selectedPointsPn.add(sub1, BorderLayout.SOUTH);
-        
-        
-        leftPane.add(selectedPointsPn, BorderLayout.CENTER);
-        mainPn.add(leftPane, BorderLayout.EAST);
-        
-        //Select Button
-        JPanel btnPn = new JPanel();
-        btnPn.add(selectFileBtn);
-        btnPn.add(saveToFileBtn);
-        btnPn.add(saveToDBBtn);
-        btnPn.add(exportBtn);
-        //mainPn.add(btnPn, BorderLayout.SOUTH);   
+       
         
         //Resize listener
         getContentPane().addHierarchyBoundsListener(new HierarchyBoundsListener(){
@@ -227,97 +128,48 @@ public class MainFrame extends JFrame
             
             @Override
             public void ancestorResized(HierarchyEvent e) {
-                updateScrollPaneSize();
-                 
+                updateImageCanvasSize();                 
             }           
-        });
-
-        
+        });    
         
         
         
         
         pack();
     }
+ 
     
-    public void addPoint(Point p)
+    private void updateImageCanvasSize()
     {
-        plListModel.addElement(p);
-    }
-    
-    public void removePoint(Point p)
-    {
-        plListModel.removeElement(p);
-    }
-    
-    public void clearAll()
-    {
-        plListModel.clear();
-    }
-    
-    private void updateScrollPaneSize()
-    {
-        scrollPane.setSize(new Dimension(this.getWidth() - 250, this.getHeight() - 100));
-        scrollPane.setPreferredSize(new Dimension (this.getWidth() - 250, this.getHeight() - 100));
+        mainPn.updateImagePanelScrollPaneSize(this.getWidth() - 300, this.getHeight() - 100);
     }
     
     
-    public void loadFloorPlan(File file)
-    {
-        //scrollPane.getViewport().remove(imagePanel);
-        imagePanel = new ImagePanel(file, this);
-        imagePanel.repaint();
-        
-        scrollPane.setViewportView(imagePanel);
-        MainFrame.this.pack();
-        MainFrame.this.validate();
-    }
-   
-    
+ 
     
     private class MainWindowMenuListener implements ActionListener
     {
-
         @Override
         public void actionPerformed(ActionEvent e)
         {
             if (e.getSource() == newItem)
             {
-                JOptionPane.showMessageDialog(null, "new menu item clicked");
-            }
-            
-        }
-        
+                //Bring up floor plan chooser popup window
+                if (floorPlanChooserFr == null)
+                    floorPlanChooserFr = new FileChooserWindow(mainPn, new ImageFileFilter());
+                
+                floorPlanChooserFr.setVisible(true);
+            }            
+        }        
     }
     
+    /*
     private class MainWindowButtonListener implements ActionListener
     {
         @Override
         public void actionPerformed(ActionEvent e)
         {
-            if (e.getSource() == selectFileBtn)
-            {
-                //Bring up file chooser popup window
-                if (fileChooserWindow == null)
-                {
-                    fileChooserWindow = new FileChooserWindow(MainFrame.this);
-                }
-                    
-                fileChooserWindow.setVisible(true);
-            }
-            else if (e.getSource() == removeBtn)
-            {
-               
-                if (imagePanel != null && !plListModel.isEmpty())
-                    for (Object p : pointList.getSelectedValuesList())
-                        imagePanel.removePoint((Point)p);
-            }
-            else if (e.getSource() == clearAllBtn)
-            {
-                if (imagePanel != null && !plListModel.isEmpty())
-                    imagePanel.clearAll();
-            }
-            else if (e.getSource() == saveToFileBtn)
+             if (e.getSource() == saveToFileBtn)
             {
                 if (imagePanel != null)
                 {
@@ -406,4 +258,6 @@ public class MainFrame extends JFrame
         }
 
     }
+    * 
+    */
 }

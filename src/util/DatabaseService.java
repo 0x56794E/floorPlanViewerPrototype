@@ -18,7 +18,7 @@
  * Boston, MA  02110-1301, USA.
  */
 
-package helper;
+package util;
 
 import java.util.HashMap;
 import java.util.Map;

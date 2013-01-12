@@ -18,11 +18,10 @@
  * Boston, MA  02110-1301, USA.
  */
 
-package helper;
+package util;
 
 import java.io.File;
-import javax.swing.*;
-import javax.swing.filechooser.*;
+import javax.swing.filechooser.FileFilter;
  
 
 /**

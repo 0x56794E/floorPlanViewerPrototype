@@ -20,7 +20,7 @@
 
 package actionListener;
 
-import helper.ImagePanel;
+import view.ImagePanel;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;

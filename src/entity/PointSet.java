@@ -25,12 +25,15 @@ import java.util.List;
 import javax.persistence.*;
 
 /**
+ * Regardless of the name, this PointSet is actually
+ * a list. In other words, duplication is allowed.
+ * 
  * @author              Vy Thuy Nguyen
  * @version             1.0 Jan 11, 2013
  * Last modified:       
  */
 @Entity
-public class PointList 
+public class PointSet 
 {
     @Id
     @GeneratedValue (strategy = GenerationType.AUTO)
@@ -43,12 +46,12 @@ public class PointList
     @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
     private FloorPlan floorPlan;
     
-    public PointList()
+    public PointSet()
     {
         
     }
     
-    public PointList(FloorPlan fp)
+    public PointSet(FloorPlan fp)
     {
         floorPlan = fp;
         points = new ArrayList<Point>();

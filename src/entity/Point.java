@@ -41,7 +41,7 @@ public class Point implements Serializable
     private FloorPlan floorPlan;
     
     @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
-    private PointList pointSet;
+    private PointSet pointSet;
     
     
     private int x; //relative to the origin

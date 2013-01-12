@@ -1,6 +1,6 @@
 /**
- * Floor Plan Marker Project
- * Copyright (C) 2013  Vy Thuy Nguyen
+ * Context-Free-Grammar to Push-down Automaton Converter
+ * Copyright (C) 2012  Vy Thuy Nguyen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -18,20 +18,17 @@
  * Boston, MA  02110-1301, USA.
  */
 
-package main;
+package util;
 
-import util.TestFrame;
+import java.io.File;
+import javax.swing.JPanel;
 
 /**
  * @author              Vy Thuy Nguyen
- * @version             1.0 Jan 11, 2013
+ * @version             1.0 Jan 12, 2013
  * Last modified:       
  */
-public class TestDrawFrame 
+public interface FileGUIContainer
 {
-    public static void main(String[] args)
-    {
-        new TestFrame();
-        
-    }
+    public void loadFileContent(File file);
 }

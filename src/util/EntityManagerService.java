@@ -17,7 +17,7 @@
  * Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
  * Boston, MA  02110-1301, USA.
  */
-package helper;
+package util;
 
 import java.sql.Statement;
 import java.sql.Connection;
