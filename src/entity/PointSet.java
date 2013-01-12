@@ -1,6 +1,6 @@
 /**
- * Floor Plan Marker Project
- * Copyright (C) 2013  Vy Thuy Nguyen
+ * Context-Free-Grammar to Push-down Automaton Converter
+ * Copyright (C) 2012  Vy Thuy Nguyen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -18,31 +18,17 @@
  * Boston, MA  02110-1301, USA.
  */
 
-package main;
+package entity;
 
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javax.persistence.Entity;
 
 /**
  * @author              Vy Thuy Nguyen
  * @version             1.0 Jan 11, 2013
  * Last modified:       
  */
-public class TestAnimatedGif 
+@Entity
+public class PointSet 
 {
-    public static void main(String[] args)
-    {
-        JFrame fr = new JFrame();
-        JPanel pn = new JPanel();
-        ImageIcon icon = new ImageIcon("purple.gif");
-        JLabel lb = new JLabel(icon);
-        
-        pn.add(lb);
-        fr.add(pn);
-        fr.setVisible(true);
-        
-        
-    }
+
 }

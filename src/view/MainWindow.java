@@ -1,6 +1,21 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * Floor Plan Marker Project
+ * Copyright (C) 2013  Vy Thuy Nguyen
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+ * Boston, MA  02110-1301, USA.
  */
 
 package view;
@@ -35,12 +50,18 @@ public class MainWindow extends JFrame
     private JButton selectFileBtn = new JButton("Select Floor Plan");
     private JButton exportBtn = new JButton("Export Floor Plan");
     
+    //File Menu
     private JMenuItem newItem = new JMenuItem("New Floor Plan...");
     private JMenuItem saveToFileItem = new JMenuItem("Save to File");
     private JMenuItem saveToDBItem = new JMenuItem("Save to Database");
     private JMenuItem saveBothItem = new JMenuItem("Save to Both File and Database");
-    private JMenuItem exportItem = new JMenuItem("Export Floor Plan as Image...");
+    private JMenuItem exportItem = new JMenuItem("Export Floor Plan to Image File...");
     private JMenuItem showExistItem = new JMenuItem("Show Saved Floor Plan... ");
+    
+    //Help Menu
+    private JMenuItem aboutItem = new JMenuItem("About");
+    private JMenuItem reportItem = new JMenuItem("Report Issue");
+    
     
     private JPanel mainPn = new JPanel();
     private JFrame fileChooserWindow = null;
@@ -81,16 +102,40 @@ public class MainWindow extends JFrame
         //Menu
         JMenuBar menuBar = new JMenuBar();
         
+        //////File Menu
         JMenu fileMenu = new JMenu("File");
         
         newItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
         fileMenu.add(newItem);
         fileMenu.addSeparator();
         
-        
+        showExistItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
         fileMenu.add(showExistItem);
+        fileMenu.addSeparator();
+        
+        saveToFileItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, ActionEvent.CTRL_MASK));
+        fileMenu.add(saveToFileItem);
+        
+        saveToDBItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, ActionEvent.CTRL_MASK));
+        fileMenu.add(saveToDBItem);
+        
+        saveBothItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, ActionEvent.CTRL_MASK));
+        fileMenu.add(saveBothItem);
+        fileMenu.addSeparator();
+        
+        exportItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.CTRL_MASK));
+        fileMenu.add(exportItem);
         
         menuBar.add(fileMenu);
+        
+        ////end File Menu
+        
+        ////Help Menu
+        JMenu helpMenu = new JMenu("Help");
+        helpMenu.add(reportItem);
+        helpMenu.add(aboutItem);
+        menuBar.add(helpMenu);
+        
         this.setJMenuBar(menuBar);
         
         
@@ -140,7 +185,7 @@ public class MainWindow extends JFrame
         btnPn.add(saveToFileBtn);
         btnPn.add(saveToDBBtn);
         btnPn.add(exportBtn);
-        mainPn.add(btnPn, BorderLayout.SOUTH);   
+        //mainPn.add(btnPn, BorderLayout.SOUTH);   
         
         //Resize listener
         getContentPane().addHierarchyBoundsListener(new HierarchyBoundsListener(){
@@ -157,6 +202,7 @@ public class MainWindow extends JFrame
             }           
         });
 
+        pack();
     }
     
     public void addPoint(Point p)
@@ -176,8 +222,8 @@ public class MainWindow extends JFrame
     
     private void updateScrollPaneSize()
     {
-        scrollPane.setSize(new Dimension(this.getWidth() - 260, this.getHeight() - 120));
-        scrollPane.setPreferredSize(new Dimension (this.getWidth() - 260, this.getHeight() - 120));
+        scrollPane.setSize(new Dimension(this.getWidth() - 250, this.getHeight() - 100));
+        scrollPane.setPreferredSize(new Dimension (this.getWidth() - 250, this.getHeight() - 100));
     }
     
     
