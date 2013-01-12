@@ -30,6 +30,7 @@ import view.MainWindow;
  */
 public class ImagePanel extends JPanel
 {
+    private BufferedImage pinImg;
     private BufferedImage image;
     MainWindow mainFr;
     public JLabel lb;
@@ -41,10 +42,10 @@ public class ImagePanel extends JPanel
     private ArrayList<Point> selectedPoints = new ArrayList<Point>();
     public ImagePanel(File file, MainWindow mf)
     {
-        
         try
         {
             image = ImageIO.read(file);
+            pinImg = ImageIO.read(new File("pin.png"));
         }
         catch (IOException exc)
         {
@@ -95,7 +96,8 @@ public class ImagePanel extends JPanel
         
         g.setColor(Color.RED);
         for (Point p : selectedPoints)
-            g.fillOval(p.getX() - 4, p.getY() - 4, 8, 8);
+            //g.fillOval(p.getX() - 4, p.getY() - 4, 8, 8);
+            g.drawImage(pinImg, p.getX() - 12, p.getY() - 12, null);
 
     }
     
@@ -103,7 +105,7 @@ public class ImagePanel extends JPanel
     {
         Point p = new Point(x, y);
         selectedPoints.add(p);
-       mainFr.addPoint(p);
+        mainFr.addPoint(p);
         this.repaint();
     }
     
@@ -111,11 +113,15 @@ public class ImagePanel extends JPanel
     {
         selectedPoints.remove(p);
         mainFr.removePoint(p);
+        this.repaint();
     }
     
     public void clearAll()
     {
         selectedPoints.clear();
-       mainFr.clearAll();
+        mainFr.clearAll();
+        this.repaint();
     }
+    
+   
 }

@@ -11,15 +11,8 @@ import actionListener.ImagePanelMouseListener;
 import entity.FloorPlan;
 import helper.DatabaseService;
 import helper.DrawingPanel;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.MouseInfo;
-import java.awt.PointerInfo;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.HierarchyBoundsListener;
-import java.awt.event.HierarchyEvent;
+import java.awt.*;
+import java.awt.event.*;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -41,6 +34,13 @@ public class MainWindow extends JFrame
     private JButton saveToDBBtn = new JButton("Save to Database");
     private JButton selectFileBtn = new JButton("Select Floor Plan");
     private JButton exportBtn = new JButton("Export Floor Plan");
+    
+    private JMenuItem newItem = new JMenuItem("New Floor Plan...");
+    private JMenuItem saveToFileItem = new JMenuItem("Save to File");
+    private JMenuItem saveToDBItem = new JMenuItem("Save to Database");
+    private JMenuItem saveBothItem = new JMenuItem("Save to Both File and Database");
+    private JMenuItem exportItem = new JMenuItem("Export Floor Plan as Image...");
+    private JMenuItem showExistItem = new JMenuItem("Show Saved Floor Plan... ");
     
     private JPanel mainPn = new JPanel();
     private JFrame fileChooserWindow = null;
@@ -67,10 +67,31 @@ public class MainWindow extends JFrame
         selectFileBtn.addActionListener(btHandler);
         exportBtn.addActionListener(btHandler);
         
+        /*
+        
+        this.setUndecorated(true);
+        this.setOpacity(0.9f);
+        */
+        JFrame.setDefaultLookAndFeelDecorated(true);
         this.setVisible(true);
         this.setDefaultCloseOperation(this.EXIT_ON_CLOSE);
         this.setSize(880, 700);
         this.setLocationRelativeTo(null);
+        
+        //Menu
+        JMenuBar menuBar = new JMenuBar();
+        
+        JMenu fileMenu = new JMenu("File");
+        
+        newItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
+        fileMenu.add(newItem);
+        fileMenu.addSeparator();
+        
+        
+        fileMenu.add(showExistItem);
+        
+        menuBar.add(fileMenu);
+        this.setJMenuBar(menuBar);
         
         
         //Init Main panel
@@ -171,6 +192,22 @@ public class MainWindow extends JFrame
         MainWindow.this.validate();
     }
    
+    
+    
+    private class MainWindowMenuListener implements ActionListener
+    {
+
+        @Override
+        public void actionPerformed(ActionEvent e)
+        {
+            if (e.getSource() == newItem)
+            {
+                JOptionPane.showMessageDialog(null, "new menu item clicked");
+            }
+            
+        }
+        
+    }
     
     private class MainWindowButtonListener implements ActionListener
     {
