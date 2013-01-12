@@ -21,7 +21,9 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import javax.persistence.*;
 
@@ -41,7 +43,11 @@ public class FloorPlan implements Serializable
     
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, 
                fetch = FetchType.LAZY, mappedBy = "floorPlan")
-    private Set<Point> points;    
+    private List<Point> points;    
+    
+    
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+               fetch = FetchType.LAZY, mappedBy = "floorPlan")
     
     private String absFilePath;
     private int originX;
@@ -57,7 +63,7 @@ public class FloorPlan implements Serializable
         absFilePath = path;
         originX = x;
         originY = y;
-        points = new HashSet<Point>();
+        points = new ArrayList<Point>();
     }
      
      public Long getId()

@@ -35,8 +35,14 @@ public class Point implements Serializable
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
     
+    
+    //superfluous; remove later
     @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
     private FloorPlan floorPlan;
+    
+    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
+    private PointList pointSet;
+    
     
     private int x; //relative to the origin
     private int y;
@@ -56,11 +62,12 @@ public class Point implements Serializable
         return id;
     }
 
+    /*
     public void setId(long id)
     {
         this.id = id;
     }
-    
+    */
     public int getX()
     {
         return x;
