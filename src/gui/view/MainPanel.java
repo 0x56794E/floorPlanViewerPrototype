@@ -173,25 +173,30 @@ public class MainPanel extends JPanel
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                switch (JOptionPane.showConfirmDialog(null,
-                                                      "Do you want to save?",
-                                                      "Save",
-                                                      JOptionPane.YES_NO_CANCEL_OPTION,
-                                                      JOptionPane.QUESTION_MESSAGE))
+                if (savePointSetBtn.isEnabled())
                 {
-                    case JOptionPane.YES_OPTION:
-                        savePointSet();
-                        showBlankFloorPlan();
-                        break;
+                    switch (JOptionPane.showConfirmDialog(null,
+                                                        "Do you want to save?",
+                                                        "Save",
+                                                        JOptionPane.YES_NO_CANCEL_OPTION,
+                                                        JOptionPane.QUESTION_MESSAGE))
+                    {
+                        case JOptionPane.YES_OPTION:
+                            savePointSet();
+                            showBlankFloorPlan();
+                            break;
 
-                    case JOptionPane.NO_OPTION:
-                        showBlankFloorPlan();
-                        break;
+                        case JOptionPane.NO_OPTION:
+                            showBlankFloorPlan();
+                            break;
 
-                    default:
-                        break;
+                        default:
+                            break;
 
+                    }
                 }
+                else 
+                    showBlankFloorPlan();
 
             }
         });
@@ -273,6 +278,7 @@ public class MainPanel extends JPanel
     private void showBlankFloorPlan()
     {
         currentPointSet = new PointSet(currentFloorPlan);
+        currentFloorPlan.addPointSet(currentPointSet);
         pointListModel.clear();
         updateView();
     }
@@ -282,7 +288,7 @@ public class MainPanel extends JPanel
         EntityManager em = DatabaseService.getEntityManager();
         em.getTransaction().begin();
         em.persist(currentPointSet);
-//        em.persist(currentFloorPlan);
+        em.persist(currentFloorPlan);
 //        for (Point p : currentPointSet.getPoints())
 //        {
 //            em.persist(p);
@@ -297,6 +303,7 @@ public class MainPanel extends JPanel
     private void updatePointSetJList()
     {
         pointSetListModel.clear();
+        System.out.println("PointSetCount = " + currentFloorPlan.getPointSets().size());
         for (PointSet ps : currentFloorPlan.getPointSets())
             pointSetListModel.addElement(ps);
     }
