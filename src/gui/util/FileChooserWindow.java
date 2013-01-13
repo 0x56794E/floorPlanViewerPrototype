@@ -18,7 +18,7 @@
  * Boston, MA  02110-1301, USA.
  */
 
-package util;
+package gui.util;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -58,7 +58,7 @@ public class FileChooserWindow extends JFrame
     private void initView()
     {
         JFrame.setDefaultLookAndFeelDecorated(true);
-        
+        this.setTitle("Open");
         this.setSize(550, 450);
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
@@ -85,4 +85,5 @@ public class FileChooserWindow extends JFrame
             FileChooserWindow.this.setVisible(false);
         }
     }
+   
 }

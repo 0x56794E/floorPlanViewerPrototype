@@ -18,9 +18,9 @@
  * Boston, MA  02110-1301, USA.
  */
 
-package actionListener;
+package util;
 
-import view.ImagePanel;
+import gui.view.ImagePanel;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;

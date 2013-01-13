@@ -20,7 +20,7 @@
 
 package main;
 
-import view.MainFrame;
+import gui.view.MainFrame;
 
 /**
  * @author              Vy Thuy Nguyen

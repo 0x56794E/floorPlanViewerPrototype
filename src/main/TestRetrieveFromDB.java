@@ -1,6 +1,6 @@
 /**
- * Floor Plan Marker Project
- * Copyright (C) 2013  Vy Thuy Nguyen
+ * Context-Free-Grammar to Push-down Automaton Converter
+ * Copyright (C) 2012  Vy Thuy Nguyen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -20,18 +20,27 @@
 
 package main;
 
-import gui.util.TestFrame;
+import entity.TestPoint;
+import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
+import util.DatabaseService;
 
 /**
  * @author              Vy Thuy Nguyen
- * @version             1.0 Jan 11, 2013
+ * @version             1.0 Jan 12, 2013
  * Last modified:       
  */
-public class TestDrawFrame 
+public class TestRetrieveFromDB 
 {
     public static void main(String[] args)
     {
-        new TestFrame();
+        EntityManager em = DatabaseService.getEntityManager();
+        Query query = em.createQuery("SELECT COUNT(p.id) FROM TestPoint p where p.id % 2 = 0");
+        
+        System.out.println(query.getSingleResult());
+        
         
     }
 }

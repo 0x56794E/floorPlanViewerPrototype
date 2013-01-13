@@ -18,9 +18,9 @@
  * Boston, MA  02110-1301, USA.
  */
 
-package view;
+package gui.view;
 
-import actionListener.ImagePanelMouseListener;
+import util.ImagePanelMouseListener;
 import entity.Point;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -39,7 +39,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import view.MainFrame;
+import gui.view.MainFrame;
 
 /**
  * @author              Vy Thuy Nguyen

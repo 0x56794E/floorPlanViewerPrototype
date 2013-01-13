@@ -1,6 +1,6 @@
 /**
- * Floor Plan Marker Project
- * Copyright (C) 2013  Vy Thuy Nguyen
+ * Context-Free-Grammar to Push-down Automaton Converter
+ * Copyright (C) 2012  Vy Thuy Nguyen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -18,20 +18,31 @@
  * Boston, MA  02110-1301, USA.
  */
 
-package main;
+package gui.util;
 
-import gui.util.TestFrame;
+import entity.FloorPlan;
+import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
+import javax.swing.JFrame;
 
 /**
  * @author              Vy Thuy Nguyen
- * @version             1.0 Jan 11, 2013
+ * @version             1.0 Jan 12, 2013
  * Last modified:       
  */
-public class TestDrawFrame 
+public class FloorPlanListPopup extends JFrame
 {
-    public static void main(String[] args)
+    
+    public FloorPlanListPopup(List<FloorPlan> floorPlans)
     {
-        new TestFrame();
+        initView();
         
+    }
+    
+    private void initView()
+    {
+        this.setSize(400, 400);
+        this.setTitle("Saved Floor Plans");
     }
 }

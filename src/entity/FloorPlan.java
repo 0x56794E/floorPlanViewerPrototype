@@ -49,7 +49,11 @@ public class FloorPlan implements Serializable
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE},
                fetch = FetchType.LAZY, mappedBy = "floorPlan")
     
+    /**
+     * This includes the file name
+     */
     private String absFilePath;
+    private String fileName;
     private int originX;
     private int originY;
     
@@ -86,6 +90,16 @@ public class FloorPlan implements Serializable
         this.absFilePath = path;
     }
     
+    public void setFileName(String name)
+    {
+        this.fileName = name;
+    }
+    
+    public String getFileName()
+    {
+        return this.fileName;
+    }
+    
     public int getOriginX()
     {
         return originX;
@@ -109,6 +123,6 @@ public class FloorPlan implements Serializable
     @Override
     public String toString()
     {
-        return String.format("File name: %s", this.absFilePath);
+        return String.format("%s", this.absFilePath);
     }
 }

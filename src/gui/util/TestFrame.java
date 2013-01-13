@@ -18,7 +18,7 @@
  * Boston, MA  02110-1301, USA.
  */
 
-package util;
+package gui.util;
 
 import entity.Point;
 import java.awt.BorderLayout;

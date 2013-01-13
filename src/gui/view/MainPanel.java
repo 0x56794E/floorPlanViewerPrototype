@@ -18,7 +18,7 @@
  * Boston, MA  02110-1301, USA.
  */
 
-package view;
+package gui.view;
 
 import entity.Point;
 import java.awt.BorderLayout;
@@ -27,9 +27,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.Enumeration;
+import javax.persistence.EntityManager;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
-import util.FileGUIContainer;
+import util.DatabaseService;
+import gui.util.FileGUIContainer;
 
 /**
  * @author              Vy Thuy Nguyen
@@ -196,12 +198,45 @@ public class MainPanel extends JPanel
     @Override
     public void loadFileContent(File file)
     {
-        imagePanel = new ImagePanel(file, MainPanel.this);
-        imagePanel.repaint();
+        int createNew = JOptionPane.YES_OPTION;
+       
+        //Check db
+        if (hasDuplicate(file.getName()))
+        {
+            createNew = JOptionPane.showConfirmDialog(null, 
+                                                      "Looks like you've already saved this floor plan in the database.\nDo you want to create a new record anyways?", 
+                                                      "Proceed?", JOptionPane.YES_NO_OPTION);
+        }
         
-        ipScrollPane.setViewportView(imagePanel);
-        mainFr.pack();
-        mainFr.validate();
+        if (createNew == JOptionPane.YES_OPTION)
+        {
+            imagePanel = new ImagePanel(file, MainPanel.this);
+            imagePanel.repaint();
+
+            ipScrollPane.setViewportView(imagePanel);
+            mainFr.pack();
+            mainFr.validate();
+        }
+        else if (createNew == JOptionPane.NO_OPTION)
+        {
+            
+        }
+        
+        //If close, do nothing
+    }
+    
+    
+    /**
+     * 
+     * @param fileName
+     * @return true if a floor plan record with the same file name
+     * has already existed db
+     */
+    private boolean hasDuplicate(String fileName)
+    {
+        EntityManager em = DatabaseService.getEntityManager();
+        long count = em.createQuery("SELECT COUNT(f.id) FROM FloorPlan f WHERE f.fileName = :name", Long.class).setParameter("name", fileName).getSingleResult();
+        return (count > 0 ? true : false);
     }
     
     /**

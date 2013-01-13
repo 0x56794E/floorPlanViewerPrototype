@@ -92,4 +92,9 @@ public class PointSet
         points.remove(p);
     }
     
+    @Override
+    public String toString()
+    {
+        return String.format("%s_PointSetID:%s", getFloorPlan().toString(), getId());
+    }
 }

@@ -18,11 +18,11 @@
  * Boston, MA  02110-1301, USA.
  */
 
-package view;
+package gui.view;
 
 import java.awt.event.*;
 import javax.swing.*;
-import util.FileChooserWindow;
+import gui.util.FileChooserWindow;
 import util.ImageFileFilter;
 
 /**
@@ -38,7 +38,7 @@ public class MainFrame extends JFrame
     private JMenuItem saveToDBItem = new JMenuItem("Save to Database");
     private JMenuItem saveBothItem = new JMenuItem("Save to Both File and Database");
     private JMenuItem exportItem = new JMenuItem("Export Floor Plan to Image File...");
-    private JMenuItem showExistItem = new JMenuItem("Show Saved Floor Plan... ");
+    private JMenuItem showExistItem = new JMenuItem("Show Saved Floor Plans... ");
     
     //Help Menu
     private JMenuItem aboutItem = new JMenuItem("About");
@@ -54,6 +54,7 @@ public class MainFrame extends JFrame
         this.setDefaultCloseOperation(this.EXIT_ON_CLOSE);
         this.setSize(880, 700);
         this.setLocationRelativeTo(null);
+        this.setTitle("Floor Plan Viewer");
         
         //Set up menu
         setupMenu();
