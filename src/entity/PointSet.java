@@ -39,16 +39,16 @@ public class PointSet
     @GeneratedValue (strategy = GenerationType.AUTO)
     private long id;
     
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, 
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.PERSIST}, 
                           fetch = FetchType.LAZY, mappedBy = "pointSet")
     private List<Point> points;
     
-    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     private FloorPlan floorPlan;
     
     public PointSet()
     {
-        
+        points = new ArrayList<Point>();
     }
     
     public PointSet(FloorPlan fp)
@@ -90,6 +90,11 @@ public class PointSet
     public void removePoint(Point p)
     {
         points.remove(p);
+    }
+    
+    public void clearAllPoints()
+    {
+        points.clear();
     }
     
     @Override

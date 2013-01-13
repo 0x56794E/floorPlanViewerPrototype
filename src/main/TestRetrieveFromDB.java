@@ -20,11 +20,11 @@
 
 package main;
 
+import entity.FloorPlan;
 import entity.TestPoint;
+import gui.view.FloorPlanListPopup;
 import java.util.List;
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
-import javax.persistence.TypedQuery;
 import util.DatabaseService;
 
 /**
@@ -36,11 +36,12 @@ public class TestRetrieveFromDB
 {
     public static void main(String[] args)
     {
+        /*
         EntityManager em = DatabaseService.getEntityManager();
-        Query query = em.createQuery("SELECT COUNT(p.id) FROM TestPoint p where p.id % 2 = 0");
-        
-        System.out.println(query.getSingleResult());
-        
+        List<FloorPlan> list = em.createQuery("Select f FROM FloorPlan f WHERE f.id % 5 = 0").getResultList();
+        System.out.printf("Count = %d", list.size());
+        new FloorPlanListPopup(list);
+        * */
         
     }
 }

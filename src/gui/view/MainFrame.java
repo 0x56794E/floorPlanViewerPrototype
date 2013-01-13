@@ -20,6 +20,7 @@
 
 package gui.view;
 
+import entity.FloorPlan;
 import java.awt.event.*;
 import javax.swing.*;
 import gui.util.FileChooserWindow;
@@ -46,6 +47,7 @@ public class MainFrame extends JFrame
     
     private MainPanel mainPn;
     private JFrame floorPlanChooserFr = null;
+    
     
     public MainFrame()      
     {  

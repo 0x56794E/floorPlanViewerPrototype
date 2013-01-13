@@ -22,24 +22,20 @@ package gui.view;
 
 import util.ImagePanelMouseListener;
 import entity.Point;
+import entity.PointSet;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.HashSet;
+import java.util.List;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import gui.view.MainFrame;
 
 /**
  * @author              Vy Thuy Nguyen
@@ -88,17 +84,15 @@ public class ImagePanel extends JPanel
         
     }
 
+    
     public void exportImage()
     {
         Graphics g = icon.getImage().getGraphics();
         g.setColor(Color.RED);
-       
         
-        Point p;
-        Enumeration<Point> iter = mainPn.getMarkedPoints();
-        while (iter.hasMoreElements())
+        List<Point> points = mainPn.getCurrentPointSet().getPoints();
+        for (Point p : points)
         {
-            p = iter.nextElement();
             g.fillOval(p.getX() - 4, p.getY() - 4, 8, 8);
         }
         
@@ -121,13 +115,12 @@ public class ImagePanel extends JPanel
         g.drawImage(image, 0, 0, null);     
         g.setColor(Color.RED);
         
-        Point p;
-        Enumeration<Point> iter = mainPn.getMarkedPoints();
-        while (iter.hasMoreElements())
-        {
-            p = iter.nextElement();
+        PointSet ps = mainPn.getCurrentPointSet();
+        List<Point> points = ps.getPoints();
+        System.out.println("points count = " + points.size());
+        for (Point p : points)
             g.drawImage(pinImg, p.getX() - 12, p.getY() - 12, null);
-        }
+        
     }
     
     /**

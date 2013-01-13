@@ -20,11 +20,10 @@
 
 package entity;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import javax.persistence.*;
 
 /**
@@ -40,14 +39,10 @@ public class FloorPlan implements Serializable
     @Id
     @GeneratedValue
     private long id;
-    
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, 
+        
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.PERSIST},
                fetch = FetchType.LAZY, mappedBy = "floorPlan")
-    private List<Point> points;    
-    
-    
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE},
-               fetch = FetchType.LAZY, mappedBy = "floorPlan")
+    private List<PointSet> pointSets;
     
     /**
      * This includes the file name
@@ -62,12 +57,13 @@ public class FloorPlan implements Serializable
         
     }
     
-     public FloorPlan(String path, int x, int y)
+     public FloorPlan(File file, int x, int y)
     {
-        absFilePath = path;
+        absFilePath = file.getPath();
+        fileName = file.getName();
         originX = x;
         originY = y;
-        points = new ArrayList<Point>();
+        pointSets = new ArrayList<PointSet>();
     }
      
      public Long getId()
@@ -118,6 +114,21 @@ public class FloorPlan implements Serializable
     public void setOriginY(int y)
     {
         this.originY = y;
+    }
+    
+    public List<PointSet> getPointSets()
+    {
+        return pointSets;
+    }
+    
+    public void setPoitSets(List<PointSet> ps)
+    {
+        pointSets = ps;
+    }
+    
+    public void addPointSet(PointSet ps)
+    {
+        pointSets.add(ps);
     }
     
     @Override

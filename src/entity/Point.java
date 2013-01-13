@@ -36,11 +36,7 @@ public class Point implements Serializable
     private long id;
     
     
-    //superfluous; remove later
-    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
-    private FloorPlan floorPlan;
-    
-    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private PointSet pointSet;
     
     
@@ -88,14 +84,14 @@ public class Point implements Serializable
         this.y = y;
     }
     
-    public FloorPlan getFloorPlan()
+    public PointSet getPointSet()
     {
-        return this.floorPlan;
+        return this.pointSet;
     }
     
-    public void setFloorPlan(FloorPlan fp)
+    public void setPointSet(PointSet ps)
     {
-        this.floorPlan = fp;
+        this.pointSet = ps;
     }
     
     public String toString()
