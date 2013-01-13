@@ -139,18 +139,5 @@ public class ImagePanel extends JPanel
     {
         Point p = new Point(x, y);
         mainPn.addPoint(p);        
-    }
-    
-    /*
-    public void removePoint(Point p)
-    {
-        mainPn.removePoint(p);
-    }
-    
-    public void clearAll()
-    {
-        mainPn.clearAll();
-    }
-    */
-   
+    }    
 }

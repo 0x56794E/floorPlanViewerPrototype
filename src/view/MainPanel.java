@@ -173,6 +173,10 @@ public class MainPanel extends JPanel
         selectedPPn.add(plScrollPane, BorderLayout.CENTER);
         
         //Buttons
+        ButtonListener btnHandler = new ButtonListener();
+        removeBtn.addActionListener(btnHandler);
+        clearAllBtn.addActionListener(btnHandler);
+        
         JPanel btnPn = new JPanel();
         btnPn.add(removeBtn);
         btnPn.add(clearAllBtn);
