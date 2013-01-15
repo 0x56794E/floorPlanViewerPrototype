@@ -56,17 +56,17 @@ public class ImagePanel extends JPanel
     
     //private HashSet<Point> selectedPoints = new HashSet<Point>();
     //private ArrayList<Point> selectedPoints = new ArrayList<Point>();
-    public ImagePanel(File file, MainPanel mp)
+    public ImagePanel(File file, MainPanel mp) throws IOException
     {
-        try
-        {
+//        try
+//        {
             image = ImageIO.read(file);
             pinImg = ImageIO.read(new File("pin.png"));
-        }
-        catch (IOException exc)
-        {
-          JOptionPane.showMessageDialog(this, "File Not Found", "Error!", JOptionPane.ERROR_MESSAGE);
-        }
+//        }
+//        catch (IOException exc)
+//        {
+//          JOptionPane.showMessageDialog(this, "File Not Found", "Error!", JOptionPane.ERROR_MESSAGE);
+//        }
         
         absPath = file.getPath();
         System.out.println("path = " + absPath);
@@ -116,11 +116,13 @@ public class ImagePanel extends JPanel
         g.setColor(Color.RED);
         
         PointSet ps = mainPn.getCurrentPointSet();
-        List<Point> points = ps.getPoints();
-        System.out.println("points count = " + points.size());
-        for (Point p : points)
-            g.drawImage(pinImg, p.getX() - 12, p.getY() - 12, null);
-        
+        if (ps != null)
+        {
+            List<Point> points = ps.getPoints();
+            System.out.println("points count = " + points.size());
+            for (Point p : points)
+                g.drawImage(pinImg, p.getX() - 12, p.getY() - 12, null);
+        }
     }
     
     /**

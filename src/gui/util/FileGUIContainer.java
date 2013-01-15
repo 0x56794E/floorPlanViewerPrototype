@@ -21,6 +21,7 @@
 package gui.util;
 
 import java.io.File;
+import java.io.IOException;
 import javax.swing.JPanel;
 
 /**
@@ -30,5 +31,10 @@ import javax.swing.JPanel;
  */
 public interface FileGUIContainer
 {
-    public void loadFileContent(File file);
+    /**
+     * 
+     * @param file
+     * @throws IOException 
+     */
+    public void loadFileContent(File file) throws IOException;
 }

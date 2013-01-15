@@ -76,7 +76,7 @@ public class FloorPlan implements Serializable
         this.id = id;
     }
     
-    public String getFileFullPath()
+    public String getAbsoluteFilePath()
     {
         return absFilePath;
     }
@@ -134,6 +134,6 @@ public class FloorPlan implements Serializable
     @Override
     public String toString()
     {
-        return String.format("%s", this.absFilePath);
+        return String.format("%s; ID = %d", this.absFilePath, this.id);
     }
 }

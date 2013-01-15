@@ -20,10 +20,8 @@
 
 package main;
 
-import entity.FloorPlan;
-import entity.TestPoint;
-import gui.view.FloorPlanListPopup;
 import java.util.List;
+import entity.FloorPlan;
 import javax.persistence.EntityManager;
 import util.DatabaseService;
 
@@ -36,12 +34,15 @@ public class TestRetrieveFromDB
 {
     public static void main(String[] args)
     {
-        /*
         EntityManager em = DatabaseService.getEntityManager();
+        List<FloorPlan> fl = em.createQuery("SELECT f FROM FloorPlan f", FloorPlan.class).getResultList();
+        System.out.printf("Floor Plan Count = %d\n", fl.size());
+        /*
         List<FloorPlan> list = em.createQuery("Select f FROM FloorPlan f WHERE f.id % 5 = 0").getResultList();
         System.out.printf("Count = %d", list.size());
         new FloorPlanListPopup(list);
         * */
+        
         
     }
 }

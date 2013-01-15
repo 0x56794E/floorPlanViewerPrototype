@@ -100,6 +100,9 @@ public class PointSet
     @Override
     public String toString()
     {
-        return String.format("%s_PointSetID:%s", getFloorPlan().toString(), getId());
+        return String.format("floorPlanID = %d; abs. file path = %s; pointSetID:%s", 
+                             getFloorPlan().getId(),
+                             getFloorPlan().toString(), 
+                             getId());
     }
 }

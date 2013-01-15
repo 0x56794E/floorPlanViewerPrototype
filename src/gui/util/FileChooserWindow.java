@@ -23,8 +23,10 @@ package gui.util;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.filechooser.FileFilter;
 
@@ -81,7 +83,20 @@ public class FileChooserWindow extends JFrame
         {
             String command = e.getActionCommand();
             if (command.equals(JFileChooser.APPROVE_SELECTION))
-                fileGUIContainer.loadFileContent(fileChooser.getSelectedFile());
+            {
+                try
+                {
+                    fileGUIContainer.loadFileContent(fileChooser.getSelectedFile());
+                }
+                catch (IOException exc)
+                {
+                    JOptionPane.showMessageDialog(null, 
+                                                 "Error While Reading From File.\n Try Again!", 
+                                                 "ERROR!", JOptionPane.ERROR_MESSAGE);
+
+                }
+            
+            }
             FileChooserWindow.this.setVisible(false);
         }
     }

@@ -1,7 +1,7 @@
 /**
- * Context-Free-Grammar to Push-down Automaton Converter Copyright (C) 2012 Vy
- * Thuy Nguyen
- *
+ * Floor Plan Marker Project
+ * Copyright (C) 2013  Vy Thuy Nguyen
+ * 
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Library General Public License as published by the Free
  * Software Foundation; either version 2 of the License, or (at your option) any
@@ -27,10 +27,14 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 import java.util.Enumeration;
+import java.util.List;
 import javax.persistence.EntityManager;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import util.DatabaseService;
 
 /**
@@ -38,16 +42,19 @@ import util.DatabaseService;
  * @version 1.0 Jan 12, 2013 Last modified:
  */
 public class MainPanel extends JPanel
-        implements FileGUIContainer
+                       implements FileGUIContainer
 {
+    /**
+     * Reference to the existing floor plan list
+     * NOTE: MIGHT NOT NEED THIS
+     */
+    FloorPlanListPopup flListPopup;
 
     /**
      * Reference to the main frame
      */
     MainFrame mainFr;
-    /**
-     * ************ SELECTED POINTS section *************
-     */
+    /************** SELECTED POINTS section **************/
     /**
      * JList of points that have been marked so far.
      */
@@ -57,27 +64,33 @@ public class MainPanel extends JPanel
      * saved
      */
     private DefaultListModel<Point> pointListModel = new DefaultListModel<Point>();
+    
     /**
      * Scroll pane for pointList
      */
     private JScrollPane plScrollPane = new JScrollPane();
+    
     /**
      * Removes the selected item from pointList Also, this action removes the
      * point from the floor plan as well as a Point from the list of points to
      * be persisted
      */
     private JButton removeBtn = new JButton("Remove");
+    
     /**
      * Removes all of the items in pointList, as well as those on the floor plan
      * and those in the list of points to by persisted
      */
     private JButton clearAllBtn = new JButton("Clear All");
+    
     /**
-     * ************ end SELECTED POINTS section *************
+     * Save the list of points for the current point set and current
+     * floor plan to file.
      */
-    /**
-     * ************ EXISTING POINT SETS section *************
-     */
+    private JButton saveToFileBtn = new JButton("Save to File");
+    /************* end SELECTED POINTS section *************/
+    
+    /************* EXISTING POINT SETS section **************/
     /**
      * This is, in fact, implemented by a list. That is there can be
      * duplication.
@@ -86,38 +99,41 @@ public class MainPanel extends JPanel
      * JList of point sets that belong to the current floor plan
      */
     private JList pointSetList;
+    
     /**
      * List model for pointSetList
      */
     private DefaultListModel pointSetListModel = new DefaultListModel();
+    
     /**
      * Scroll pane for pointSetList
      */
     private JScrollPane pslScrollPane = new JScrollPane();
     private JButton newPointSetBtn = new JButton("New Set");
     private JButton savePointSetBtn = new JButton("Save");
-    /**
-     * ************ end EXISTING POINT SETS section *************
-     */
-    /**
-     * ************ FLOOR PLAN section *************
-     */
+    /************** end EXISTING POINT SETS section **************/
+    
+    /************** FLOOR PLAN section **************/
     /**
      * the Floor plan
      *
      * @see ImagePanel
      */
     private ImagePanel imagePanel;
+    
     /**
      * Scroll pane for imagePanel
      */
     private JScrollPane ipScrollPane = new JScrollPane();
+    
     /**
      * ************ end FLOOR PLAN section *************
      */
+    
     private FloorPlan currentFloorPlan;
     private PointSet currentPointSet;
-
+    EntityManager em = DatabaseService.getEntityManager();
+    
     public MainPanel(MainFrame mf)
     {
         mainFr = mf;
@@ -161,9 +177,20 @@ public class MainPanel extends JPanel
         //JList setup
         pointSetList.setLayoutOrientation(JList.VERTICAL);
         pointSetList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        pointSetList.addListSelectionListener(new ListSelectionListener() {
 
+            @Override
+            public void valueChanged(ListSelectionEvent e)
+            {
+                if (e.getValueIsAdjusting())
+                {
+                    MainPanel.this.setCurrentPointSet((PointSet)pointSetList.getSelectedValue());
+                }
+            }
+        });
+        
         pslScrollPane.setViewportView(pointSetList);
-        pslScrollPane.setPreferredSize(new Dimension(180, 130));
+        pslScrollPane.setPreferredSize(new Dimension(300, 130));
         existingPSPn.add(pslScrollPane, BorderLayout.CENTER);
 
         //Buttons
@@ -233,7 +260,7 @@ public class MainPanel extends JPanel
         pointJList.setLayoutOrientation(JList.VERTICAL);
         pointJList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         plScrollPane.setViewportView(pointJList);
-        plScrollPane.setPreferredSize(new Dimension(180, 400));
+        plScrollPane.setPreferredSize(new Dimension(300, 400));
         selectedPPn.add(plScrollPane, BorderLayout.CENTER);
 
         //Buttons
@@ -261,12 +288,24 @@ public class MainPanel extends JPanel
             }
         });
 
+        saveToFileBtn.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+                if (imagePanel != null && !pointListModel.isEmpty())
+                {
+                    saveToFile();
+                }
+            }
+        
+        });
         removeBtn.setEnabled(false);
         clearAllBtn.setEnabled(false);
+        saveToFileBtn.setEnabled(false);
 
         JPanel btnPn = new JPanel();
         btnPn.add(removeBtn);
         btnPn.add(clearAllBtn);
+        btnPn.add(saveToFileBtn);
         selectedPPn.add(btnPn, BorderLayout.SOUTH);
         leftPane.add(selectedPPn, BorderLayout.CENTER);
         /**
@@ -275,6 +314,11 @@ public class MainPanel extends JPanel
         this.add(leftPane, BorderLayout.EAST);
     }
 
+    private void saveToFile()
+    {
+        throw new UnsupportedOperationException();
+    }
+    
     private void showBlankFloorPlan()
     {
         currentPointSet = new PointSet(currentFloorPlan);
@@ -289,10 +333,6 @@ public class MainPanel extends JPanel
         em.getTransaction().begin();
         em.persist(currentPointSet);
         em.persist(currentFloorPlan);
-//        for (Point p : currentPointSet.getPoints())
-//        {
-//            em.persist(p);
-//        }
         
         em.getTransaction().commit();
         
@@ -303,7 +343,6 @@ public class MainPanel extends JPanel
     private void updatePointSetJList()
     {
         pointSetListModel.clear();
-        System.out.println("PointSetCount = " + currentFloorPlan.getPointSets().size());
         for (PointSet ps : currentFloorPlan.getPointSets())
             pointSetListModel.addElement(ps);
     }
@@ -314,12 +353,14 @@ public class MainPanel extends JPanel
     }
 
     @Override
-    public void loadFileContent(File file)
+    public void loadFileContent(File file) throws IOException
     {
         int createNew = JOptionPane.YES_OPTION;
 
-        //Check db
-        if (hasDuplicate(file.getName()))
+        //Exisitng floor plan list
+        List<FloorPlan> existingFLList = getExistingFloorPlans(file.getName());
+        
+        if (existingFLList.size() > 0)
         {
             createNew = JOptionPane.showConfirmDialog(null,
                                                       "Looks like you've already saved this floor plan in the database.\nDo you want to create a new record anyways?",
@@ -333,6 +374,7 @@ public class MainPanel extends JPanel
             currentFloorPlan.addPointSet(currentPointSet);
 
             imagePanel = new ImagePanel(file, MainPanel.this);
+            
             imagePanel.repaint();
             ipScrollPane.setViewportView(imagePanel);
             mainFr.pack();
@@ -340,16 +382,88 @@ public class MainPanel extends JPanel
         }
         else if (createNew == JOptionPane.NO_OPTION)
         {
+            //Show existing floor plans for user to choose from
+            showFloorPlanListPopup(existingFLList);
         }
 
         //If close, do nothing
     }
-
-    public void setCurrentFloorPlan(FloorPlan fp)
+    
+    /**
+     * Show a list of all floor plans in database in a popup window.
+     * User can choose a floor plan from this list
+     */
+    public void showFloorPlanListPopup()
+    {   
+        this.flListPopup = new FloorPlanListPopup(MainPanel.this);        
+    }
+    
+    /**
+     * Show a list of all floor plans in database with given name in a popup window.
+     * User can choose a floor plan from this list
+     * 
+     * @param fileName 
+     */
+    public void showFloorPlanListPopup(String fileName)
     {
-        this.currentFloorPlan = fp;
+        this.flListPopup = new FloorPlanListPopup(MainPanel.this, fileName);
     }
 
+    /**
+     * Show the given list of floor plans in a popup window.
+     * User can choose a floor plan from this list.
+     * 
+     * @param list 
+     */
+    public void showFloorPlanListPopup(List<FloorPlan> list)
+    {
+        this.flListPopup = new FloorPlanListPopup(MainPanel.this, list);
+    }
+    
+    public void setCurrentFloorPlan(FloorPlan fp) throws IOException
+    {
+        
+        this.currentFloorPlan = fp;
+        this.currentPointSet = fp.getPointSets().get(0);
+        //try
+        //{
+            imagePanel = new ImagePanel(new File(fp.getAbsoluteFilePath()), MainPanel.this);
+            
+        //}
+//        catch (IOException e)
+//        {
+//            JOptionPane.showMessageDialog(null, 
+//                                          "Error While Reading From File. The file might have been moved.\n"
+//                                          + "We found info about a file with the same name at the following path:\n"
+//                                          + fp.getAbsoluteFilePath()
+//                                          + "\nPlease check that the file is actually there.\n"
+//                                          + "If you wish to create a new record or select another floor plan, you may do so now.", 
+//                                          "ERROR!", JOptionPane.ERROR_MESSAGE);
+//            //mainFr.newFloorPlanItemClicked();
+            //this.currentFloorPlan = null;
+            //this.currentPointSet = null;
+            //return;
+            
+ //       }
+        
+        this.updatePointSetJList();
+               
+        imagePanel.repaint();
+        ipScrollPane.setViewportView(imagePanel);
+        mainFr.pack();
+        mainFr.validate();
+        
+        updateView();
+        //this.repaint();
+        //mainFr.validate();
+    }
+
+    public void setCurrentPointSet(PointSet ps)
+    {
+        this.currentPointSet = ps;
+        updateView();
+    }
+    
     /**
      *
      * @param fileName
@@ -358,11 +472,18 @@ public class MainPanel extends JPanel
      */
     private boolean hasDuplicate(String fileName)
     {
-        EntityManager em = DatabaseService.getEntityManager();
         long count = em.createQuery("SELECT COUNT(f.id) FROM FloorPlan f WHERE f.fileName = :name", Long.class).setParameter("name", fileName).getSingleResult();
         return (count > 0 ? true : false);
     }
 
+    private List<FloorPlan> getExistingFloorPlans(String fileName)
+    {
+        return em.createQuery("SELECT f FROM FloorPlan f WHERE f.fileName = :name")
+                 .setParameter("name", fileName)
+                 .getResultList();
+    }
+        
+    
     /**
      * Adds the specified point to the list and triggers repaint to mark this
      * point on the floor plan
@@ -391,7 +512,7 @@ public class MainPanel extends JPanel
     }
 
     /**
-     * Removes all points in the list and triggers repaint to remove all marks
+     * Rem6oves all points in the list and triggers repaint to remove all marks
      * from the floor plan
      */
     public void clearAll()
@@ -424,6 +545,7 @@ public class MainPanel extends JPanel
         }
 
         imagePanel.repaint();
+        mainFr.validate();
     }
 
     private void disableAllButtons()

@@ -35,10 +35,10 @@ public class MainFrame extends JFrame
 {
     //File Menu
     private JMenuItem newItem = new JMenuItem("New Floor Plan...");
-    private JMenuItem saveToFileItem = new JMenuItem("Save to File");
+    private JMenuItem saveToFileItem = new JMenuItem("Save All Point Sets to File");
     private JMenuItem saveToDBItem = new JMenuItem("Save to Database");
     private JMenuItem saveBothItem = new JMenuItem("Save to Both File and Database");
-    private JMenuItem exportItem = new JMenuItem("Export Floor Plan to Image File...");
+    private JMenuItem exportItem = new JMenuItem("Export Marked Floor Plan...");
     private JMenuItem showExistItem = new JMenuItem("Show Saved Floor Plans... ");
     
     //Help Menu
@@ -51,12 +51,8 @@ public class MainFrame extends JFrame
     
     public MainFrame()      
     {  
-        JFrame.setDefaultLookAndFeelDecorated(false);
-        this.setVisible(true);
-        this.setDefaultCloseOperation(this.EXIT_ON_CLOSE);
-        this.setSize(880, 700);
-        this.setLocationRelativeTo(null);
-        this.setTitle("Floor Plan Viewer");
+        //Init this JFrame
+        initFrame();
         
         //Set up menu
         setupMenu();
@@ -82,6 +78,69 @@ public class MainFrame extends JFrame
         pack();
     }
  
+    private void initFrame()
+    {
+        JFrame.setDefaultLookAndFeelDecorated(false);
+        this.setVisible(true);
+        this.setDefaultCloseOperation(this.EXIT_ON_CLOSE);
+        this.setSize(880, 700);
+        this.setLocationRelativeTo(null);
+        this.setTitle("Floor Plan Viewer");
+        
+        this.addWindowListener(new WindowListener(){
+
+            @Override
+            public void windowOpened(WindowEvent e)
+            {
+             //   throw new UnsupportedOperationException("Not supported yet.");
+            }
+
+            @Override
+            public void windowClosing(WindowEvent e)
+            {
+               // throw new UnsupportedOperationException("Not supported yet.");
+                JOptionPane.showMessageDialog(null, "Closing");
+                return;
+            }
+
+            @Override
+            public void windowClosed(WindowEvent e)
+            {
+                //throw new UnsupportedOperationException("Not supported yet.");
+            }
+
+            @Override
+            public void windowIconified(WindowEvent e)
+            {
+                //throw new UnsupportedOperationException("Not supported yet.");
+            }
+
+            @Override
+            public void windowDeiconified(WindowEvent e)
+            {
+                ///throw new UnsupportedOperationException("Not supported yet.");
+            }
+
+            @Override
+            public void windowActivated(WindowEvent e)
+            {
+                ///throw new UnsupportedOperationException("Not supported yet.");
+            }
+
+            @Override
+            public void windowDeactivated(WindowEvent e)
+            {
+                
+                //throw new UnsupportedOperationException("Not supported yet.");
+            }
+        });
+    }
+    
+    public void newFloorPlanItemClicked()
+    {
+        newItem.setSelected(true);
+    }
+    
     private void setupMenu()
     {
         //=======================Menu=================
@@ -97,6 +156,13 @@ public class MainFrame extends JFrame
         fileMenu.addSeparator();
         
         showExistItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
+        showExistItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                mainPn.showFloorPlanListPopup();
+            }
+        });
         fileMenu.add(showExistItem);
         fileMenu.addSeparator();
         
@@ -104,6 +170,7 @@ public class MainFrame extends JFrame
         fileMenu.add(saveToFileItem);
         
         saveToDBItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, ActionEvent.CTRL_MASK));
+        //actionlistner 
         fileMenu.add(saveToDBItem);
         
         saveBothItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, ActionEvent.CTRL_MASK));
@@ -128,7 +195,7 @@ public class MainFrame extends JFrame
     
     private void updateImageCanvasSize()
     {
-        mainPn.updateImagePanelScrollPaneSize(this.getWidth() - 300, this.getHeight() - 100);
+        mainPn.updateImagePanelScrollPaneSize(this.getWidth() - 360, this.getHeight() - 100);
     }
     
     private class MenuListener implements ActionListener
