@@ -49,9 +49,10 @@ public class ImagePanelMouseListener implements MouseMotionListener, MouseListen
     public void mouseClicked(MouseEvent e)
     {
         //throw new UnsupportedOperationException("Not supported yet.");
-        ImagePanel dp = (ImagePanel)e.getSource();
-        dp.addPoint(e.getX(), e.getY());
+        ImagePanel ip = (ImagePanel)e.getSource();
+        ip.addPoint(e.getX(), e.getY());
         System.out.println("Current pos: (" + e.getX() + ", " + e.getY() + ")");
+        System.out.println("Tile index: " + ip.getMousePosition());
     }
 
     @Override

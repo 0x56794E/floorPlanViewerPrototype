@@ -20,10 +20,11 @@
 
 package gui.view;
 
-import entity.FloorPlan;
 import java.awt.event.*;
 import javax.swing.*;
 import gui.util.FileChooserWindow;
+import java.io.IOException;
+import util.FileService;
 import util.ImageFileFilter;
 
 /**
@@ -35,7 +36,7 @@ public class MainFrame extends JFrame
 {
     //File Menu
     private JMenuItem newItem = new JMenuItem("New Floor Plan...");
-    private JMenuItem saveToFileItem = new JMenuItem("Save All Point Sets to File");
+    private JMenuItem saveToFileItem = new JMenuItem("Save Current Point Set to File");
     private JMenuItem saveToDBItem = new JMenuItem("Save to Database");
     private JMenuItem saveBothItem = new JMenuItem("Save to Both File and Database");
     private JMenuItem exportItem = new JMenuItem("Export Marked Floor Plan...");
@@ -167,6 +168,21 @@ public class MainFrame extends JFrame
         fileMenu.addSeparator();
         
         saveToFileItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, ActionEvent.CTRL_MASK));
+        saveToFileItem.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                try
+                {
+                    FileService.savePointSetToFile(mainPn.getCurrentPointSet());
+                }
+                catch (IOException exc)
+                {
+                    JOptionPane.showMessageDialog(null, "Error writing to file", "ERROR", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
         fileMenu.add(saveToFileItem);
         
         saveToDBItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, ActionEvent.CTRL_MASK));
@@ -177,6 +193,26 @@ public class MainFrame extends JFrame
         fileMenu.add(saveBothItem);
         fileMenu.addSeparator();
         
+        
+        exportItem.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                if (mainPn.hasImage())
+                {
+                    mainPn.exportImage();
+                }
+                else
+                {
+                    JOptionPane.showMessageDialog(null,
+                                                  "Please load a floor plan and mark it first", 
+                                                  "No Image to Export",
+                                                  JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        
+        });
         exportItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.CTRL_MASK));
         fileMenu.add(exportItem);
         

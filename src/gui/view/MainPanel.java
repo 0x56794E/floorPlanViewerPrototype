@@ -28,6 +28,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Enumeration;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -36,6 +38,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import util.DatabaseService;
+import util.FileService;
 
 /**
  * @author Vy Thuy Nguyen
@@ -155,8 +158,10 @@ public class MainPanel extends JPanel
         JPanel sub = new JPanel();
         TitledBorder b = new TitledBorder("Floor Plan");
         sub.setBorder(b);
-        sub.add(ipScrollPane);
-
+        sub.setLayout(new BorderLayout());
+        sub.add(ipScrollPane, BorderLayout.CENTER);
+        JPanel btnSub = new JPanel();
+        
         this.add(sub, BorderLayout.CENTER);
         /**
          * * end Image Canvas **
@@ -346,12 +351,42 @@ public class MainPanel extends JPanel
         for (PointSet ps : currentFloorPlan.getPointSets())
             pointSetListModel.addElement(ps);
     }
+    
     public void updateImagePanelScrollPaneSize(int width, int height)
     {
         ipScrollPane.setSize(new Dimension(width, height));
         ipScrollPane.setPreferredSize(new Dimension(width, height));
     }
 
+    public boolean hasImage()
+    {
+        return imagePanel != null;
+    }
+    
+    public boolean exportImage()
+    {
+        if (hasImage())
+        {
+            try
+            {
+                //imagePanel.exportCurrentFloorPlan();
+                FileService.saveFloorPlanToFile(currentFloorPlan, currentPointSet);
+            }
+            catch (IOException exc)
+            {
+               JOptionPane.showMessageDialog(null, 
+                                             "Error While Writing to File. Try Again", 
+                                             "ERROR!", 
+                                             JOptionPane.ERROR_MESSAGE);
+               return false;
+            }
+            
+            return true;
+        }
+        else
+            return false;
+    }
+    
     @Override
     public void loadFileContent(File file) throws IOException
     {
@@ -560,4 +595,5 @@ public class MainPanel extends JPanel
     {
         return currentPointSet;
     }
+
 }

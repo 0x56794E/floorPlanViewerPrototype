@@ -58,18 +58,10 @@ public class ImagePanel extends JPanel
     //private ArrayList<Point> selectedPoints = new ArrayList<Point>();
     public ImagePanel(File file, MainPanel mp) throws IOException
     {
-//        try
-//        {
-            image = ImageIO.read(file);
-            pinImg = ImageIO.read(new File("pin.png"));
-//        }
-//        catch (IOException exc)
-//        {
-//          JOptionPane.showMessageDialog(this, "File Not Found", "Error!", JOptionPane.ERROR_MESSAGE);
-//        }
+        image = ImageIO.read(file);
+        pinImg = ImageIO.read(new File("resources\\pin.png"));
         
         absPath = file.getPath();
-        System.out.println("path = " + absPath);
         fileName = file.getName();
         mainPn = mp;
         
@@ -79,36 +71,50 @@ public class ImagePanel extends JPanel
         this.addMouseMotionListener(mouseListener);
         
         icon = new ImageIcon(image);
-        //System.out.println("img size = " + icon.getIconWidth());
-        this.setPreferredSize(new Dimension(icon.getIconWidth(), icon.getIconHeight()));
-        
+        this.setPreferredSize(new Dimension(icon.getIconWidth(), icon.getIconHeight()));        
     }
 
     
-    public void exportImage()
+    /**
+     * Set up directories under the current working directory, which have the 
+     * following format:
+     * <floorPlanName>-<floorPlanID>\
+     * 
+     * @param floorPlanFileName
+     * @param floorPlanID
+     * @throws IOException 
+     */
+    private void setupDirectory(String floorPlanFileName, long floorPlanID) throws IOException
     {
-        Graphics g = icon.getImage().getGraphics();
-        g.setColor(Color.RED);
+        new File(floorPlanFileName + "-" + floorPlanID).mkdirs();
         
-        List<Point> points = mainPn.getCurrentPointSet().getPoints();
-        for (Point p : points)
-        {
-            g.fillOval(p.getX() - 4, p.getY() - 4, 8, 8);
-        }
-        
-        try
-        {
-            File outputFile = new File("modified-" + fileName);
-            ImageIO.write(image, "jpg", outputFile);
-            JOptionPane.showMessageDialog(null, "Successfully Exported Image", "Done!", JOptionPane.INFORMATION_MESSAGE);
-
-        }
-        catch(IOException exc)
-        {
-            exc.printStackTrace();
-        }
+        //Path p = new Path("output\\" + floorPlanFileName); //Files.createDirectory("output\\" + floorPlanFileName);
     }
-    
+//    
+//    public void exportCurrentFloorPlan() throws IOException
+//    {
+//        Graphics g = icon.getImage().getGraphics();
+//        g.setColor(Color.RED);
+//        PointSet ps = mainPn.getCurrentPointSet();
+//        List<Point> points = ps.getPoints();
+//        
+//        for (Point p : points)
+//        {
+//            g.fillOval(p.getX() - 4, p.getY() - 4, 8, 8);
+//        }
+//        
+//        File oFile = new File("output\\" + fileName + "-PointSetID_" + ps.getId() + ".png");
+//        ImageIO.write(image, "png", oFile);
+//        //System.err.printf("User's dir %s", System.getProperty("user.dir"));
+//        JOptionPane.showMessageDialog(null, 
+//                                        "Successfully Exported Image to the Following File:\n"
+//                                        + oFile.getAbsolutePath(), 
+//                                        "Done!", 
+//                                        JOptionPane.INFORMATION_MESSAGE);
+//
+//
+//    }
+//    
     public void paintComponent(Graphics g) 
     {
         super.paintComponent(g);
