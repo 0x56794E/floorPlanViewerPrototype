@@ -1,6 +1,6 @@
 /**
- * Context-Free-Grammar to Push-down Automaton Converter
- * Copyright (C) 2012  Vy Thuy Nguyen
+ * Floor Plan Marker Project
+ * Copyright (C) 2013  Vy Thuy Nguyen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public

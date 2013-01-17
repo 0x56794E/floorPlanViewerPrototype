@@ -124,6 +124,12 @@ public class MainPanel extends JPanel
      */
     private ImagePanel imagePanel;
     
+    private JButton startAnnotModeBtn = new JButton ("Start marking mode");
+    
+    private JButton saveAnnotBtn = new JButton("Save");
+    
+    private JButton cancelAnnotBtn = new JButton("Cancel");
+    
     /**
      * Scroll pane for imagePanel
      */
@@ -135,7 +141,7 @@ public class MainPanel extends JPanel
     
     private FloorPlan currentFloorPlan;
     private PointSet currentPointSet;
-    EntityManager em = DatabaseService.getEntityManager();
+    private EntityManager em = DatabaseService.getEntityManager();
     
     public MainPanel(MainFrame mf)
     {
@@ -152,27 +158,44 @@ public class MainPanel extends JPanel
         this.pointSetList = new JList(pointSetListModel);
 
         //================ Render Components ================
-        /**
-         * * Image Canvas **
-         */
+        /*** Image Canvas ***/
         JPanel sub = new JPanel();
         TitledBorder b = new TitledBorder("Floor Plan");
         sub.setBorder(b);
         sub.setLayout(new BorderLayout());
         sub.add(ipScrollPane, BorderLayout.CENTER);
+        
         JPanel btnSub = new JPanel();
+        btnSub.add(startAnnotModeBtn);
+        btnSub.add(saveAnnotBtn);
+        btnSub.add(cancelAnnotBtn);
+        sub.add(btnSub, BorderLayout.SOUTH);
         
         this.add(sub, BorderLayout.CENTER);
-        /**
-         * * end Image Canvas **
-         */
+        
+        //Annot. btns action listener
+        startAnnotModeBtn.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                //Ask for saving the currrent point set
+                //TODO:
+                
+                //Show blank floor plan
+                showBlankFloorPlan();
+                disableAllButtons();
+            }
+        });
+        
+        
+        /*** end Image Canvas ***/
+        
         //===== Left Pane ====
         JPanel leftPane = new JPanel();
         leftPane.setLayout(new BorderLayout());
 
-        /**
-         * * Existing Point Sets **
-         */
+        /*** Existing Point Sets ***/
         //Top-level pane
         JPanel existingPSPn = new JPanel();
         existingPSPn.setLayout(new BorderLayout());
@@ -332,6 +355,11 @@ public class MainPanel extends JPanel
         updateView();
     }
 
+    private void showBlankFloorPlanForAnnot()
+    {
+        
+    }
+    
     private void savePointSet()
     {
         EntityManager em = DatabaseService.getEntityManager();
@@ -356,6 +384,9 @@ public class MainPanel extends JPanel
     {
         ipScrollPane.setSize(new Dimension(width, height));
         ipScrollPane.setPreferredSize(new Dimension(width, height));
+        
+        if (imagePanel != null)
+            ipScrollPane.setMaximumSize(imagePanel.getPaddedImageSize());
     }
 
     public boolean hasImage()
@@ -404,16 +435,12 @@ public class MainPanel extends JPanel
 
         if (createNew == JOptionPane.YES_OPTION)
         {
-            currentFloorPlan = new FloorPlan(file, 0, 0);
+            currentFloorPlan = new FloorPlan(file, 0, 0, imagePanel.getImageWidth(), imagePanel.getImageHeight());
             currentPointSet = new PointSet(currentFloorPlan);
             currentFloorPlan.addPointSet(currentPointSet);
-
             imagePanel = new ImagePanel(file, MainPanel.this);
-            
-            imagePanel.repaint();
             ipScrollPane.setViewportView(imagePanel);
-            mainFr.pack();
-            mainFr.validate();
+            updateView();
         }
         else if (createNew == JOptionPane.NO_OPTION)
         {
@@ -460,26 +487,8 @@ public class MainPanel extends JPanel
         
         this.currentFloorPlan = fp;
         this.currentPointSet = fp.getPointSets().get(0);
-        //try
-        //{
-            imagePanel = new ImagePanel(new File(fp.getAbsoluteFilePath()), MainPanel.this);
-            
-        //}
-//        catch (IOException e)
-//        {
-//            JOptionPane.showMessageDialog(null, 
-//                                          "Error While Reading From File. The file might have been moved.\n"
-//                                          + "We found info about a file with the same name at the following path:\n"
-//                                          + fp.getAbsoluteFilePath()
-//                                          + "\nPlease check that the file is actually there.\n"
-//                                          + "If you wish to create a new record or select another floor plan, you may do so now.", 
-//                                          "ERROR!", JOptionPane.ERROR_MESSAGE);
-//            //mainFr.newFloorPlanItemClicked();
-            //this.currentFloorPlan = null;
-            //this.currentPointSet = null;
-            //return;
-            
- //       }
+        
+        imagePanel = new ImagePanel(new File(fp.getAbsoluteFilePath()), MainPanel.this);
         
         this.updatePointSetJList();
                
@@ -579,6 +588,7 @@ public class MainPanel extends JPanel
             disableAllButtons();
         }
 
+        ipScrollPane.setMaximumSize(imagePanel.getPaddedImageSize());
         imagePanel.repaint();
         mainFr.validate();
     }
@@ -594,6 +604,11 @@ public class MainPanel extends JPanel
     public PointSet getCurrentPointSet()
     {
         return currentPointSet;
+    }
+
+    void disableCell(int x, int y)
+    {
+        currentFloorPlan.getAnnotFloorPlan().disableCell(x, y);
     }
 
 }

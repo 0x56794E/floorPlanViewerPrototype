@@ -231,7 +231,7 @@ public class MainFrame extends JFrame
     
     private void updateImageCanvasSize()
     {
-        mainPn.updateImagePanelScrollPaneSize(this.getWidth() - 360, this.getHeight() - 100);
+        mainPn.updateImagePanelScrollPaneSize(this.getWidth() - 350, this.getHeight() - 160);
     }
     
     private class MenuListener implements ActionListener

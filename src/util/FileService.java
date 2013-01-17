@@ -44,7 +44,6 @@ public class FileService
 {
     public static void savePointSetToFile(PointSet ps) throws IOException
     {
-     // Create file 
         FileWriter fstream = new FileWriter(ps.getFloorPlan().getFileName() + "-pointSetID_" + ps.getId() + ".txt");
         BufferedWriter out = new BufferedWriter(fstream);
         
@@ -72,7 +71,7 @@ public class FileService
     }
     
     /**
-     * Save a copy of the floor plan with all the points in ps in it.
+     * Save a copy of the floor plan with all the points in ps on it.
      * 
      * @param fp
      * @param ps

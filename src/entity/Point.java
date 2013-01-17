@@ -39,7 +39,6 @@ public class Point implements Serializable
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private PointSet pointSet;
     
-    
     private int x; //relative to the origin
     private int y;
 

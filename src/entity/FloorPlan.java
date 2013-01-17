@@ -44,6 +44,11 @@ public class FloorPlan implements Serializable
                fetch = FetchType.LAZY, mappedBy = "floorPlan")
     private List<PointSet> pointSets;
     
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.PERSIST},
+               fetch = FetchType.EAGER, mappedBy = "floorPlan")
+    private AnnotFloorPlan annotFloorPlan;
+    
+    
     /**
      * This includes the file name
      */
@@ -51,20 +56,33 @@ public class FloorPlan implements Serializable
     private String fileName;
     private int originX;
     private int originY;
+    private long width;
+    private long height;
+    
     
     public FloorPlan()
     {
+        pointSets = new ArrayList<PointSet>();
+        annotFloorPlan = new AnnotFloorPlan(this);
         
     }
     
-     public FloorPlan(File file, int x, int y)
+     public FloorPlan(File file, int x, int y, long width, long height)
     {
         absFilePath = file.getPath();
         fileName = file.getName();
         originX = x;
         originY = y;
+        this.width = width;
+        this.height = height;
         pointSets = new ArrayList<PointSet>();
+        annotFloorPlan = new AnnotFloorPlan(this);
     }
+     
+     public AnnotFloorPlan getAnnotFloorPlan()
+     {
+         return annotFloorPlan;
+     }
      
      public Long getId()
     {

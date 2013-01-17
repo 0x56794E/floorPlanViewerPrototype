@@ -54,8 +54,6 @@ public class ImagePanel extends JPanel
     
     private MainPanel mainPn;
     
-    //private HashSet<Point> selectedPoints = new HashSet<Point>();
-    //private ArrayList<Point> selectedPoints = new ArrayList<Point>();
     public ImagePanel(File file, MainPanel mp) throws IOException
     {
         image = ImageIO.read(file);
@@ -75,46 +73,6 @@ public class ImagePanel extends JPanel
     }
 
     
-    /**
-     * Set up directories under the current working directory, which have the 
-     * following format:
-     * <floorPlanName>-<floorPlanID>\
-     * 
-     * @param floorPlanFileName
-     * @param floorPlanID
-     * @throws IOException 
-     */
-    private void setupDirectory(String floorPlanFileName, long floorPlanID) throws IOException
-    {
-        new File(floorPlanFileName + "-" + floorPlanID).mkdirs();
-        
-        //Path p = new Path("output\\" + floorPlanFileName); //Files.createDirectory("output\\" + floorPlanFileName);
-    }
-//    
-//    public void exportCurrentFloorPlan() throws IOException
-//    {
-//        Graphics g = icon.getImage().getGraphics();
-//        g.setColor(Color.RED);
-//        PointSet ps = mainPn.getCurrentPointSet();
-//        List<Point> points = ps.getPoints();
-//        
-//        for (Point p : points)
-//        {
-//            g.fillOval(p.getX() - 4, p.getY() - 4, 8, 8);
-//        }
-//        
-//        File oFile = new File("output\\" + fileName + "-PointSetID_" + ps.getId() + ".png");
-//        ImageIO.write(image, "png", oFile);
-//        //System.err.printf("User's dir %s", System.getProperty("user.dir"));
-//        JOptionPane.showMessageDialog(null, 
-//                                        "Successfully Exported Image to the Following File:\n"
-//                                        + oFile.getAbsolutePath(), 
-//                                        "Done!", 
-//                                        JOptionPane.INFORMATION_MESSAGE);
-//
-//
-//    }
-//    
     public void paintComponent(Graphics g) 
     {
         super.paintComponent(g);
@@ -140,5 +98,34 @@ public class ImagePanel extends JPanel
     {
         Point p = new Point(x, y);
         mainPn.addPoint(p);        
-    }    
+    }
+    
+    /**
+     * 
+     * @return 
+     */
+    public Dimension getPaddedImageSize()
+    {
+        return new Dimension(image.getWidth() + 10, image.getHeight() + 10);
+    }
+    
+    public long getImageWidth()
+    {
+        return image.getWidth();
+    }
+    
+    public long getImageHeight()
+    {
+        return image.getHeight();
+    }
+    
+    /**
+     * 
+     * @param x the x-coor
+     * @param y the y-coor
+     */
+    public void disableCell(int x, int y)
+    {
+        mainPn.disableCell(x, y);
+    }
 }
