@@ -45,6 +45,11 @@ public class TabbedPanel extends JTabbedPane
     //Get Direction Panel
     GetDirectionPanel directionPn;
     
+    public AnnotPanel getAnnotPn()
+    {
+        return annotPn;
+    }
+    
     public TabbedPanel(MainFrame mf)
     {   
         mainFr = mf;
@@ -65,8 +70,8 @@ public class TabbedPanel extends JTabbedPane
         
         //Sub tabbed pane containing annotPn and directionPn
         JTabbedPane subTabbedPane = new JTabbedPane(JTabbedPane.BOTTOM);
-        subTabbedPane.addTab("Marking Dead Cells", annotPn);
-        subTabbedPane.addTab("Get Direction", directionPn);
+        subTabbedPane.addTab("Mark Dead Cells", annotPn);
+        subTabbedPane.addTab("Mark Locations", directionPn);
         this.addTab("Direction", subTabbedPane);
     }
 

@@ -35,6 +35,7 @@ import javax.swing.border.TitledBorder;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
 import java.util.List;
+import util.DeadCell;
 
 /**
  * @author              Vy Thuy Nguyen
@@ -148,6 +149,10 @@ public class GetDirectionPanel extends JPanel
     @Override
     public void doPaintComponent(Graphics g, BufferedImage img)
     {
+        //Paint wall
+        for (DeadCell dc : mainFr.mainContent.getAnnotPn().deadCells)
+            g.fillRect(dc.getMinX(), dc.getMinY(), dc.getWidth(), dc.getHeight());   
+        
         //Paint from and to pins
         if (x1 > 0 && y1 > 0)
         {
