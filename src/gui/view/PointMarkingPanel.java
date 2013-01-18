@@ -41,7 +41,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import util.DatabaseService;
-import util.DeadCell;
+import entity.DeadCell;
 import util.FileService;
 
 /**

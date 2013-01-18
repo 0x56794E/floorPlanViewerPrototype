@@ -23,7 +23,7 @@ package gui.util;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.Observable;
-import util.DeadCell;
+import entity.DeadCell;
 
 /**
  * @author              Vy Thuy Nguyen

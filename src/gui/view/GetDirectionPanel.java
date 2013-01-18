@@ -35,7 +35,7 @@ import javax.swing.border.TitledBorder;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
 import java.util.List;
-import util.DeadCell;
+import entity.DeadCell;
 
 /**
  * @author              Vy Thuy Nguyen
@@ -180,15 +180,18 @@ public class GetDirectionPanel extends JPanel
             SimpleGraph graph = afl.getGraph();
            List<DefaultEdge> edges = afl.getShortestPath(x1, y1, x2, y2);
 
+           int halfW = afl.getUnitW() / 2;
+           int halfH = afl.getUnitH() / 2;
+           
             for (DefaultEdge e : edges)
             {
                 Cell source = (Cell)graph.getEdgeSource(e);
                 Cell target = (Cell)graph.getEdgeTarget(e);
 
-                g2.drawLine(source.getCol() * afl.getUnitW(),
-                            source.getRow() * afl.getUnitH(),
-                            target.getCol() * afl.getUnitW(), 
-                            target.getRow() * afl.getUnitH());
+                g2.drawLine(source.getCol() * afl.getUnitW() + halfW,
+                            source.getRow() * afl.getUnitH() + halfH,
+                            target.getCol() * afl.getUnitW() + halfW, 
+                            target.getRow() * afl.getUnitH() + halfH);
             }
         }
     }

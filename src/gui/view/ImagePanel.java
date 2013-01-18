@@ -40,7 +40,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
-import util.DeadCell;
+import entity.DeadCell;
 
 /**
  * @author              Vy Thuy Nguyen

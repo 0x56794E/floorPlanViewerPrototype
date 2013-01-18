@@ -28,7 +28,6 @@ import javax.persistence.*;
 import org.jgrapht.alg.DijkstraShortestPath;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
-import util.DeadCell;
 
 /**
  * @author              Vy Thuy Nguyen
@@ -289,6 +288,7 @@ public class AnnotFloorPlan implements Serializable
         //Color all pixels within this cell
         dc.setMinX(minX * unitW);
         dc.setMinY(minY * unitH);
+   
         dc.setWidth(unitW);
         dc.setHeight(unitH);
     }

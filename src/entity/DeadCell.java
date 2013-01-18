@@ -18,7 +18,7 @@
  * Boston, MA  02110-1301, USA.
  */
 
-package util;
+package entity;
 
 /**
  * @author              Vy Thuy Nguyen
@@ -29,6 +29,7 @@ public class DeadCell
 {
     int minX;
     int minY;
+    
     int width;
     int height;
 

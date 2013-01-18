@@ -36,7 +36,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import util.DeadCell;
+import entity.DeadCell;
 
 /**
  * @author              Vy Thuy Nguyen
@@ -52,7 +52,7 @@ public class AnnotPanel extends JPanel
     
     boolean inMarkingMode;
     JButton markEraseBtn;
-    
+    JButton saveDeadCellBtn = new JButton("Save");
     
     ArrayList<DeadCell> deadCells = new ArrayList<DeadCell>();
     private FloorPlan currentFloorPlan;
@@ -77,6 +77,14 @@ public class AnnotPanel extends JPanel
         
         });
         
+        saveDeadCellBtn.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+        });
         
         //Render components
         this.setLayout(new BorderLayout());
@@ -84,6 +92,7 @@ public class AnnotPanel extends JPanel
         
         JPanel btnPn = new JPanel();
         btnPn.add(markEraseBtn);
+        btnPn.add(saveDeadCellBtn);
         this.add(btnPn, BorderLayout.SOUTH);
     }
 
