@@ -56,18 +56,18 @@ public class FloorPlan implements Serializable
     private String fileName;
     private int originX;
     private int originY;
-    private long width;
-    private long height;
+    private int width;
+    private int height;
     
     
     public FloorPlan()
     {
         pointSets = new ArrayList<PointSet>();
-        annotFloorPlan = new AnnotFloorPlan(this);
+        //annotFloorPlan = new AnnotFloorPlan(this);
         
     }
     
-     public FloorPlan(File file, int x, int y, long width, long height)
+     public FloorPlan(File file, int x, int y, int width, int height)
     {
         absFilePath = file.getPath();
         fileName = file.getName();
@@ -78,6 +78,16 @@ public class FloorPlan implements Serializable
         pointSets = new ArrayList<PointSet>();
         annotFloorPlan = new AnnotFloorPlan(this);
     }
+     
+     public int getWidth()
+     {
+         return width;
+     }
+     
+     public int getHeight()
+     {
+         return height;
+     }
      
      public AnnotFloorPlan getAnnotFloorPlan()
      {

@@ -21,10 +21,14 @@
 package entity;
 
 import java.io.Serializable;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import javax.persistence.*;
+import org.jgrapht.alg.DijkstraShortestPath;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
+import util.DeadCell;
 
 /**
  * @author              Vy Thuy Nguyen
@@ -42,142 +46,271 @@ public class AnnotFloorPlan implements Serializable
     private FloorPlan floorPlan;
     
     //Each cell accounts for 1% of the width and the height
-    private final int ratio = 1; //percent in respect to actual length
+    private final int ratio = 2; //percent in respect to actual length
     int unitW;
     int unitH;
+    int rowCount;
+    int colCount;
     
     private SimpleGraph g;
-    private Cell[][] cellContainer = new Cell[101][101];
+    private Cell[][] cellContainer;
+    
+    
+    public int getUnitW()
+    {
+        return unitW;
+    }
+    
+    public int getUnitH()
+    {
+        return unitH;
+    }
+    
+    public SimpleGraph getGraph()
+    {
+        return g;
+    }
     
     @SuppressWarnings("unchecked")
     public AnnotFloorPlan()
     {
         floorPlan = new FloorPlan();
         
-        //cellContainer.iterator().
-        
-        //Init the graph
-        DefaultEdge e = new DefaultEdge();
-        
         int width = 1200;
         int height = 1000;
         unitW = width * ratio / 100;
         unitH = height * ratio / 100;
-        int dUnitW = 2 * unitW;
-        int dUnitH = 2 * unitH;
-        
-        g = new SimpleGraph(e.getClass());
-       
-        for (int x = 0; x <= width; x += dUnitW)
-            
-            for (int y = 0; y <= height; y += dUnitH)
-            {
-                //Create a node
-                Cell c = new Cell(x, y);
-                g.addVertex(c);
-                
-                //Add vertices
-                //North
-                if (y > 0)
-                {
-                    Cell northC = new Cell(x, y - unitH);
-                    g.addVertex(northC);
-                    g.addEdge(c, northC);
-                
-                
-                    //NE
-                    if (x < width)
-                    {
-                        Cell neC = new Cell(x + unitW, y - unitH);
-                        g.addVertex(neC);
-                        g.addEdge(c, neC);
-                    }
-                }
-                
-                //East
-                if (x < width)
-                {
-                    Cell eastC = new Cell(x + unitH, y);
-                    g.addVertex(eastC);
-                    g.addEdge(c, eastC);
-                    
-                    //SE
-                    if (y < height)
-                    {
-                        Cell seC = new Cell(x + unitH, y + unitH);
-                        g.addVertex(seC);
-                        g.addEdge(c, seC);
-                    }
-                }
-                
-                //South
-                if (y < height)
-                {
-                    Cell southC = new Cell(x, y + unitH);
-                    g.addVertex(southC);
-                    g.addEdge(c, southC);
-                    
-                    //SW
-                    if (x > 0)
-                    {
-                        Cell swC = new Cell(x - unitW, y + unitH);
-                        g.addVertex(swC);
-                        g.addEdge(c, swC);
-                    }
-                }
-                
-            
-                //West
-                if (x > 0)
-                {
-                    Cell westC = new Cell(x - unitW, y);
-                    g.addVertex(westC);
-                    g.addEdge(c, westC);
-                    
-                    //NW
-                    if (y > 0)
-                    {
-                        Cell nwC = new Cell(x - unitW, y - unitH);
-                        g.addVertex(nwC);
-                        g.addEdge(c, nwC);
-                    }
-                }                
-            }
+        rowCount = height / unitH + 1;
+        colCount = width / unitW + 1;
+         cellContainer = new Cell[rowCount][colCount];
+         
+        //Init the graph
+        g = new SimpleGraph(DefaultEdge.class);
+        generateVertices();
+        generateEdges();
     }
     
+    public AnnotFloorPlan(FloorPlan fp)
+    {
+        floorPlan = fp;        
+        
+        unitW = fp.getWidth() * ratio / 100;
+        unitH = fp.getHeight() * ratio / 100;
+        rowCount = fp.getHeight() / unitH + 1;
+        colCount = fp.getWidth() / unitW + 1;
+        cellContainer = new Cell[rowCount][colCount];
+        
+        //init the graph
+        g = new SimpleGraph(DefaultEdge.class);
+        generateVertices();
+        generateEdges();
+    }
     
+    public List<DefaultEdge> getShortestPath(int x1, int y1, int x2, int y2)
+    {
+        //int x1 = 158, y1 = 109, x2 = 108, y2 = 489;
+        int row1 = y1 / unitH, col1 = x1 / unitW, row2 = y2 / unitH, col2 = x2 / unitW;
+        
+        System.out.printf("finding shortest pathh from (%d, %d) to (%d, %d) (of cell[%d, %d] to cell[%d, %d]\n", x1, y1, x2, y2, row1, col1, row2, col2);
+             
+        
+        DijkstraShortestPath d = new DijkstraShortestPath(g, cellContainer[row1][col1], cellContainer[row2][col2]);
+        return d.getPathEdgeList();
+        
+        
+    }
     
     private void generateVertices()
     {
-        for (int row = 0; row <= 101; ++row)
-            for (int col = 0; col <= 101; ++col)
+        for (int row = 0; row < rowCount; ++row)
+            for (int col = 0; col < colCount; ++col)
             {
-                cellContainer[row][col] = new Cell(col, row);
+                cellContainer[row][col] = new Cell(row, col);
                 g.addVertex(cellContainer[row][col]);
             }
     }
     
     private void generateEdges()
     {
-        
+        for (int row = 0; row < rowCount; ++row)
+            for (int col = 0; col < colCount; ++col)
+            {
+                System.out.println("generating edges for node at [" + row + ", " + col+ "]...");
+                //North
+                if (row > 0)
+                {
+                    g.addEdge(cellContainer[row][col], cellContainer[row - 1][col]);
+                    
+                    //NE
+                    if (col < colCount - 2)
+                        g.addEdge(cellContainer[row][col], cellContainer[row - 1][col + 1]);
+                }
+                
+                //East
+                if (col < colCount - 2)
+                {
+                    g.addEdge(cellContainer[row][col], cellContainer[row][col + 1]);
+                    
+                    //SE
+                    if (row < rowCount - 2)
+                        g.addEdge(cellContainer[row][col], cellContainer[row + 1][col + 1]);
+                }
+                
+                //South
+                if (row < rowCount - 2)
+                {
+                    g.addEdge(cellContainer[row][col], cellContainer[row + 1][col]);
+                    
+                    //SW
+                    if (col > 0)
+                        g.addEdge(cellContainer[row][col], cellContainer[row + 1][col - 1]);
+                }
+                
+                //West
+                if (col > 0)
+                {
+                    g.addEdge(cellContainer[row][col], cellContainer[row][col - 1]);
+                    
+                    //NW
+                    if (row > 0)
+                        g.addEdge(cellContainer[row][col], cellContainer[row - 1][col - 1]);
+                }
+            }
     }
     
-    public AnnotFloorPlan(FloorPlan fp)
+
+    private List<Cell> getNeighbors(int row, int col)
     {
-        floorPlan = fp;        
+        List<Cell> neighbors = new ArrayList<Cell>();
+        
+        //North
+        try
+        {
+            neighbors.add(cellContainer[row - 1][col]);
+        }
+        catch(Exception e)
+        {
+            System.out.println("No north neighbor");
+        }
+        
+        //Northeast
+        try
+        {
+            neighbors.add(cellContainer[row - 1][col + 1]);
+        }
+        catch(Exception e)
+        {
+            System.out.println("No northeast neighbor");
+        }
+        
+        //East
+        try
+        {
+            neighbors.add(cellContainer[row][col + 1]);
+        }
+        catch(Exception e)
+        {
+            System.out.println("No east neighbor");
+        }
+        
+        //SE
+        try
+        {
+            neighbors.add(cellContainer[row + 1][col + 1]);
+        }
+        catch(Exception e)
+        {
+            System.out.println("No southeast neighbor");
+        }
+        
+        //South
+        try
+        {
+            neighbors.add(cellContainer[row + 1][col]);
+        }
+        catch(Exception e)
+        {
+            System.out.println("No south neighbor");
+        }
+        
+        
+        //SW
+        try
+        {
+            neighbors.add(cellContainer[row + 1][col - 1]);
+        }
+        catch(Exception e)
+        {
+            System.out.println("No sw neighbor");
+        }
+        
+        //West
+        try
+        {
+            neighbors.add(cellContainer[row][col - 1]);
+        }
+        catch(Exception e)
+        {
+            System.out.println("No west neighbor");
+        }
+        
+        //Northweast
+        try
+        {
+            neighbors.add(cellContainer[row - 1][col - 1]);
+        }
+        catch(Exception e)
+        {
+            System.out.println("No north west neighbor");
+        }
+        
+        return neighbors;
+        
     }
     
     /**
      * 
      * @param x the x-coor
      * @param y the y-coor
+     * @param dc 
      */
-    public void disableCell(int x, int y)
+    public void disableCell(int x, int y, DeadCell dc)
     {
-        Cell c = cellContainer[x / unitW][y / unitH];
+        int minX = x / unitW;
+        int minY = y / unitH;
+        Cell c = cellContainer[minY][minX];
         c.disableCell();
         
         //removing all edges touching this cell
-        g.removeAllEdges(g.edgesOf(c));
+        List<Cell> neighbors = getNeighbors(minY, minX);
+        for (Cell n : neighbors)
+            g.removeAllEdges(c, n);
+        
+        //Color all pixels within this cell
+        dc.setMinX(minX * unitW);
+        dc.setMinY(minY * unitH);
+        dc.setWidth(unitW);
+        dc.setHeight(unitH);
     }
+    
+    public void enabbleCell(int x, int y, DeadCell dc)
+    {
+        int minX = x / unitW;
+        int minY = y / unitH;
+        Cell c = cellContainer[minY][minX];
+        c.enabbleCell();
+        
+        //add edges to all cells touching this cell
+        List<Cell> neighbors = getNeighbors(minY, minX);
+        for (Cell n : neighbors)
+        {
+            g.addEdge(c, n);
+        }
+        
+        //Set minX and minY all pixels within this cell
+        dc.setMinX(minX * unitW);
+        dc.setMinY(minY * unitH);
+    }
+    
+    
 }

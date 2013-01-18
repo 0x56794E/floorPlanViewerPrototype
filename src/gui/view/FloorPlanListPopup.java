@@ -37,18 +37,18 @@ public class FloorPlanListPopup extends JFrame
 
     private List<FloorPlan> floorPlans;
     private TopLevelPanel topLevelPn;
-    private MainPanel mainPn;
+    private PointMarkingPanel pointMarkingPn;
 
-    public FloorPlanListPopup(MainPanel mainPn, List<FloorPlan> fps)
+    public FloorPlanListPopup(PointMarkingPanel mainPn, List<FloorPlan> fps)
     {
-        this.mainPn = mainPn;
+        this.pointMarkingPn = mainPn;
         floorPlans = fps;
         initView();
     }
     
-    public FloorPlanListPopup(MainPanel mainPn)
+    public FloorPlanListPopup(PointMarkingPanel mainPn)
     {
-        this.mainPn = mainPn;
+        this.pointMarkingPn = mainPn;
 
         //Find all floor plans
         EntityManager em = DatabaseService.getEntityManager();
@@ -56,9 +56,9 @@ public class FloorPlanListPopup extends JFrame
         initView();
     }
 
-    public FloorPlanListPopup(MainPanel mainPn, String fileName)
+    public FloorPlanListPopup(PointMarkingPanel mainPn, String fileName)
     {
-        this.mainPn = mainPn;
+        this.pointMarkingPn = mainPn;
 
         //Find floor plans with given name
         EntityManager em = DatabaseService.getEntityManager();
@@ -124,7 +124,7 @@ public class FloorPlanListPopup extends JFrame
                 {
                     try
                     {
-                        mainPn.setCurrentFloorPlan(fpJList.getSelectedValue());
+                        pointMarkingPn.getUI().setCurrentFloorPlan(fpJList.getSelectedValue());
                     }
                     catch (IOException exc)
                     {

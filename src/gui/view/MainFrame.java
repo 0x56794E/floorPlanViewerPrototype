@@ -20,10 +20,15 @@
 
 package gui.view;
 
-import java.awt.event.*;
-import javax.swing.*;
+import entity.FloorPlan;
 import gui.util.FileChooserWindow;
+import gui.util.TabbedPanel;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.event.*;
 import java.io.IOException;
+import javax.swing.*;
 import util.FileService;
 import util.ImageFileFilter;
 
@@ -45,10 +50,14 @@ public class MainFrame extends JFrame
     //Help Menu
     private JMenuItem aboutItem = new JMenuItem("About");
     private JMenuItem reportItem = new JMenuItem("Report Issue");
-    
-    private MainPanel mainPn;
     private JFrame floorPlanChooserFr = null;
     
+    //Current cursor pos
+    private JTextField currentPos = new JTextField("");
+    
+    
+    //Main content
+    TabbedPanel mainContent;
     
     public MainFrame()      
     {  
@@ -59,10 +68,24 @@ public class MainFrame extends JFrame
         setupMenu();
         
         //Init Main panel
-        mainPn = new MainPanel(this);   
+        mainContent = new TabbedPanel(this);
+        
+        
+//        JPanel main = new JPanel();
+//        pointMarkingPn = new PointMarkingPanel(this);   
+//        this.updateImageCanvasSize();
+//        main.add(pointMarkingPn);
+        this.add(mainContent, BorderLayout.CENTER);
         this.updateImageCanvasSize();
-        this.add(mainPn);
-       
+        
+        JPanel statusPanel = new JPanel();
+        statusPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        currentPos.setEditable(false);   
+        currentPos.setPreferredSize(new Dimension(this.getWidth(), 16));
+        currentPos.setBorder(null);
+        statusPanel.add(currentPos);
+        this.add(statusPanel, BorderLayout.SOUTH);
+        
         //Resize listener
         getContentPane().addHierarchyBoundsListener(new HierarchyBoundsListener(){
             @Override
@@ -87,6 +110,7 @@ public class MainFrame extends JFrame
         this.setSize(880, 700);
         this.setLocationRelativeTo(null);
         this.setTitle("Floor Plan Viewer");
+        this.setLayout(new BorderLayout());
         
         this.addWindowListener(new WindowListener(){
 
@@ -101,7 +125,7 @@ public class MainFrame extends JFrame
             {
                // throw new UnsupportedOperationException("Not supported yet.");
                 JOptionPane.showMessageDialog(null, "Closing");
-                return;
+                
             }
 
             @Override
@@ -161,7 +185,7 @@ public class MainFrame extends JFrame
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                mainPn.showFloorPlanListPopup();
+                mainContent.getPointMarkingPn().getUI().showFloorPlanListPopup();
             }
         });
         fileMenu.add(showExistItem);
@@ -175,7 +199,7 @@ public class MainFrame extends JFrame
             {
                 try
                 {
-                    FileService.savePointSetToFile(mainPn.getCurrentPointSet());
+                    FileService.savePointSetToFile(mainContent.getPointMarkingPn().getUI().getCurrentPointSet());
                 }
                 catch (IOException exc)
                 {
@@ -199,9 +223,9 @@ public class MainFrame extends JFrame
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                if (mainPn.hasImage())
+                if (mainContent.getPointMarkingPn().getUI().hasImage())
                 {
-                    mainPn.exportImage();
+                    mainContent.getPointMarkingPn().getUI().exportImage();
                 }
                 else
                 {
@@ -231,7 +255,17 @@ public class MainFrame extends JFrame
     
     private void updateImageCanvasSize()
     {
-        mainPn.updateImagePanelScrollPaneSize(this.getWidth() - 350, this.getHeight() - 160);
+        mainContent.updateImagePanelScrollPaneSize(this.getWidth() - 350, this.getHeight() - 152);
+    }
+
+    void setCurrentPositionlabel(String str)
+    {
+        currentPos.setText(str);
+    }
+
+    public FloorPlan getCurrentFloorPlan()
+    {
+        return mainContent.getPointMarkingPn().getUI().getCurrentFloorPlan();
     }
     
     private class MenuListener implements ActionListener
@@ -245,7 +279,7 @@ public class MainFrame extends JFrame
                        
                 //Bring up floor plan chooser popup window
                 if (floorPlanChooserFr == null)
-                    floorPlanChooserFr = new FileChooserWindow(mainPn, new ImageFileFilter());
+                    floorPlanChooserFr = new FileChooserWindow(mainContent.getPointMarkingPn().getUI(), new ImageFileFilter());
                 
                 floorPlanChooserFr.setVisible(true);
             }            

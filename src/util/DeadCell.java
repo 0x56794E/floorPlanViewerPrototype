@@ -18,69 +18,72 @@
  * Boston, MA  02110-1301, USA.
  */
 
-package entity;
+package util;
 
 /**
  * @author              Vy Thuy Nguyen
- * @version             1.0 Jan 16, 2013
+ * @version             1.0 Jan 17, 2013
  * Last modified:       
  */
-public class Cell
+public class DeadCell
 {
+    int minX;
+    int minY;
+    int width;
+    int height;
 
-    private boolean isDead;
-    private int col;
-    private int row;
-    
-    public Cell(int r, int c)
+    public DeadCell()
     {
-        this.col = c;
-        this.row = r;
-        isDead = false;
     }
-    public int getCol()
+
+    public int getMinX()
     {
-        return col;
+        return minX;
     }
     
-    public int getRow()
+    public int getMinY()
     {
-        return row;
-        
+        return minY;
     }
     
-    public void disableCell()
+    public int getWidth()
     {
-        isDead = false;
+        return width;
     }
     
-    public void enabbleCell()
+    public int getHeight()
     {
-        isDead = true;
+        return height;
+    }
+    
+    public void setMinX(int x)
+    {
+        minX = x;
+    }
+
+    public void setMinY(int y)
+    {
+        minY = y;
+    }
+
+    public void setWidth(int w)
+    {
+        width = w;
+    }
+
+    public void setHeight(int h)
+    {
+        height = h;
     }
     
     public boolean equals (Object rhs)
     {
-        if (rhs == null || !(rhs instanceof Cell))
+        if (rhs == null || !(rhs instanceof DeadCell))
             return false;
         else
         {
-            Cell rhsCell = (Cell) rhs;
-            return rhsCell.col == this.col && rhsCell.row == this.row;
+            DeadCell dc = (DeadCell)rhs;
+            return dc.minX == this.minX && dc.minY == this.minY;
         }
-    }
-
-    @Override
-    public int hashCode()
-    {
-        int hash = 3;
-        hash = 83 * hash + (int) (this.col ^ (this.col >>> 32));
-        hash = 83 * hash + (int) (this.row ^ (this.row >>> 32));
-        return hash;
-    }
-    
-    public String toString()
-    {
-        return String.format("(%d, %d)", row, col);
     }
 }
