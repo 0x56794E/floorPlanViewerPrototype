@@ -20,14 +20,16 @@
 
 package gui.view;
 
-import entity.FloorPlan;
+import entity.*;
 import gui.util.FileChooserWindow;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.*;
 import java.io.IOException;
+import javax.persistence.EntityManager;
 import javax.swing.*;
+import util.DatabaseService;
 import util.FileService;
 import util.ImageFileFilter;
 
@@ -38,11 +40,17 @@ import util.ImageFileFilter;
  */
 public class MainFrame extends JFrame 
 {
+    //Dialog mgs
+    private static final String closingMsg = "Do you want to save the current work before exiting?\n\n" 
+                                             + "'Yes' to save and exit.\n"
+                                             + "'No' to exit without saving.\n"   
+                                             + "'Cancel' to go back.";
+    
     //File Menu
     private JMenuItem newItem = new JMenuItem("New Floor Plan...");
-    private JMenuItem saveToFileItem = new JMenuItem("Save Current Point Set to File");
+    private JMenuItem saveAllPointSetsToFileItem = new JMenuItem("Save All Point Sets to File");
     private JMenuItem saveToDBItem = new JMenuItem("Save to Database");
-    private JMenuItem saveBothItem = new JMenuItem("Save to Both File and Database");
+    //private JMenuItem saveBothItem = new JMenuItem("Save to Both File and Database");
     private JMenuItem exportItem = new JMenuItem("Export Marked Floor Plan...");
     private JMenuItem showExistItem = new JMenuItem("Show Saved Floor Plans... ");
     
@@ -105,7 +113,9 @@ public class MainFrame extends JFrame
     {
         JFrame.setDefaultLookAndFeelDecorated(false);
         this.setVisible(true);
-        this.setDefaultCloseOperation(this.EXIT_ON_CLOSE);
+        
+        this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        
         this.setSize(880, 700);
         this.setLocationRelativeTo(null);
         this.setTitle("Floor Plan Viewer");
@@ -122,8 +132,23 @@ public class MainFrame extends JFrame
             @Override
             public void windowClosing(WindowEvent e)
             {
-               // throw new UnsupportedOperationException("Not supported yet.");
-                JOptionPane.showMessageDialog(null, "Closing");
+                int option = JOptionPane.showConfirmDialog(null, closingMsg, 
+                                                                 "Exiting?", 
+                                                                 JOptionPane.YES_NO_CANCEL_OPTION);
+                switch (option)
+                {
+                    case JOptionPane.YES_OPTION:
+                        saveCurrentWorkToDB();
+                        //fall thru
+                        
+                    case JOptionPane.NO_OPTION:
+                        MainFrame.this.dispose();
+                        System.exit(option);
+                        break;
+                        
+                    default: //do nothing
+                        break;
+                }
                 
             }
 
@@ -190,35 +215,54 @@ public class MainFrame extends JFrame
         fileMenu.add(showExistItem);
         fileMenu.addSeparator();
         
-        saveToFileItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, ActionEvent.CTRL_MASK));
-        saveToFileItem.addActionListener(new ActionListener() {
+        saveAllPointSetsToFileItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, ActionEvent.CTRL_MASK));
+        saveAllPointSetsToFileItem.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                try
+                FloorPlan fp = mainContent.getPointMarkingPn().getUI().getCurrentFloorPlan();
+                if (fp != null)
                 {
-                    FileService.savePointSetToFile(mainContent.getPointMarkingPn().getUI().getCurrentPointSet());
+                    try
+                    {
+                        FileService.saveAllPointSetsToFile(fp);
+                    }
+                    catch (IOException exc)
+                    {
+                        JOptionPane.showMessageDialog(null, 
+                                                      "Error writing to file", 
+                                                      "ERROR", 
+                                                      JOptionPane.ERROR_MESSAGE);
+                    }
                 }
-                catch (IOException exc)
+                else
                 {
-                    JOptionPane.showMessageDialog(null, "Error writing to file", "ERROR", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, 
+                                                  "Please select a floor  plan and create a point set first.", 
+                                                  "ERROR", 
+                                                  JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
-        fileMenu.add(saveToFileItem);
+        fileMenu.add(saveAllPointSetsToFileItem);
         
         saveToDBItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, ActionEvent.CTRL_MASK));
-        //actionlistner 
+        saveToDBItem.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                saveCurrentWorkToDB();                
+            }
+        });
         fileMenu.add(saveToDBItem);
         
-        saveBothItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, ActionEvent.CTRL_MASK));
-        fileMenu.add(saveBothItem);
+        //saveBothItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, ActionEvent.CTRL_MASK));
+        //fileMenu.add(saveBothItem);
+        
         fileMenu.addSeparator();
-        
-        
         exportItem.addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent e)
             {
@@ -252,6 +296,48 @@ public class MainFrame extends JFrame
         this.setJMenuBar(menuBar);    
     }
     
+    private void saveCurrentWorkToDB()
+    {
+        FloorPlan fp = mainContent.getPointMarkingPn().getUI().getCurrentFloorPlan();
+        if (fp != null)
+        {
+            EntityManager em = DatabaseService.getEntityManager();
+            em.getTransaction().begin();
+
+            //Persist pointSets
+            for (PointSet ps: fp.getPointSets())
+            {
+                //Persist points
+                for (Point p : ps.getPoints())
+                    em.persist(p);
+
+                em.persist(ps);
+            }
+
+            //Persist deadCells and afp
+            AnnotFloorPlan afp = fp.getAnnotFloorPlan();
+            for (Cell dc : afp.getDeadCells())
+            {
+                dc.setAnnotFloorPlan(afp);
+                em.persist(dc);
+            }
+            
+            em.persist(afp);
+            em.persist(fp);
+            em.getTransaction().commit();
+            DatabaseService.cleanup();
+
+            JOptionPane.showMessageDialog(null, "Successfully Saved To Database");
+        }
+//        else
+//        {
+//            JOptionPane.showMessageDialog(null, 
+//                                            "Please select a floor plan first.", 
+//                                            "No Floor Plan Found", 
+//                                            JOptionPane.ERROR_MESSAGE);
+//        }
+    }
+    
     private void updateImageCanvasSize()
     {
         mainContent.updateImagePanelScrollPaneSize(this.getWidth() - 350, this.getHeight() - 152);
@@ -274,7 +360,7 @@ public class MainFrame extends JFrame
         {
             if (e.getSource() == newItem)
             {
-                System.out.println("Bringing up file chooser");
+                //System.out.println("Bringing up file chooser");
                        
                 //Bring up floor plan chooser popup window
                 if (floorPlanChooserFr == null)
@@ -284,102 +370,4 @@ public class MainFrame extends JFrame
             }            
         }        
     }
-    
-    /*
-    private class MainWindowButtonListener implements ActionListener
-    {
-        @Override
-        public void actionPerformed(ActionEvent e)
-        {
-             if (e.getSource() == saveToFileBtn)
-            {
-                if (imagePanel != null)
-                {
-                    int option = JOptionPane.YES_OPTION;
-                    System.out.println("size = " + plListModel.capacity());
-                    if (plListModel.isEmpty())
-                    {
-                        option = JOptionPane.showConfirmDialog(null, 
-                                                               "There's nothing to save! Do you want to proceed anyways?\nWarning: This will result in erase previously saved data if there is any.", 
-                                                               "Proceed?", 
-                                                               JOptionPane.YES_NO_OPTION, 
-                                                               JOptionPane.QUESTION_MESSAGE);
-                    }
-                    if (option == JOptionPane.YES_OPTION)
-                    {
-                        try
-                        {
-                            // Create file 
-                            FileWriter fstream = new FileWriter(imagePanel.fileName + "-points.txt");
-                            BufferedWriter out = new BufferedWriter(fstream);
-                            Enumeration iter = plListModel.elements();
-
-                            while (iter.hasMoreElements())
-                            {
-                                out.write(iter.nextElement().toString());
-                                out.write(";\r\n");
-                            }
-
-                            //Close the output stream
-                            out.close();
-                            
-                            JOptionPane.showMessageDialog(null, "Sucessfully Saved To File");
-                        }
-                        catch (Exception exc) //Catch exception if any
-                        {
-                            System.err.println("Error: " + exc.getMessage());
-                            
-                        }
-                    }
-                }
-                else
-                {
-                    JOptionPane.showMessageDialog(null, "Please select a floor plan first.", "No Floor Plan Found", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-            else if (e.getSource() == saveToDBBtn)
-            {
-                EntityManager em = DatabaseService.getEntityManager();
-                    
-                    if (imagePanel != null)
-                    {
-                        em.getTransaction().begin();
-                        FloorPlan fp = new FloorPlan(imagePanel.absPath, 0, 0);
-                        Enumeration iter = plListModel.elements();
-                        while (iter.hasMoreElements())
-                        {
-                            Point p = (Point)iter.nextElement();
-                            p.setFloorPlan(fp);
-                            em.persist(p);
-                        }
-                        em.persist(fp);
-                        em.getTransaction().commit();
-                        DatabaseService.cleanup();
-                        
-                        JOptionPane.showMessageDialog(null, "Successfully Saved To Database");
-                    }
-                    else
-                    {
-                        JOptionPane.showMessageDialog(null, "Please select a floor plan first.", "No Floor Plan Found", JOptionPane.ERROR_MESSAGE);
-                    }
-                    
-            }
-            else if (e.getSource() == exportBtn)
-            {
-                if (imagePanel != null)
-                {   
-                    
-                    imagePanel.exportImage();
-                }
-                else
-                {
-                    JOptionPane.showMessageDialog(null, "Please select a floor plan first.", "No Floor Plan Found", JOptionPane.ERROR_MESSAGE);
-                }
-                    
-            }
-        }
-
-    }
-    * 
-    */
 }

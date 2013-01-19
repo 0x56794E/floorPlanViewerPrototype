@@ -42,6 +42,12 @@ import javax.swing.JOptionPane;
  */
 public class FileService 
 {
+    public static void saveAllPointSetsToFile(FloorPlan fp) throws IOException
+    {
+        for (PointSet ps : fp.getPointSets())
+            savePointSetToFile(ps);
+    }
+    
     public static void savePointSetToFile(PointSet ps) throws IOException
     {
         FileWriter fstream = new FileWriter(ps.getFloorPlan().getFileName() + "-pointSetID_" + ps.getId() + ".txt");
@@ -50,12 +56,11 @@ public class FileService
         for (Point p : ps.getPoints())
         {
             out.write(p.toString());
-            out.write(";\r\n");
+            out.write("\r\n");
         }
 
         //Close the output stream
         out.close();
-        JOptionPane.showMessageDialog(null, "Sucessfully Saved To File");    
     }
     
     /**
@@ -64,10 +69,10 @@ public class FileService
      * @param fp
      * @throws IOException 
      */
-    public static void saveFloorPlanToFile(FloorPlan fp) throws IOException
+    public static void exporteFloorPlanImage(FloorPlan fp) throws IOException
     {
         for (PointSet ps : fp.getPointSets())
-            saveFloorPlanToFile(fp, ps);
+            exportFloorPlanImage(fp, ps);
     }
     
     /**
@@ -77,7 +82,7 @@ public class FileService
      * @param ps
      * @throws IOException 
      */
-    public static void saveFloorPlanToFile(FloorPlan fp, PointSet ps) throws IOException
+    public static void exportFloorPlanImage(FloorPlan fp, PointSet ps) throws IOException
     {
         File file = new File(fp.getAbsoluteFilePath());
         BufferedImage image = ImageIO.read(file);
@@ -87,13 +92,10 @@ public class FileService
         List<Point> points = ps.getPoints();
         
         for (Point p : points)
-        {
             g.fillOval(p.getX() - 4, p.getY() - 4, 8, 8);
-        }
         
         File oFile = new File("output\\" + fp.getFileName() + "-PointSetID_" + ps.getId() + ".png");
         ImageIO.write(image, "png", oFile);
-        //System.err.printf("User's dir %s", System.getProperty("user.dir"));
         JOptionPane.showMessageDialog(null, 
                                         "Successfully Exported Image to the Following File:\n"
                                         + oFile.getAbsolutePath(), 

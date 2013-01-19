@@ -24,7 +24,6 @@ import entity.PointSet;
 import gui.util.FileGUIContainer;
 import gui.util.ImagePanelContainer;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
@@ -34,7 +33,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Observable;
-import java.util.Observer;
 import javax.persistence.EntityManager;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -56,82 +54,75 @@ public class PointMarkingPanel extends Observable
         uI = new UI(mf);
     }
     
-    
     public UI getUI()
     {
         return uI;
         
     }
     
-    
-    
     public class UI extends JPanel
                     implements FileGUIContainer, ImagePanelContainer
     {
-        /**
-        * Reference to the existing floor plan list
-        * NOTE: MIGHT NOT NEED THIS
-        */
-        FloorPlanListPopup flListPopup;
-
+        //Object state
+        
         /**
         * Reference to the main frame
         */
-        MainFrame mainFr;
-        /************** SELECTED POINTS section **************/
+        private MainFrame mainFr;
+        
+        //************** SELECTED POINTS section **************
         /**
-        * JList of points that have been marked so far.
-        */
+         * JList of points that have been marked so far.
+         */
         private JList<Point> pointJList;
+        
         /**
-        * List model for pointList This collection contains a list of points to be
-        * saved
-        */
+         * List model for pointList This collection contains a list of points to be
+         * saved
+         */
         private DefaultListModel<Point> pointListModel = new DefaultListModel<Point>();
 
         /**
-        * Scroll pane for pointList
-        */
+         * Scroll pane for pointList
+         */
         private JScrollPane plScrollPane = new JScrollPane();
 
         /**
-        * Removes the selected item from pointList Also, this action removes the
-        * point from the floor plan as well as a Point from the list of points to
-        * be persisted
-        */
+         * Removes the selected item from pointList Also, this action removes the
+         * point from the floor plan as well as a Point from the list of points to
+         * be persisted
+         */
         private JButton removeBtn = new JButton("Remove");
 
         /**
-        * Removes all of the items in pointList, as well as those on the floor plan
-        * and those in the list of points to by persisted
-        */
+         * Removes all of the items in pointList, as well as those on the floor plan
+         * and those in the list of points to by persisted
+         */
         private JButton clearAllBtn = new JButton("Clear All");
 
         /**
-        * Save the list of points for the current point set and current
-        * floor plan to file.
-        */
+         * Save the list of points for the current point set and current
+         * floor plan to file.
+         */
         private JButton saveToFileBtn = new JButton("Save to File");
-        /************* end SELECTED POINTS section *************/
+        //************* end SELECTED POINTS section *************
 
-        /************* EXISTING POINT SETS section **************/
+        //************* EXISTING POINT SETS section **************
         /**
-        * This is, in fact, implemented by a list. That is there can be
-        * duplication.
-        */
-        /**
-        * JList of point sets that belong to the current floor plan
-        */
+         * This is, in fact, implemented by a list. That is there can be
+         * duplication.
+         * JList of point sets that belong to the current floor plan
+         */
         private JList pointSetList;
 
         /**
-        * List model for pointSetList
-        */
+         * List model for pointSetList
+         */
         private DefaultListModel pointSetListModel = new DefaultListModel();
 
         /**
-        * Scroll pane for pointSetList
-        */
+         * Scroll pane for pointSetList
+         */
         private JScrollPane pslScrollPane = new JScrollPane();
         private JButton newPointSetBtn = new JButton("New Set");
         private JButton savePointSetBtn = new JButton("Save");
@@ -139,22 +130,19 @@ public class PointMarkingPanel extends Observable
 
         /************** FLOOR PLAN section **************/
         /**
-        * the Floor plan
-        *
-        * @see ImagePanel
-        */
+         * the Floor plan
+         *
+         * @see ImagePanel
+         */
         private ImagePanel imagePanel;
         private JButton saveAnnotBtn = new JButton("Save");
 
         /**
-        * Scroll pane for imagePanel
-        */
+         * Scroll pane for imagePanel
+         */
         private JScrollPane ipScrollPane = new JScrollPane();
-
-        /**
-        * ************ end FLOOR PLAN section *************
-        */
-
+        //************ end FLOOR PLAN section *************
+        
         private FloorPlan currentFloorPlan;
         private PointSet currentPointSet;
         private EntityManager em = DatabaseService.getEntityManager();
@@ -164,6 +152,232 @@ public class PointMarkingPanel extends Observable
             mainFr = mf;
 
             initView();
+        }
+
+        //ImagePanelContainer interface
+        @Override
+        public void doPaintComponent(Graphics g, BufferedImage pinImg)
+        {
+            if (currentPointSet != null)
+            {
+                List<Point> points = currentPointSet.getPoints();
+                for (Point p : points)
+                    g.drawImage(pinImg, p.getX() - 12, p.getY() - 12, null);
+            }
+        }
+
+        @Override
+        public void doPaintComponent(Graphics g)
+        {
+            if (currentPointSet != null)
+            {
+                List<Point> points = currentPointSet.getPoints();
+                //System.out.println("points count = " + points.size());
+                for (Point p : points)
+                    g.fillOval(p.getX() - 4, p.getY() - 4, 8, 8);
+            }
+        }
+
+        @Override
+        public void onMouseClicked(int x, int y)
+        {
+            Point p = new Point(x, y);
+            pointListModel.addElement(p);
+            p.setPointSet(currentPointSet);
+            currentPointSet.addPoint(p);
+            updateView();
+        }
+
+        @Override
+        public void updateCurrentPositionLabel(String str)
+        {
+            mainFr.setCurrentPositionlabel(str);
+        }
+        
+        //FileGUIContainer interface
+        @Override
+        public void loadFileContent(File file) throws IOException
+        {
+            int createNew = JOptionPane.YES_OPTION;
+
+            //Exisitng floor plan list
+            List<FloorPlan> existingFLList = getExistingFloorPlans(file.getName());
+
+            if (existingFLList.size() > 0)
+            {
+                createNew = JOptionPane.showConfirmDialog(null,
+                                                        "Looks like you've already saved this floor plan in the database.\nDo you want to create a new record anyways?",
+                                                        "Proceed?", JOptionPane.YES_NO_OPTION);
+            }
+
+            if (createNew == JOptionPane.YES_OPTION)
+            {
+                imagePanel = new ImagePanel(file, PointMarkingPanel.UI.this);
+                currentFloorPlan = new FloorPlan(file, 0, 0, imagePanel.getImageWidth(), imagePanel.getImageHeight());
+                currentPointSet = new PointSet(currentFloorPlan);
+                currentFloorPlan.addPointSet(currentPointSet);
+                ipScrollPane.setViewportView(imagePanel);
+                
+                PointMarkingPanel.this.setChanged();
+                PointMarkingPanel.this.notifyObservers(PointMarkingPanel.this);
+            
+                updateView();
+            }
+            else if (createNew == JOptionPane.NO_OPTION)
+            {
+                //Show existing floor plans for user to choose from
+                showFloorPlanListPopup(existingFLList);
+            }
+            //If close, do nothing
+        }
+        
+        //UI interface
+        public void updateImagePanelScrollPaneSize(int width, int height)
+        {
+            if (imagePanel != null)
+                ipScrollPane.setMaximumSize(imagePanel.getPaddedImageSize());
+            ipScrollPane.setSize(new Dimension(width, height));
+            ipScrollPane.setPreferredSize(new Dimension(width, height));
+
+        }
+
+        public boolean hasImage()
+        {
+            return imagePanel != null;
+        }
+
+        public File getImageFile()
+        {
+            if (imagePanel != null)
+                return imagePanel.getImageFile();
+            else
+                return null;
+        }
+
+        public boolean exportImage()
+        {
+            if (hasImage())
+            {
+                try
+                {
+                    //imagePanel.exportCurrentFloorPlan();
+                    FileService.exportFloorPlanImage(currentFloorPlan, currentPointSet);
+                }
+                catch (IOException exc)
+                {
+                JOptionPane.showMessageDialog(null, 
+                                                "Error While Writing to File. Try Again", 
+                                                "ERROR!", 
+                                                JOptionPane.ERROR_MESSAGE);
+                return false;
+                }
+
+                return true;
+            }
+            else
+                return false;
+        }
+
+        /**
+        * Show a list of all floor plans in database in a popup window.
+        * User can choose a floor plan from this list
+        */
+        public void showFloorPlanListPopup()
+        {   
+            new FloorPlanListPopup(PointMarkingPanel.this);        
+        }
+
+        /**
+        * Show a list of all floor plans in database with given name in a popup window.
+        * User can choose a floor plan from this list
+        * 
+        * @param fileName 
+        */
+        public void showFloorPlanListPopup(String fileName)
+        {
+            new FloorPlanListPopup(PointMarkingPanel.this, fileName);
+        }
+
+        /**
+        * Show the given list of floor plans in a popup window.
+        * User can choose a floor plan from this list.
+        * 
+        * @param list 
+        */
+        public void showFloorPlanListPopup(List<FloorPlan> list)
+        {
+            new FloorPlanListPopup(PointMarkingPanel.this, list);
+        }
+
+        public void setCurrentFloorPlan(FloorPlan fp) throws IOException
+        {
+            this.currentFloorPlan = fp;
+            this.currentPointSet = fp.getPointSets().get(0);
+            imagePanel = new ImagePanel(new File(fp.getAbsoluteFilePath()), PointMarkingPanel.UI.this);
+            this.updatePointSetJList();
+            this.updatePointJList();
+            fp.getAnnotFloorPlan().updateGraph();
+            ipScrollPane.setViewportView(imagePanel);
+            
+            PointMarkingPanel.this.setChanged();
+            PointMarkingPanel.this.notifyObservers(PointMarkingPanel.this);
+            
+            updateView();
+        }
+
+        public void setCurrentPointSet(PointSet ps)
+        {
+            this.currentPointSet = ps;
+            updatePointJList();
+            updateView();
+        }
+
+        /**
+        * Adds the specified point to the list and triggers repaint to mark this
+        * point on the floor plan
+        *
+        * @param p
+        */
+        public void addPoint(Point p)
+        {
+            pointListModel.addElement(p);
+            p.setPointSet(currentPointSet);
+            currentPointSet.addPoint(p);
+            updateView();
+        }
+
+        /**
+        * Removes the specified point from the list and triggers repaint to remove
+        * this point's mark from the floor plan
+        *
+        * @param p
+        */
+        public void removePoint(Point p)
+        {
+            pointListModel.removeElement(p);
+            currentPointSet.removePoint(p);
+            updateView();
+        }
+
+        /**
+        * Removes all points in the list and triggers repaint to remove all marks
+        * from the floor plan
+        */
+        public void clearAll()
+        {
+            pointListModel.clear();
+            currentPointSet.clearAllPoints();
+            updateView();
+        }
+
+        public PointSet getCurrentPointSet()
+        {
+            return currentPointSet;
+        }
+
+        public FloorPlan getCurrentFloorPlan()
+        {
+            return currentFloorPlan;
         }
 
         private void initView()
@@ -215,6 +429,7 @@ public class PointMarkingPanel extends Observable
                     if (e.getValueIsAdjusting())
                     {
                         PointMarkingPanel.UI.this.setCurrentPointSet((PointSet)pointSetList.getSelectedValue());
+                        
                     }
                 }
             });
@@ -321,7 +536,15 @@ public class PointMarkingPanel extends Observable
                 {
                     if (imagePanel != null && !pointListModel.isEmpty())
                     {
-                        saveToFile();
+                        try
+                        {
+                            saveToFile();
+                        }
+                        catch (Exception exc)
+                        {
+                            JOptionPane.showMessageDialog(null, "Error trying to save to file", "ERROR!", JOptionPane.ERROR_MESSAGE);
+                        }
+                        JOptionPane.showMessageDialog(null, "Sucessfully Saved To File");
                     }
                 }
 
@@ -340,10 +563,10 @@ public class PointMarkingPanel extends Observable
             this.add(leftPane, BorderLayout.EAST);
         }
 
-
-        private void saveToFile()
+        //private members
+        private void saveToFile() throws IOException
         {
-            throw new UnsupportedOperationException();
+            FileService.savePointSetToFile(currentPointSet);
         }
 
         private void showBlankFloorPlan()
@@ -352,11 +575,6 @@ public class PointMarkingPanel extends Observable
             currentFloorPlan.addPointSet(currentPointSet);
             pointListModel.clear();
             updateView();
-        }
-
-        private void showBlankFloorPlanForAnnot()
-        {
-
         }
 
         private void savePointSet()
@@ -379,135 +597,14 @@ public class PointMarkingPanel extends Observable
                 pointSetListModel.addElement(ps);
         }
 
-        public void updateImagePanelScrollPaneSize(int width, int height)
+        private void updatePointJList()
         {
-            if (imagePanel != null)
-                ipScrollPane.setMaximumSize(imagePanel.getPaddedImageSize());
-            ipScrollPane.setSize(new Dimension(width, height));
-            ipScrollPane.setPreferredSize(new Dimension(width, height));
-
+            pointListModel.clear();
+            for (Point p : currentPointSet.getPoints())
+                pointListModel.addElement(p);
         }
-
-        public boolean hasImage()
-        {
-            return imagePanel != null;
-        }
-
-        public File getImageFile()
-        {
-            if (imagePanel != null)
-                return imagePanel.getImageFile();
-            else
-                return null;
-        }
-
-        public boolean exportImage()
-        {
-            if (hasImage())
-            {
-                try
-                {
-                    //imagePanel.exportCurrentFloorPlan();
-                    FileService.saveFloorPlanToFile(currentFloorPlan, currentPointSet);
-                }
-                catch (IOException exc)
-                {
-                JOptionPane.showMessageDialog(null, 
-                                                "Error While Writing to File. Try Again", 
-                                                "ERROR!", 
-                                                JOptionPane.ERROR_MESSAGE);
-                return false;
-                }
-
-                return true;
-            }
-            else
-                return false;
-        }
-
-        @Override
-        public void loadFileContent(File file) throws IOException
-        {
-            int createNew = JOptionPane.YES_OPTION;
-
-            //Exisitng floor plan list
-            List<FloorPlan> existingFLList = getExistingFloorPlans(file.getName());
-
-            if (existingFLList.size() > 0)
-            {
-                createNew = JOptionPane.showConfirmDialog(null,
-                                                        "Looks like you've already saved this floor plan in the database.\nDo you want to create a new record anyways?",
-                                                        "Proceed?", JOptionPane.YES_NO_OPTION);
-            }
-
-            if (createNew == JOptionPane.YES_OPTION)
-            {
-                imagePanel = new ImagePanel(file, PointMarkingPanel.UI.this);
-                currentFloorPlan = new FloorPlan(file, 0, 0, imagePanel.getImageWidth(), imagePanel.getImageHeight());
-                currentPointSet = new PointSet(currentFloorPlan);
-                currentFloorPlan.addPointSet(currentPointSet);
-                ipScrollPane.setViewportView(imagePanel);
-                
-                updateView();
-            }
-            else if (createNew == JOptionPane.NO_OPTION)
-            {
-                //Show existing floor plans for user to choose from
-                showFloorPlanListPopup(existingFLList);
-            }
-
-            //If close, do nothing
-        }
-
-        /**
-        * Show a list of all floor plans in database in a popup window.
-        * User can choose a floor plan from this list
-        */
-        public void showFloorPlanListPopup()
-        {   
-            this.flListPopup = new FloorPlanListPopup(PointMarkingPanel.this);        
-        }
-
-        /**
-        * Show a list of all floor plans in database with given name in a popup window.
-        * User can choose a floor plan from this list
-        * 
-        * @param fileName 
-        */
-        public void showFloorPlanListPopup(String fileName)
-        {
-            this.flListPopup = new FloorPlanListPopup(PointMarkingPanel.this, fileName);
-        }
-
-        /**
-        * Show the given list of floor plans in a popup window.
-        * User can choose a floor plan from this list.
-        * 
-        * @param list 
-        */
-        public void showFloorPlanListPopup(List<FloorPlan> list)
-        {
-            this.flListPopup = new FloorPlanListPopup(PointMarkingPanel.this, list);
-        }
-
-        public void setCurrentFloorPlan(FloorPlan fp) throws IOException
-        {
-            this.currentFloorPlan = fp;
-            this.currentPointSet = fp.getPointSets().get(0);
-            imagePanel = new ImagePanel(new File(fp.getAbsoluteFilePath()), PointMarkingPanel.UI.this);
-            this.updatePointSetJList();
-            fp.getAnnotFloorPlan().updateGraph();
-            ipScrollPane.setViewportView(imagePanel);
-            updateView();
-        }
-
-        public void setCurrentPointSet(PointSet ps)
-        {
-            this.currentPointSet = ps;
-            updateView();
-        }
-
-        /**
+        
+       /**
         *
         * @param fileName
         * @return true if a floor plan record with the same file name has already
@@ -518,58 +615,9 @@ public class PointMarkingPanel extends Observable
             long count = em.createQuery("SELECT COUNT(f.id) FROM FloorPlan f WHERE f.fileName = :name", Long.class).setParameter("name", fileName).getSingleResult();
             return (count > 0 ? true : false);
         }
-
-        private List<FloorPlan> getExistingFloorPlans(String fileName)
-        {
-            return em.createQuery("SELECT f FROM FloorPlan f WHERE f.fileName = :name")
-                     .setParameter("name", fileName)
-                     .getResultList();
-        }
-
-
-        /**
-        * Adds the specified point to the list and triggers repaint to mark this
-        * point on the floor plan
-        *
-        * @param p
-        */
-        public void addPoint(Point p)
-        {
-            pointListModel.addElement(p);
-            p.setPointSet(currentPointSet);
-            currentPointSet.addPoint(p);
-            updateView();
-        }
-
-        /**
-        * Removes the specified point from the list and triggers repaint to remove
-        * this point's mark from the floor plan
-        *
-        * @param p
-        */
-        public void removePoint(Point p)
-        {
-            pointListModel.removeElement(p);
-            currentPointSet.removePoint(p);
-            updateView();
-        }
-
-        /**
-        * Removes all points in the list and triggers repaint to remove all marks
-        * from the floor plan
-        */
-        public void clearAll()
-        {
-            pointListModel.clear();
-            currentPointSet.clearAllPoints();
-            updateView();
-        }
-
+        
         private void updateView()
         {
-            PointMarkingPanel.this.setChanged();
-            PointMarkingPanel.this.notifyObservers(PointMarkingPanel.this);
-            
             if (currentFloorPlan != null && currentFloorPlan.getPointSets().size() > 0)
             {
                 savePointSetBtn.setEnabled(true);
@@ -579,6 +627,7 @@ public class PointMarkingPanel extends Observable
                     clearAllBtn.setEnabled(true);
                     removeBtn.setEnabled(true);
                     newPointSetBtn.setEnabled(true);
+                    saveToFileBtn.setEnabled(true);
                 }
                 else
                 {
@@ -595,69 +644,25 @@ public class PointMarkingPanel extends Observable
             mainFr.validate();
         }
 
+        /**
+         * 
+         * @param fileName
+         * @return a list of floor plans whose image file's name is the same
+         * as the given file name
+         */
+        private List<FloorPlan> getExistingFloorPlans(String fileName)
+        {
+            return em.createQuery("SELECT f FROM FloorPlan f WHERE f.fileName = :name")
+                     .setParameter("name", fileName)
+                     .getResultList();
+        }
+
         private void disableAllButtons()
         {
             savePointSetBtn.setEnabled(false);
             clearAllBtn.setEnabled(false);
             removeBtn.setEnabled(false);
             newPointSetBtn.setEnabled(false);
-        }
-
-        public PointSet getCurrentPointSet()
-        {
-            return currentPointSet;
-        }
-
-        public FloorPlan getCurrentFloorPlan()
-        {
-            return currentFloorPlan;
-        }
-
-//        @Override
-//        public void disableCell(int x, int y, DeadCell c)
-//        {
-//            currentFloorPlan.getAnnotFloorPlan().disableCell(x, y, c);
-//        }
-
-        @Override
-        public void doPaintComponent(Graphics g, BufferedImage pinImg)
-        {
-            if (currentPointSet != null)
-            {
-                List<Point> points = currentPointSet.getPoints();
-                System.out.println("points count = " + points.size());
-                for (Point p : points)
-                    g.drawImage(pinImg, p.getX() - 12, p.getY() - 12, null);
-            }
-        }
-
-        @Override
-        public void doPaintComponent(Graphics g)
-        {
-            if (currentPointSet != null)
-            {
-                List<Point> points = currentPointSet.getPoints();
-                System.out.println("points count = " + points.size());
-                for (Point p : points)
-                    g.fillOval(p.getX() - 4, p.getY() - 4, 8, 8);
-            }
-        }
-
-        @Override
-        public void onMouseClicked(int x, int y)
-        {
-            Point p = new Point(x, y);
-            pointListModel.addElement(p);
-            p.setPointSet(currentPointSet);
-            currentPointSet.addPoint(p);
-            updateView();
-
-        }
-
-        @Override
-        public void updateCurrentPositionLabel(String str)
-        {
-            mainFr.setCurrentPositionlabel(str);
         }
     }
 }

@@ -235,7 +235,7 @@ public class GetDirectionPanel extends JPanel
     {
         try
         {
-            System.out.println("Update in get direction called");
+            //System.out.println("Update in get direction called");
             PointMarkingPanel pn = (PointMarkingPanel)arg;
             imagePanel = new ImagePanel(pn.getUI().getImageFile(), this);
             ipScrollPane.setViewportView(imagePanel);
