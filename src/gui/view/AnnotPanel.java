@@ -20,23 +20,23 @@
 
 package gui.view;
 
-import entity.FloorPlan;
+import entity.AnnotFloorPlan;
+import entity.Cell;
 import gui.util.ImagePanelContainer;
 import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Set;
+import javax.persistence.EntityManager;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import entity.DeadCell;
+import util.DatabaseService;
 
 /**
  * @author              Vy Thuy Nguyen
@@ -46,20 +46,20 @@ import entity.DeadCell;
 public class AnnotPanel extends JPanel
                         implements ImagePanelContainer, Observer
 {
-    MainFrame mainFr;
-    ImagePanel imagePanel;
+    private MainFrame mainFr;
+    private ImagePanel imagePanel;
     private JScrollPane ipScrollPane = new JScrollPane();
     
     boolean inMarkingMode;
     JButton markEraseBtn;
     JButton saveDeadCellBtn = new JButton("Save");
     
-    ArrayList<DeadCell> deadCells = new ArrayList<DeadCell>();
-    private FloorPlan currentFloorPlan;
+    private Set<Cell> deadCells;
     
     public AnnotPanel(MainFrame mf)
     {
         mainFr = mf;
+        
         inMarkingMode = true;
         markEraseBtn = new JButton("Eraser");
         markEraseBtn.addActionListener(new ActionListener() {
@@ -82,7 +82,18 @@ public class AnnotPanel extends JPanel
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                throw new UnsupportedOperationException("Not supported yet.");
+                EntityManager em = DatabaseService.getEntityManager();
+                em.getTransaction().begin();
+                AnnotFloorPlan afp = mainFr.getCurrentFloorPlan().getAnnotFloorPlan();
+                for (Cell dc : afp.getDeadCells())
+                {
+                    dc.setAnnotFloorPlan(afp);
+                    em.persist(dc);
+                }
+                
+                em.persist(mainFr.getCurrentFloorPlan().getAnnotFloorPlan());
+                em.getTransaction().commit();
+                em.close();
             }
         });
         
@@ -105,28 +116,22 @@ public class AnnotPanel extends JPanel
     @Override
     public void doPaintComponent(Graphics g, BufferedImage img)
     {
-        for (DeadCell dc : deadCells)
-            g.fillRect(dc.getMinX(), dc.getMinY(), dc.getWidth(), dc.getHeight());       
+        deadCells = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getDeadCells();
+        int halfUnitW = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getUnitW();// / 2;
+        int halfUnitH = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getUnitH();// / 2;
+        for (Cell dc : deadCells)
+            g.fillRect(dc.getMinX(), dc.getMinY(), halfUnitW, halfUnitH);       
     }
-
-
 
     @Override
     public void onMouseClicked(int x, int y)
     {
         if (inMarkingMode)
-        {
-            DeadCell c = new DeadCell();
-            deadCells.add(c);
-            currentFloorPlan.getAnnotFloorPlan().disableCell(x, y, c);
-        }
+            mainFr.getCurrentFloorPlan().getAnnotFloorPlan().disableCell(x, y);
+       
         else
-        {
-            DeadCell c = new DeadCell();
-            currentFloorPlan.getAnnotFloorPlan().enabbleCell(x, y, c);
-            deadCells.remove(c);
-                    
-        }
+            mainFr.getCurrentFloorPlan().getAnnotFloorPlan().enabbleCell(x, y);                   
+       
         repaint();
     }
 
@@ -141,10 +146,9 @@ public class AnnotPanel extends JPanel
     {
         try
         {
-            System.out.println("Update called");
+            //System.out.println("Update called");
             PointMarkingPanel pn = (PointMarkingPanel)arg;
             imagePanel = new ImagePanel(pn.getUI().getImageFile(), this);
-            currentFloorPlan = pn.getUI().getCurrentFloorPlan();
             ipScrollPane.setViewportView(imagePanel);
         }
         catch (IOException e)
@@ -152,7 +156,4 @@ public class AnnotPanel extends JPanel
             System.out.println("unable to update annotPn");
         }
     }
-    
-    
-    
 }

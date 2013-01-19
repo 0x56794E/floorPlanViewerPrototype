@@ -31,19 +31,10 @@ import java.awt.event.MouseMotionListener;
  */
 public class ImagePanelMouseListener implements MouseMotionListener, MouseListener
 {
-    private boolean inAnnotMode;
-    private boolean inEraseMode;
     
     public ImagePanelMouseListener()
     {
         super();
-        inAnnotMode = false;
-        inEraseMode = false;
-    }
-    
-    public void setInAnnotMode(boolean annotMode)
-    {
-        inAnnotMode = annotMode;
     }
     
     @Override
@@ -66,20 +57,8 @@ public class ImagePanelMouseListener implements MouseMotionListener, MouseListen
     public void mouseClicked(MouseEvent e)
     {
         ImagePanel ip = (ImagePanel)e.getSource();
-            
-//        if (inAnnotMode)
-//        {
-//            //ip.disableCell(e.getX(), e.getY());
-//        }
-//        else
-        {
-            //throw new UnsupportedOperationException("Not supported yet.");
-            //ip.addPoint(e.getX(), e.getY());
-           // System.out.println("Current pos: (" + e.getX() + ", " + e.getY() + ")");
-           // System.out.println("Tile index: " + ip.getMousePosition());   
-            
-            ip.onMouseClicked(e.getX(), e.getY());
-        }
+        ip.onMouseClicked(e.getX(), e.getY());
+        
     }
 
     @Override

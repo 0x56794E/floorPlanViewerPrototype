@@ -35,7 +35,8 @@ import javax.swing.border.TitledBorder;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
 import java.util.List;
-import entity.DeadCell;
+import org.jgrapht.graph.DefaultWeightedEdge;
+import org.jgrapht.graph.SimpleWeightedGraph;
 
 /**
  * @author              Vy Thuy Nguyen
@@ -45,22 +46,22 @@ import entity.DeadCell;
 public class GetDirectionPanel extends JPanel
                                implements ImagePanelContainer, Observer
 {
-    MainFrame mainFr;
-    ImagePanel imagePanel;
+    private MainFrame mainFr;
+    private ImagePanel imagePanel;
     private JScrollPane ipScrollPane = new JScrollPane();
     
-    JButton goBtn = new JButton("Go");
-    JTextField fromXField = new JTextField();
-    JTextField fromYField = new JTextField();
-    JTextField toXField = new JTextField();
-    JTextField toYField = new JTextField();
+    private JButton goBtn = new JButton("Go");
+    private JTextField fromXField = new JTextField();
+    private JTextField fromYField = new JTextField();
+    private JTextField toXField = new JTextField();
+    private JTextField toYField = new JTextField();
     
-    int x1 = -1;
-    int y1 = -1;
-    int x2 = -1;
-    int y2 = -1;
-    boolean settingFrom = true;
-    boolean ready = false;
+    private int x1 = -1;
+    private int y1 = -1;
+    private int x2 = -1;
+    private int y2 = -1;
+    private boolean settingFrom = true;
+    private boolean ready = false;
     
     public GetDirectionPanel(MainFrame mf)
     {
@@ -91,7 +92,6 @@ public class GetDirectionPanel extends JPanel
         //Render components
         //Center pane
         JPanel imgPn = new JPanel();
-        //imgPn.add(ipScrollPane);
         this.add(ipScrollPane, BorderLayout.CENTER);
         
         //Left pane
@@ -149,9 +149,14 @@ public class GetDirectionPanel extends JPanel
     @Override
     public void doPaintComponent(Graphics g, BufferedImage img)
     {
-        //Paint wall
-        for (DeadCell dc : mainFr.mainContent.getAnnotPn().deadCells)
-            g.fillRect(dc.getMinX(), dc.getMinY(), dc.getWidth(), dc.getHeight());   
+        AnnotFloorPlan afl = mainFr.getCurrentFloorPlan().getAnnotFloorPlan();
+        int unitW = afl.getUnitW();
+        int unitH = afl.getUnitH();
+        int halfUnitH = unitH;// / 2;
+       
+      //Paint wall
+        for (Cell dc : afl.getDeadCells())
+            g.fillRect(dc.getMinX(), dc.getMinY(), unitW, halfUnitH);   
         
         //Paint from and to pins
         if (x1 > 0 && y1 > 0)
@@ -171,36 +176,33 @@ public class GetDirectionPanel extends JPanel
         //Paint path       
         if (ready)
         {
-            g.setColor(Color.GREEN);
-            AnnotFloorPlan afl = mainFr.getCurrentFloorPlan().getAnnotFloorPlan();
-
             Graphics2D g2 = (Graphics2D) g;
             g2.setStroke(new BasicStroke(3));
 
-            SimpleGraph graph = afl.getGraph();
-           List<DefaultEdge> edges = afl.getShortestPath(x1, y1, x2, y2);
+            SimpleWeightedGraph graph = afl.getGraph();
+            List<DefaultWeightedEdge> edges = afl.getShortestPath(x1, y1, x2, y2);
 
            int halfW = afl.getUnitW() / 2;
            int halfH = afl.getUnitH() / 2;
            
             for (DefaultEdge e : edges)
             {
-                Cell source = (Cell)graph.getEdgeSource(e);
+                
+                Cell source = (Cell)graph.getEdgeSource(e);                
                 Cell target = (Cell)graph.getEdgeTarget(e);
 
-                g2.drawLine(source.getCol() * afl.getUnitW() + halfW,
-                            source.getRow() * afl.getUnitH() + halfH,
-                            target.getCol() * afl.getUnitW() + halfW, 
-                            target.getRow() * afl.getUnitH() + halfH);
+                //g2.setColor(Color.ORANGE);
+                //g2.drawRect(source.getCol() * unitW, source.getRow() * unitH, unitW, unitH);
+                //g2.drawRect(target.getCol() * unitW, target.getRow() * unitH, unitW, unitH);
+                
+                g2.setColor(Color.GREEN);
+                g2.drawLine(source.getCol() * unitW + halfW,
+                            source.getRow() * unitH + halfH,
+                            target.getCol() * unitW + halfW, 
+                            target.getRow() * unitH + halfH);
             }
         }
     }
-//
-//    @Override
-//    public void disableCell(int x, int y, DeadCell c)
-//    {
-//        throw new UnsupportedOperationException("Not supported yet.");
-//    }
 
     @Override
     public void onMouseClicked(int x, int y)
@@ -236,7 +238,6 @@ public class GetDirectionPanel extends JPanel
             System.out.println("Update in get direction called");
             PointMarkingPanel pn = (PointMarkingPanel)arg;
             imagePanel = new ImagePanel(pn.getUI().getImageFile(), this);
-            //currentFloorPlan = pn.getUI().getCurrentFloorPlan();
             ipScrollPane.setViewportView(imagePanel);
         }
         catch (IOException e)

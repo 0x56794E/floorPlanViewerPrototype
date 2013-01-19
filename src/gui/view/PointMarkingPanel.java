@@ -41,12 +41,11 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import util.DatabaseService;
-import entity.DeadCell;
 import util.FileService;
 
 /**
  * @author Vy Thuy Nguyen
- * @version 1.0 Jan 12, 2013 Last modified:
+ * @version 1.0 Jan 12, 2013 
  */
 public class PointMarkingPanel extends Observable
 {
@@ -145,13 +144,7 @@ public class PointMarkingPanel extends Observable
         * @see ImagePanel
         */
         private ImagePanel imagePanel;
-
-        private JButton startAnnotModeBtn = new JButton ("Start marking mode");
-
         private JButton saveAnnotBtn = new JButton("Save");
-
-        private JButton cancelAnnotBtn = new JButton("Cancel");
-
 
         /**
         * Scroll pane for imagePanel
@@ -187,20 +180,6 @@ public class PointMarkingPanel extends Observable
             TitledBorder b = new TitledBorder("Floor Plan");
             sub.setBorder(b);
             sub.add(ipScrollPane);
-
-
-
-    //        JPanel btnSub = new JPanel();
-    //        btnSub.setLayout(new FlowLayout(FlowLayout.LEFT));
-    //        currentPos.setEditable(false);
-    //        currentPos.setSize(100, 60);
-    //        btnSub.add(currentPos);
-
-            //btnSub.add(startAnnotModeBtn);
-            //btnSub.add(saveAnnotBtn);
-            //btnSub.add(cancelAnnotBtn);
-            //sub.add(btnSub, BorderLayout.SOUTH);
-
             this.add(sub, BorderLayout.CENTER);
 
             saveAnnotBtn.addActionListener(new ActionListener() {
@@ -208,29 +187,9 @@ public class PointMarkingPanel extends Observable
                 @Override
                 public void actionPerformed(ActionEvent e)
                 {
-                    //imagePanel.getShortestPath();
+                  
                 }
             });
-
-            //Annot. btns action listener
-            startAnnotModeBtn.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e)
-                {
-                    //Ask for saving the currrent point set
-                    //TODO:
-
-                    //Show blank floor plan
-                    showBlankFloorPlan();
-                    disableAllButtons();
-
-                    JButton b = (JButton)e.getSource();
-                    b.setEnabled(false);
-                    imagePanel.setInAnnotMode(true);
-                }
-            });
-
 
             /*** end Image Canvas ***/
 
@@ -315,12 +274,10 @@ public class PointMarkingPanel extends Observable
             existingPSPn.add(upperBtnPn, BorderLayout.SOUTH);
 
             leftPane.add(existingPSPn, BorderLayout.NORTH);
-            /**
-            * * end Existing Point Sets **
-            */
-            /**
-            * * Selected Points **
-            */
+            // end Existing Point Sets
+            
+            
+            //Selected Points 
             //Top-level pane
             JPanel selectedPPn = new JPanel();
             selectedPPn.setLayout(new BorderLayout());
@@ -379,16 +336,10 @@ public class PointMarkingPanel extends Observable
             btnPn.add(saveToFileBtn);
             selectedPPn.add(btnPn, BorderLayout.SOUTH);
             leftPane.add(selectedPPn, BorderLayout.CENTER);
-            /**
-            * * end Selected Points **
-            */
+            // end Selected Points
             this.add(leftPane, BorderLayout.EAST);
         }
 
-        public void setCurrentPos(String str)
-        {
-
-        }
 
         private void saveToFile()
         {
@@ -541,22 +492,13 @@ public class PointMarkingPanel extends Observable
 
         public void setCurrentFloorPlan(FloorPlan fp) throws IOException
         {
-
             this.currentFloorPlan = fp;
             this.currentPointSet = fp.getPointSets().get(0);
-
             imagePanel = new ImagePanel(new File(fp.getAbsoluteFilePath()), PointMarkingPanel.UI.this);
-
             this.updatePointSetJList();
-
-            imagePanel.repaint();
+            fp.getAnnotFloorPlan().updateGraph();
             ipScrollPane.setViewportView(imagePanel);
-            mainFr.pack();
-            mainFr.validate();
-
             updateView();
-            //this.repaint();
-            //mainFr.validate();
         }
 
         public void setCurrentPointSet(PointSet ps)

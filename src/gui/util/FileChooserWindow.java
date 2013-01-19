@@ -84,6 +84,7 @@ public class FileChooserWindow extends JFrame
             String command = e.getActionCommand();
             if (command.equals(JFileChooser.APPROVE_SELECTION))
             {
+               // FileChooserWindow.this.setVisible(false);
                 try
                 {
                     fileGUIContainer.loadFileContent(fileChooser.getSelectedFile());
@@ -97,6 +98,7 @@ public class FileChooserWindow extends JFrame
                 }
             
             }
+            
             FileChooserWindow.this.setVisible(false);
         }
     }

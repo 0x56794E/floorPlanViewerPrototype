@@ -22,7 +22,6 @@ package gui.view;
 
 import entity.FloorPlan;
 import gui.util.FileChooserWindow;
-import gui.util.TabbedPanel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;

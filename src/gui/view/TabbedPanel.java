@@ -18,7 +18,7 @@
  * Boston, MA  02110-1301, USA.
  */
 
-package gui.util;
+package gui.view;
 
 import gui.view.AnnotPanel;
 import gui.view.GetDirectionPanel;
@@ -66,12 +66,12 @@ public class TabbedPanel extends JTabbedPane
 
     private void renderComponents()
     {
-        this.addTab("Location Marking", pointMarkingPn.getUI());
+        this.addTab("Mark Locations", pointMarkingPn.getUI());
         
         //Sub tabbed pane containing annotPn and directionPn
         JTabbedPane subTabbedPane = new JTabbedPane(JTabbedPane.BOTTOM);
         subTabbedPane.addTab("Mark Dead Cells", annotPn);
-        subTabbedPane.addTab("Mark Locations", directionPn);
+        subTabbedPane.addTab("Get Direction", directionPn);
         this.addTab("Direction", subTabbedPane);
     }
 
