@@ -26,6 +26,8 @@ import gui.util.ImagePanelContainer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Observable;
@@ -50,6 +52,11 @@ public class GetDirectionPanel extends JPanel
     private ImagePanel imagePanel;
     private JScrollPane ipScrollPane = new JScrollPane();
     
+    private JPanel fromCoorPn = new JPanel();
+    private JPanel toCoorPn = new JPanel();
+    private TitledBorder fromCoorBorder = new TitledBorder("From");
+    private TitledBorder toCoorBorder = new TitledBorder("To");
+    
     private JButton goBtn = new JButton("Go");
     private JTextField fromXField = new JTextField();
     private JTextField fromYField = new JTextField();
@@ -69,25 +76,7 @@ public class GetDirectionPanel extends JPanel
         this.setLayout(new BorderLayout());
         
         //Init components
-        //Left pane
-        fromXField.setPreferredSize(new Dimension(50, 20));
-        fromYField.setPreferredSize(new Dimension(50, 20));
-        toXField.setPreferredSize(new Dimension(50, 20));
-        toYField.setPreferredSize(new Dimension(50, 20));
-        fromXField.setEditable(false);        
-        fromYField.setEditable(false);        
-        toXField.setEditable(false);        
-        toYField.setEditable(false);
-        goBtn.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e)
-            {
-                if (x1 >= 0 && x2 >= 0 && y1 >= 0 && y2 >= 0)
-                    ready = true;
-                imagePanel.repaint();
-            }
-        });
+        initComponents();
         
         //Render components
         //Center pane
@@ -105,31 +94,29 @@ public class GetDirectionPanel extends JPanel
         
         //Row 1
         JPanel r1 = new JPanel();
-        JLabel fromLb = new JLabel("   From:                          ");
-        
-        JPanel fromCoorPn = new JPanel();
+        //JLabel fromLb = new JLabel("   From:                          ");
+        fromCoorPn.setBorder(fromCoorBorder);
         fromCoorPn.setLayout(new FlowLayout(FlowLayout.LEFT));
         fromCoorPn.add(new JLabel(" x: "));
         fromCoorPn.add(fromXField);
         fromCoorPn.add(new JLabel(" y: "));
         fromCoorPn.add(fromYField);
         
-        r1.add(fromLb);
+        //r1.add(fromLb);
         r1.add(fromCoorPn);
         leftPn.add(r1);
         
         //Row 2
         JPanel r2 = new JPanel();
-        JLabel toLb = new JLabel("   To:                          ");
-        
-        JPanel toCoorPn = new JPanel();
+        //JLabel toLb = new JLabel("   To:                          ");
+        toCoorPn.setBorder(toCoorBorder);
         toCoorPn.setLayout(new FlowLayout(FlowLayout.LEFT));
         toCoorPn.add(new JLabel(" x: "));
         toCoorPn.add(toXField);
         toCoorPn.add(new JLabel(" y: "));
         toCoorPn.add(toYField);
         
-        r2.add(toLb);
+        //r2.add(toLb);
         r2.add(toCoorPn);
         leftPn.add(r2);
         
@@ -140,6 +127,129 @@ public class GetDirectionPanel extends JPanel
         this.add(leftPn, BorderLayout.EAST);
     }
 
+    private void initComponents()
+    {
+        //Left pane
+        fromXField.setPreferredSize(new Dimension(50, 20));
+        fromYField.setPreferredSize(new Dimension(50, 20));
+        toXField.setPreferredSize(new Dimension(50, 20));
+        toYField.setPreferredSize(new Dimension(50, 20));
+        
+        //Listener
+        fromXField.addFocusListener(new FocusListener() {
+
+            @Override
+            public void focusGained(FocusEvent e)
+            {}
+
+            @Override
+            public void focusLost(FocusEvent e)
+            {
+                try
+                {
+                    int x = Integer.parseInt(fromXField.getText());
+                    if (isInXRange(x))
+                        x1 = x;
+                        
+                }
+                catch (NumberFormatException exc)
+                {
+                    JOptionPane.showMessageDialog(null, "Value must be an integer", "INVALID VALUE", JOptionPane.ERROR_MESSAGE);
+                    fromXField.setText("0");
+                }
+                
+                imagePanel.repaint();
+            }
+        });
+        
+         toXField.addFocusListener(new FocusListener() {
+
+            @Override
+            public void focusGained(FocusEvent e)
+            {}
+
+            @Override
+            public void focusLost(FocusEvent e)
+            {
+                try
+                {
+                    int x = Integer.parseInt(toXField.getText());
+                    if (isInXRange(x))
+                        x2 = x;
+                        
+                }
+                catch (NumberFormatException exc)
+                {
+                    JOptionPane.showMessageDialog(null, "Value must be an integer", "INVALID VALUE", JOptionPane.ERROR_MESSAGE);
+                    toXField.setText("0");
+                }
+                
+                imagePanel.repaint();
+            }
+        });
+        
+        fromYField.addFocusListener(new FocusListener() {
+
+            @Override
+            public void focusGained(FocusEvent e)
+            {}
+
+            @Override
+            public void focusLost(FocusEvent e)
+            {
+                try
+                {
+                    int y = Integer.parseInt(fromYField.getText());
+                    if (isInYRange(y))
+                        y1 = y;
+
+                }
+                catch (NumberFormatException exc)
+                {
+                    JOptionPane.showMessageDialog(null, "Value must be an integer", "INVALID VALUE", JOptionPane.ERROR_MESSAGE);
+                    fromYField.setText("0");
+                }
+                imagePanel.repaint();
+            }
+        });
+        
+        toYField.addFocusListener(new FocusListener() {
+
+            @Override
+            public void focusGained(FocusEvent e)
+            {}
+
+            @Override
+            public void focusLost(FocusEvent e)
+            {
+                try
+                {
+                    int y = Integer.parseInt(toYField.getText());
+                    if (isInYRange(y))
+                        y2 = y;
+
+                }
+                catch (NumberFormatException exc)
+                {
+                    JOptionPane.showMessageDialog(null, "Value must be an integer", "INVALID VALUE", JOptionPane.ERROR_MESSAGE);
+                    toYField.setText("0");
+                }
+                imagePanel.repaint();
+            }
+        });
+         
+        goBtn.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                if (x1 >= 0 && x2 >= 0 && y1 >= 0 && y2 >= 0)
+                    ready = true;
+                imagePanel.repaint();
+            }
+        });
+    }
+    
     @Override
     public void doPaintComponent(Graphics g)
     {
@@ -201,6 +311,8 @@ public class GetDirectionPanel extends JPanel
                             target.getCol() * unitW + halfW, 
                             target.getRow() * unitH + halfH);
             }
+            
+            ready = false;
         }
     }
 
@@ -209,19 +321,22 @@ public class GetDirectionPanel extends JPanel
     {
         if (settingFrom)
         {
-            ready = false;
             x1 = x;
             y1 = y;
+            fromCoorBorder.setTitleColor(Color.BLACK);
+            toCoorBorder.setTitleColor(Color.ORANGE);
         }
         else
         {
             x2 = x;
             y2 = y;
-            ready = true;
+            toCoorBorder.setTitleColor(Color.BLACK);
+            fromCoorBorder.setTitleColor(Color.ORANGE);
         }
         
         settingFrom = !settingFrom;
-        imagePanel.repaint();
+        //imagePanel.repaint();
+        this.repaint();
     }
 
     @Override
@@ -235,7 +350,6 @@ public class GetDirectionPanel extends JPanel
     {
         try
         {
-            //System.out.println("Update in get direction called");
             PointMarkingPanel pn = (PointMarkingPanel)arg;
             imagePanel = new ImagePanel(pn.getUI().getImageFile(), this);
             ipScrollPane.setViewportView(imagePanel);
@@ -244,6 +358,17 @@ public class GetDirectionPanel extends JPanel
         {
             System.out.println("unable to update annotPn");
         }
+    }
+
+    
+    public boolean isInYRange(int y)
+    {
+        return (y >= 0 && y <= imagePanel.getImageHeight());
+    }
+    
+    public boolean isInXRange(int x)
+    {
+        return (x >= 0 && x <= imagePanel.getImageWidth());
     }
 
 }

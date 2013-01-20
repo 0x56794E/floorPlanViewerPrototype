@@ -70,7 +70,7 @@ public class TabbedPanel extends JTabbedPane
         
         //Sub tabbed pane containing annotPn and directionPn
         JTabbedPane subTabbedPane = new JTabbedPane(JTabbedPane.BOTTOM);
-        subTabbedPane.addTab("Mark Dead Cells", annotPn);
+        subTabbedPane.addTab("Mark Impenetrable Cells", annotPn);
         subTabbedPane.addTab("Get Direction", directionPn);
         this.addTab("Direction", subTabbedPane);
     }
