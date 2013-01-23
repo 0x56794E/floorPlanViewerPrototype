@@ -57,28 +57,14 @@ public class AnnotFloorPlan implements Serializable
     int colCount;
     
     @Transient
-    private SimpleWeightedGraph g;
+    private boolean graphInitialized = false;
+    
+    @Transient
+    private SimpleWeightedGraph<Cell, DefaultWeightedEdge> g;
     
     @Transient
     private Cell[][] cellContainer;
-    
-    
-    
-    public int getUnitW()
-    {
-        return unitW;
-    }
-    
-    public int getUnitH()
-    {
-        return unitH;
-    }
-    
-    public SimpleWeightedGraph getGraph()
-    {
-        return g;
-    }
-    
+        
     @SuppressWarnings({"unchecked", "unchecked"})
     public AnnotFloorPlan()
     {
@@ -94,9 +80,9 @@ public class AnnotFloorPlan implements Serializable
         cellContainer = new Cell[rowCount][colCount];
          
         //Init the graph
-        g = new SimpleWeightedGraph(DefaultWeightedEdge.class);
-        generateVertices();
-        generateEdges();
+        g = new SimpleWeightedGraph<Cell, DefaultWeightedEdge>(DefaultWeightedEdge.class);
+        
+        initGraph();
     }
     
     public AnnotFloorPlan(FloorPlan fp)
@@ -111,9 +97,41 @@ public class AnnotFloorPlan implements Serializable
         cellContainer = new Cell[rowCount][colCount];
         
         //init the graph
-        g = new SimpleWeightedGraph(DefaultWeightedEdge.class);
-        generateVertices();
-        generateEdges();
+        g = new SimpleWeightedGraph<Cell, DefaultWeightedEdge>(DefaultWeightedEdge.class);
+        
+        initGraph();
+        //generateVertices();
+        //generateEdges();
+    }
+     
+    public int getUnitW()
+    {
+        return unitW;
+    }
+    
+    public int getUnitH()
+    {
+        return unitH;
+    }
+    
+    public SimpleWeightedGraph<Cell, DefaultWeightedEdge> getGraph()
+    {
+        return g;
+    }
+    
+    public boolean needInitGraph()
+    {
+        return !graphInitialized;
+    }
+    
+    public void initGraph()
+    {
+        if (!graphInitialized)
+        {
+            generateVertices();
+            generateEdges();
+            graphInitialized = true;
+        }
     }
     
     /**

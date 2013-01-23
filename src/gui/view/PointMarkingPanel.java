@@ -222,6 +222,7 @@ public class PointMarkingPanel extends Observable
                 PointMarkingPanel.this.notifyObservers(PointMarkingPanel.this);
             
                 updateView();
+                
             }
             else if (createNew == JOptionPane.NO_OPTION)
             {

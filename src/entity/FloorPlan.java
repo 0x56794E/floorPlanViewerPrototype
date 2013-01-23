@@ -62,9 +62,7 @@ public class FloorPlan implements Serializable
     
     public FloorPlan()
     {
-        pointSets = new ArrayList<PointSet>();
-        //annotFloorPlan = new AnnotFloorPlan(this);
-        
+        pointSets = new ArrayList<PointSet>();   
     }
     
      public FloorPlan(File file, int x, int y, int width, int height)

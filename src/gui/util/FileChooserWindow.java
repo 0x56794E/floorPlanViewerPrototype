@@ -84,7 +84,6 @@ public class FileChooserWindow extends JFrame
             String command = e.getActionCommand();
             if (command.equals(JFileChooser.APPROVE_SELECTION))
             {
-               // FileChooserWindow.this.setVisible(false);
                 try
                 {
                     fileGUIContainer.loadFileContent(fileChooser.getSelectedFile());
@@ -92,7 +91,8 @@ public class FileChooserWindow extends JFrame
                 catch (IOException exc)
                 {
                     JOptionPane.showMessageDialog(null, 
-                                                 "Error While Reading From File.\n Try Again!", 
+                                                 "Error While Reading From File.\nTry Again!"
+                                                 + "\n" + exc.getStackTrace(), 
                                                  "ERROR!", JOptionPane.ERROR_MESSAGE);
 
                 }
