@@ -168,7 +168,6 @@ public class AnnotFloorPlan implements Serializable
         for (int row = 0; row < rowCount; ++row)
             for (int col = 0; col < colCount; ++col)
             {
-                //System.out.println("generating edges for node at [" + row + ", " + col+ "]...");
                 addEdges(row, col);
             }
     }
