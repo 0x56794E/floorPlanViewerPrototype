@@ -104,6 +104,11 @@ public class AnnotFloorPlan implements Serializable
         //generateEdges();
     }
      
+    public FloorPlan getFloorPlan()
+    {
+        return this.floorPlan;
+    }
+    
     public int getUnitW()
     {
         return unitW;
@@ -355,5 +360,20 @@ public class AnnotFloorPlan implements Serializable
     {
         for (Cell c : deadCells)
             removeEdges(c.getRow(), c.getCol());
+    }
+    
+    public int getRowCount()
+    {
+        return this.rowCount;
+    }
+    
+    public int getColCount()
+    {
+        return this.colCount;
+    }
+    
+    public Cell[][] getCellContainer()
+    {
+        return this.cellContainer;
     }
 }

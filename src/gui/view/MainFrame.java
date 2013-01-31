@@ -27,6 +27,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.*;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.persistence.EntityManager;
 import javax.swing.*;
 import util.DatabaseService;
@@ -52,7 +54,9 @@ public class MainFrame extends JFrame
     private JMenuItem saveToDBItem = new JMenuItem("Save to Database");
     //private JMenuItem saveBothItem = new JMenuItem("Save to Both File and Database");
     private JMenuItem exportItem = new JMenuItem("Export Marked Floor Plan...");
+    private JMenuItem exportWithDeadCellItem = new JMenuItem("Export Floor Plan with Dead Cells...");
     private JMenuItem showExistItem = new JMenuItem("Show Saved Floor Plans... ");
+    
     
     //Help Menu
     private JMenuItem aboutItem = new JMenuItem("About");
@@ -283,6 +287,37 @@ public class MainFrame extends JFrame
         exportItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.CTRL_MASK));
         fileMenu.add(exportItem);
         
+        
+        exportWithDeadCellItem.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                if (mainContent.getPointMarkingPn().getUI().hasImage())
+                {
+                    try
+                    {
+                        FileService.exportFloorPlanWithDeadCells(mainContent.pointMarkingPn.getUI().getCurrentFloorPlan());
+                        JOptionPane.showMessageDialog(null, "Successfully export image");
+                    }
+                    catch (IOException ex)
+                    {
+                        JOptionPane.showMessageDialog(null,
+                                                  "Error while exported image.", 
+                                                  "ERROR",
+                                                  JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+                else
+                {
+                    JOptionPane.showMessageDialog(null,
+                                                  "Please load a floor plan and mark it first", 
+                                                  "No Image to Export",
+                                                  JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+        fileMenu.add(exportWithDeadCellItem);
         menuBar.add(fileMenu);
         
         //end File Menu

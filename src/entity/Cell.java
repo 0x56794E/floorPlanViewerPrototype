@@ -108,6 +108,11 @@ public class Cell
         isDead = false;
     }
     
+    public boolean isDead()
+    {
+        return this.isDead;
+    }
+    
     public boolean equals (Object rhs)
     {
         if (rhs == null || !(rhs instanceof Cell))

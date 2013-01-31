@@ -32,11 +32,15 @@ import java.io.IOException;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.persistence.EntityManager;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import util.DatabaseService;
+import util.FileService;
 
 /**
  * @author              Vy Thuy Nguyen
@@ -53,7 +57,8 @@ public class AnnotPanel extends JPanel
     boolean inMarkingMode;
     JButton markEraseBtn;
     JButton saveDeadCellBtn = new JButton("Save");
-    
+    JButton saveDeadCellToFileBtn = new JButton("Save to File");
+    JButton saveGraphBtn = new JButton("Save Floor Plan for Partitioning");
     private Set<Cell> deadCells;
     
     public AnnotPanel(MainFrame mf)
@@ -93,8 +98,43 @@ public class AnnotPanel extends JPanel
                 
                 em.persist(mainFr.getCurrentFloorPlan().getAnnotFloorPlan());
                 em.getTransaction().commit();
-                em.close();
+                //em.close();
             }
+        });
+        
+        saveDeadCellToFileBtn.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                try
+                {
+                    FileService.saveDeadCellsToFile(AnnotPanel.this.deadCells);
+                    JOptionPane.showMessageDialog(null, "Successfully Saved Dead Cells to File");
+                }
+                catch (IOException ex)
+                {
+                    JOptionPane.showMessageDialog(null, "Error while saving dead cells to file", "ERROR", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        
+        });
+        saveGraphBtn.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                try
+                {
+                    FileService.saveGraph(AnnotPanel.this.mainFr.mainContent.getPointMarkingPn().getUI().getCurrentFloorPlan().getAnnotFloorPlan());
+                    JOptionPane.showMessageDialog(null, "Successfully Saved Graph To File");
+                }
+                catch (IOException ex)
+                {
+                    JOptionPane.showMessageDialog(null, "Error while saving graph to file", "ERROR", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        
         });
         
         //Render components
@@ -104,6 +144,8 @@ public class AnnotPanel extends JPanel
         JPanel btnPn = new JPanel();
         btnPn.add(markEraseBtn);
         btnPn.add(saveDeadCellBtn);
+        btnPn.add(saveDeadCellToFileBtn);
+        btnPn.add(saveGraphBtn);
         this.add(btnPn, BorderLayout.SOUTH);
     }
 
