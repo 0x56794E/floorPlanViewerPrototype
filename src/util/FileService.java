@@ -28,11 +28,14 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
+import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.DefaultWeightedEdge;
+import org.jgrapht.graph.SimpleWeightedGraph;
 
 /**
  * @author              Vy Thuy Nguyen
@@ -180,6 +183,86 @@ public class FileService
             }
 
         //Close the output stream
+        out.close();
+    }
+    
+    public static void saveLargestConnectedComponent(AnnotFloorPlan annotFp) throws IOException
+    {
+        SimpleWeightedGraph<Cell, DefaultWeightedEdge> g = annotFp.getGraph();
+        System.out.printf("row = %d, col = %d", annotFp.getRowCount(), annotFp.getColCount());
+        ArrayList<List<Cell>> components = new ArrayList<>();
+        boolean visited[][] = new boolean[annotFp.getRowCount()][annotFp.getColCount()];
+        for (int row = 0; row < annotFp.getRowCount(); ++row)
+            for (int col = 0; col < annotFp.getColCount(); ++col)
+                visited[row][col] = false;
+        
+        Queue<Cell> q; 
+        Cell t = null, u = null;
+        for (Cell c : g.vertexSet())
+        {
+            if (c.isDead())
+            {
+                visited[c.getRow()][c.getCol()] = true;
+                continue;
+            }
+            
+            if (!visited[c.getRow()][c.getCol()])
+            {
+                q = new LinkedList<Cell>();
+                ArrayList<Cell> component = new ArrayList<>();
+                visited[c.getRow()][c.getCol()] = true;
+                
+                //Find all connected nodes
+                q.add(c);
+                component.add(c);
+                while (!q.isEmpty())
+                {
+                    t = q.remove();
+                    System.out.println("\nedge count = " + g.edgesOf(t).size() + "for " + t);
+                    for (DefaultWeightedEdge e : g.edgesOf(t))
+                    {
+                        System.out.println("\tsource of e: " + g.getEdgeSource(e));
+                        System.out.println("\ttarget of e: " + g.getEdgeTarget(e));
+                        u = t.equals(g.getEdgeSource(e)) ?
+                                g.getEdgeTarget(e) :
+                                g.getEdgeSource(e);
+                        if (!visited[u.getRow()][u.getCol()])
+                        {
+                            visited[u.getRow()][u.getCol()] = true;
+                            q.add(u);
+                            component.add(u);
+                            System.out.println("marking " + u);
+                        }
+                    }
+                }
+                
+                System.out.println("this compenent has " + component.size() + " cells");
+                components.add(component);
+            } //end if not visited
+        }
+        
+        System.out.println("connected component count = " + components.size());
+        int largestSize = 0, largestIndex = 0;
+        for (int i = 0; i < components.size(); ++i)
+        {
+            if (components.get(i).size() > largestSize)
+            {
+                largestSize = components.get(i).size();
+                largestIndex = i;
+            }
+        }
+        
+        //Print to fiile
+        FileWriter fstream = new FileWriter(annotFp.getFloorPlan().getFileName() 
+                        + "_" + annotFp.getFloorPlan().getId() 
+                        + "_availCell.txt");
+        BufferedWriter out = new BufferedWriter(fstream);
+        for (Cell cell : components.get(largestIndex))
+        {
+            out.write(cell.getCol() + " " + cell.getRow());
+            out.write("\r\n");
+        }
+        
         out.close();
     }
 }

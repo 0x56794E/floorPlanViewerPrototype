@@ -50,7 +50,7 @@ public class AnnotFloorPlan implements Serializable
     
     
     //Each cell accounts for 1% of the width and the height
-    private final int ratio = 2; //percent in respect to actual length
+    private final int RATIO = 20; //percent in respect to actual length
     int unitW;
     int unitH;
     int rowCount;
@@ -73,10 +73,10 @@ public class AnnotFloorPlan implements Serializable
         
         int width = 1200;
         int height = 1000;
-        unitW = width * ratio / 100;
-        unitH = height * ratio / 100;
-        rowCount = height / unitH + 1;
-        colCount = width / unitW + 1;
+        unitW = width * RATIO / 100;
+        unitH = height * RATIO / 100;
+        rowCount = height / unitH;
+        colCount = width / unitW;
         cellContainer = new Cell[rowCount][colCount];
          
         //Init the graph
@@ -90,10 +90,10 @@ public class AnnotFloorPlan implements Serializable
         floorPlan = fp;        
         deadCells = new HashSet<Cell>();
         
-        unitW = fp.getWidth() * ratio / 100;
-        unitH = fp.getHeight() * ratio / 100;
-        rowCount = fp.getHeight() / unitH + 1;
-        colCount = fp.getWidth() / unitW + 1;
+        unitW = fp.getWidth() * RATIO / 100;
+        unitH = fp.getHeight() * RATIO / 100;
+        rowCount = fp.getHeight() / unitH;
+        colCount = fp.getWidth() / unitW;
         cellContainer = new Cell[rowCount][colCount];
         
         //init the graph
@@ -163,6 +163,7 @@ public class AnnotFloorPlan implements Serializable
         for (int row = 0; row < rowCount; ++row)
             for (int col = 0; col < colCount; ++col)
             {
+                
                 cellContainer[row][col] = new Cell(row, col);
                 g.addVertex(cellContainer[row][col]);
             }
@@ -185,45 +186,84 @@ public class AnnotFloorPlan implements Serializable
      */
     private void removeEdges(int row, int col)
     {
+        System.out.printf("Node at (%d, %d) has %d edges\n",
+                          row,
+                          col,
+                          g.edgesOf(cellContainer[row][col]).size());
+        //g.removeAllEdges(g.edgesOf(cellContainer[row][col]));
+        
          //North
         if (row > 0)
         {
+            
+            System.out.println("Removing N neighbor at " + cellContainer[row - 1][col]);
             g.removeAllEdges(cellContainer[row][col], cellContainer[row - 1][col]);
             
             //NE
-            if (col < colCount - 2)
-                g.removeAllEdges(cellContainer[row][col], cellContainer[row - 1][col + 1]);                
+            if (col < colCount - 1)
+            {
+                System.out.println("Removing NE neighbor at row=" + row + "col=" + col + ": " + cellContainer[row - 1][col + 1]);
+                g.removeAllEdges(cellContainer[row][col], cellContainer[row - 1][col + 1]);
+            }                
         }
 
         //East
-        if (col < colCount - 2)
+        if (col < colCount - 1)
         {
             g.removeAllEdges(cellContainer[row][col], cellContainer[row][col + 1]);
-           
+            System.out.println("Removing E neighbor at " + cellContainer[row][col + 1]);
+            
             //SE
-            if (row < rowCount - 2)
-                g.removeAllEdges(cellContainer[row][col], cellContainer[row + 1][col + 1]);                
+            if (row < rowCount - 1)
+            {
+                g.removeAllEdges(cellContainer[row][col], cellContainer[row + 1][col + 1]);     
+                System.out.println("Removing SE neighbor at " + cellContainer[row + 1][col + 1]);     
+            }
         }
 
         //South
-        if (row < rowCount - 2)
+        if (row < rowCount - 1)
         {
             g.removeAllEdges(cellContainer[row][col], cellContainer[row + 1][col]);
+            System.out.println("Removing S neighbor at " + cellContainer[row + 1][col]);
             
             //SW
             if (col > 0)
-                g.removeAllEdges(cellContainer[row][col], cellContainer[row + 1][col - 1]);              
+            {
+                g.removeAllEdges(cellContainer[row][col], cellContainer[row + 1][col - 1]);
+                
+                System.out.println("Removing SW neighbor at " + cellContainer[row + 1][col - 1]);
+            }              
         }
 
         //West
         if (col > 0)
         {
             g.removeAllEdges(cellContainer[row][col], cellContainer[row][col - 1]);
+            System.out.println("Removing SW neighbor at " + cellContainer[row][col - 1]);
             
             //NW
             if (row > 0)
+            {
                 g.removeAllEdges(cellContainer[row][col], cellContainer[row - 1][col - 1]);
+                System.out.println("Removing NW neighbor at " + cellContainer[row - 1][col - 1]);
+            }
                 
+        }
+        
+        System.out.printf("After removing; Node at (%d, %d) has %d edges\nThese are: \n",
+                          row,
+                          col,
+                          g.edgesOf(cellContainer[row][col]).size());
+        for (DefaultWeightedEdge e : g.edgesOf(cellContainer[row][col]))
+        {
+            System.out.printf("Source: %s; Target: %s;",
+                              g.getEdgeSource(e),
+                              g.getEdgeTarget(e));
+            System.out.println("  This and edge with opp source and target are equal? " 
+                    + g.getEdge(g.getEdgeSource(e), g.getEdgeTarget(e)).equals(
+                      g.getEdge(g.getEdgeTarget(e), g.getEdgeSource(e))
+                    ));
         }
     }
     
@@ -244,7 +284,7 @@ public class AnnotFloorPlan implements Serializable
                                       cellContainer[row - 1][col]),
                             1);
             //NE
-            if (col < colCount - 2)
+            if (col < colCount - 1)
             {
                 g.addEdge(cellContainer[row][col], cellContainer[row - 1][col + 1]);
                 g.setEdgeWeight(g.getEdge(cellContainer[row][col],
@@ -254,7 +294,7 @@ public class AnnotFloorPlan implements Serializable
         }
 
         //East
-        if (col < colCount - 2)
+        if (col < colCount - 1)
         {
             g.addEdge(cellContainer[row][col], cellContainer[row][col + 1]);
             g.setEdgeWeight(g.getEdge(cellContainer[row][col],
@@ -263,7 +303,7 @@ public class AnnotFloorPlan implements Serializable
 
 
             //SE
-            if (row < rowCount - 2)
+            if (row < rowCount - 1)
             {
                 g.addEdge(cellContainer[row][col], cellContainer[row + 1][col + 1]);
                 g.setEdgeWeight(g.getEdge(cellContainer[row][col],
@@ -274,7 +314,7 @@ public class AnnotFloorPlan implements Serializable
         }
 
         //South
-        if (row < rowCount - 2)
+        if (row < rowCount - 1)
         {
             g.addEdge(cellContainer[row][col], cellContainer[row + 1][col]);
             g.setEdgeWeight(g.getEdge(cellContainer[row][col],
@@ -375,5 +415,74 @@ public class AnnotFloorPlan implements Serializable
     public Cell[][] getCellContainer()
     {
         return this.cellContainer;
+    }
+    
+    
+    public ArrayList<Cell> getLargestConnectedComponent()
+    {
+        System.out.printf("row = %d, col = %d", rowCount, colCount);
+        ArrayList<ArrayList<Cell>> components = new ArrayList<>();
+        boolean visited[][] = new boolean[rowCount][colCount];
+        for (int row = 0; row < rowCount; ++row)
+            for (int col = 0; col < colCount; ++col)
+                visited[row][col] = false;
+        
+        Queue<Cell> q; 
+        Cell t = null, u = null;
+        for (Cell c : g.vertexSet())
+        {
+            if (c.isDead())
+            {
+                visited[c.getRow()][c.getCol()] = true;
+                continue;
+            }
+            
+            if (!visited[c.getRow()][c.getCol()])
+            {
+                q = new LinkedList<Cell>();
+                ArrayList<Cell> component = new ArrayList<>();
+                visited[c.getRow()][c.getCol()] = true;
+                
+                //Find all connected nodes
+                q.add(c);
+                component.add(c);
+                while (!q.isEmpty())
+                {
+                    t = q.remove();
+                    System.out.println("\nedge count = " + g.edgesOf(t).size() + "for " + t);
+                    for (DefaultWeightedEdge e : g.edgesOf(t))
+                    {
+                        System.out.println("\tsource of e: " + g.getEdgeSource(e));
+                        System.out.println("\ttarget of e: " + g.getEdgeTarget(e));
+                        u = t.equals(g.getEdgeSource(e)) ?
+                                g.getEdgeTarget(e) :
+                                g.getEdgeSource(e);
+                        if (!visited[u.getRow()][u.getCol()])
+                        {
+                            visited[u.getRow()][u.getCol()] = true;
+                            q.add(u);
+                            component.add(u);
+                            System.out.println("marking " + u);
+                        }
+                    }
+                }
+                
+                System.out.println("this compenent has " + component.size() + " cells");
+                components.add(component);
+            } //end if not visited
+        }
+        
+        System.out.println("connected component count = " + components.size());
+        int largestSize = 0, largestIndex = 0;
+        for (int i = 0; i < components.size(); ++i)
+        {
+            if (components.get(i).size() > largestSize)
+            {
+                largestSize = components.get(i).size();
+                largestIndex = i;
+            }
+        }
+        
+        return components.get(largestIndex);
     }
 }
