@@ -171,7 +171,7 @@ public class Line
      */
     public double getSj(Cell node)
     {
-        return a * (node.getRow() - ybar) - b * (node.getCol() - xbar);
+        return a * (node.getY() - ybar) - b * (node.getX() - xbar);
     }
     
     /**
@@ -187,7 +187,7 @@ public class Line
      */
     public static double getSj(Cell node, double a, double b, double xbar, double ybar)
     {
-        return a * (node.getRow() - ybar) - b * (node.getCol() - xbar);
+        return a * (node.getY() - ybar) - b * (node.getX() - xbar);
     }
     
     

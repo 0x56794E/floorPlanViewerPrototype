@@ -35,8 +35,11 @@ public class Cell
     private long id;
     
     private boolean isDead;
-    private int col;
+    private int x;
+    private int y;
+
     private int row;
+    private int col;
     
     private int minX;
     private int minY;
@@ -77,8 +80,10 @@ public class Cell
     
     public Cell(int r, int c)
     {
-        this.col = c;
         this.row = r;
+        this.col = c;
+        this.x = c;
+        this.y = -r;
         isDead = false;
     }
     
@@ -87,15 +92,24 @@ public class Cell
         this.isDead = false;
     }
     
-    public int getCol()
+    public int getX()
     {
-        return col;
+        return x;
+    }
+    
+    public int getY()
+    {
+        return y;
+        
     }
     
     public int getRow()
     {
-        return row;
-        
+        return this.row;
+    }
+    public int getCol()
+    {
+        return this.col;
     }
     
     public void disableCell()
@@ -120,7 +134,7 @@ public class Cell
         else
         {
             Cell rhsCell = (Cell) rhs;
-            return rhsCell.col == this.col && rhsCell.row == this.row;
+            return rhsCell.x == this.x && rhsCell.y == this.y;
         }
     }
 
@@ -128,13 +142,14 @@ public class Cell
     public int hashCode()
     {
         int hash = 3;
-        hash = 83 * hash + (int) (this.col ^ (this.col >>> 32));
-        hash = 83 * hash + (int) (this.row ^ (this.row >>> 32));
+        hash = 83 * hash + (int) (this.x ^ (this.x >>> 32));
+        hash = 83 * hash + (int) (this.y ^ (this.y >>> 32));
         return hash;
     }
     
     public String toString()
     {
-        return String.format("(%d, %d)", row, col);
+        return String.format("(%d, %d)", x, y); 
     }
+    
 }

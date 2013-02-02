@@ -127,7 +127,6 @@ public class FileService
     
     public static void saveDeadCellsToFile(FloorPlan fp) throws IOException
     {
-        
         FileWriter fstream = new FileWriter(fp.getFileName() + "_" + fp.getId() + "_deadCells.txt");
         BufferedWriter out = new BufferedWriter(fstream);
         
@@ -177,7 +176,7 @@ public class FileService
             {
                 if (!cellContainer[row][col].isDead())
                 {
-                    out.write(cellContainer[row][col].getCol() + " " + cellContainer[row][col].getRow());
+                    out.write(cellContainer[row][col].getX() + " " + cellContainer[row][col].getY());
                     out.write("\r\n");
                 }
             }
@@ -259,7 +258,7 @@ public class FileService
         BufferedWriter out = new BufferedWriter(fstream);
         for (Cell cell : components.get(largestIndex))
         {
-            out.write(cell.getCol() + " " + cell.getRow());
+            out.write(cell.getX() + " " + cell.getY());
             out.write("\r\n");
         }
         

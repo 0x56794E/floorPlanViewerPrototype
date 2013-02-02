@@ -115,24 +115,20 @@ public class InertialPartitioner
         
         for (Cell node : nodes)
         {
-            xbar += node.getCol();
-            ybar += node.getRow();
+            xbar += node.getX();
+            ybar += node.getY();
         }
         
-        System.out.printf("Sigma x = %f; Sigma y = %f\n", xbar, ybar);
         xbar /= N;
         ybar /= N;
-        System.out.printf("Done computing xbar and ybar; xbar = %f, ybar = %f\n",
-                          xbar,
-                          ybar);
         
         //Compute sum of squares of distance (x1, x2 and x3)
         double x1 = 0, x3 = 0, x2 = 0;
         double xDif = 0, yDif = 0;
         for (Cell node : nodes)
         {
-            xDif = node.getCol() - xbar;
-            yDif = node.getRow() - ybar;
+            xDif = node.getX() - xbar;
+            yDif = node.getY() - ybar;
             x1 += xDif * xDif;
             x3 += yDif * yDif;
             x2 += xDif * yDif;
@@ -198,9 +194,16 @@ public class InertialPartitioner
                         break;
                     }
                 }   
+               
                 sValues.add(min, sj);               
             }
-        } //end for-each node
+        }
+      
+        //TODO: remove this
+        for (int k = 0; k < sValues.size(); ++k)
+            System.out.printf("%f; ", sValues.get(k));
+        
+        System.out.println();
         
         size = sValues.size();
         double sbar = (size % 2 == 0 //If even number of elements
@@ -238,12 +241,31 @@ public class InertialPartitioner
         subRegions.add(line.getRightNodes());
         k--;
         
+        System.out.println("\nFinding  line #1: " + line);
+        System.out.printf("Largest region has %d nodes\n", nodes.size());
+        for (Cell n : nodes) System.out.printf("%s; ", n);
+        System.out.println("\n");
+        
+        System.out.println("\n\tLeft nodes include:");
+        System.out.print("\t\t");
+        for (Cell n : line.getLeftNodes()) 
+        {
+            System.out.printf("%s - sj = %f; ", n, line.getSj(n));
+        }
+        System.out.println();
+        System.out.println("\n\tRight nodes include:");
+        System.out.print("\t\t");
+        for (Cell n : line.getRightNodes()) 
+        {
+            System.out.printf("%s - sj = %f; ", n, line.getSj(n));
+        }
+        System.out.println();
+        
         for (int i = 0; i < k; ++i)
         {
-           //Find the greatest set
+            //Find the greatest set
             Collection<Cell> largestList = subRegions.last();
-            System.out.printf("\nLargest region has %d nodes\n", largestList.size());
-            for (Cell n : largestList) System.out.printf("%s; ", n);
+            
             System.out.println("\n");
             
             //Line dividing this set
@@ -255,6 +277,28 @@ public class InertialPartitioner
             System.out.println("removing ok? " + res);
             subRegions.add(line.getLeftNodes());
             subRegions.add(line.getRightNodes());
+            
+        System.out.println("\nFinding  line #" + (i + 2) + ": " + line);
+        System.out.printf("Largest region has %d nodes\n", largestList.size());
+        for (Cell n : largestList) 
+        {
+            System.out.printf("%s; ", n);
+        }
+        System.out.println("\n\tLeft nodes include:");
+        System.out.print("\t\t");
+        for (Cell n : line.getLeftNodes()) 
+        {
+            System.out.printf("%s - sj = %f; ", n, line.getSj(n));
+        }
+        System.out.println();
+        System.out.println("\n\tRight nodes include:");
+        System.out.print("\t\t");
+        for (Cell n : line.getRightNodes())
+        {
+            System.out.printf("%s - sj = %f; ", n, line.getSj(n));
+        }
+        System.out.println();
+        
         }
         
         return lines;
@@ -301,10 +345,10 @@ public class InertialPartitioner
      */
     public static boolean areOnSameSide(Line line, Cell node1, Cell node2)
     {
-        double prod = ( (line.getA() * (node1.getCol() - line.getXbar())
-                         + line.getB() * (node1.getCol() - line.getYbar()))
-                      * (line.getA() * (node2.getCol() - line.getXbar())
-                         + line.getB() * (node2.getRow() - line.getYbar())));
+        double prod = ( (line.getA() * (node1.getX() - line.getXbar())
+                         + line.getB() * (node1.getX() - line.getYbar()))
+                      * (line.getA() * (node2.getX() - line.getXbar())
+                         + line.getB() * (node2.getY() - line.getYbar())));
         
         return (prod >= 0 ? true : false);
     }

@@ -179,9 +179,13 @@ public class AnnotPanel extends JPanel
         deadCells = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getDeadCells();
         int unitW = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getUnitW();// / 2;
         int unitH = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getUnitH();// / 2;
-        for (Cell dc : deadCells)
-            g.fillRect(dc.getMinX(), dc.getMinY(), unitW, unitH);      
-        
+//        for (Cell dc : deadCells)
+//            g.fillRect(dc.getMinX(), dc.getMinY(), unitW, unitH);      
+        g.setColor(Color.red);
+        for (Cell cell : mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getGraph().vertexSet())
+        {
+            g.drawRect(cell.getCol() * unitW, cell.getRow() * unitH, unitW, unitH);
+        }
         //Visualize the lines
         if (showPartition)
         {
@@ -199,34 +203,80 @@ public class AnnotPanel extends JPanel
                 Graphics2D g2D = (Graphics2D) g;      
                 g2D.setStroke(new BasicStroke(10F));  // set stroke width of 10
 
-                double halfUnitW = unitW / 2, halfUnitH = unitH / 2;
-                double actualWidth = mainFr.getCurrentFloorPlan().getWidth();
+                double halfUnitW = unitW / 2, halfUnitH = unitH / 2,
+                       epsilon = 0.00001;
+                int actualWidth = (int)(mainFr.getCurrentFloorPlan().getWidth() / unitW);
+                int actualHeight = (int)(mainFr.getCurrentFloorPlan().getHeight() / unitH);
                 int x1, y1, x2, y2, x, y;
                 Line line;
-                
                 for (int i = 0; i < lines.size(); ++i)
                 {
                     //Line L: a(x - xbar) + b(y - ybar) = 0;
                     line = lines.get(i);
                     
+                    //Find the points where the line crosses four sides of the floor plan
+                    //The four sides are represented by:
+                    //Top: Lt: y = 0
+                    //Left: Ll: x = 0;
+                    //Bottom: Lb: y = -h;
+                    //Right: Lr: x = w;
+                    ArrayList<Cell> intersects = new ArrayList<>();
+                    if (Math.abs(line.getA()) < epsilon) //if a = 0 => horizontal line
+                    {
+                        //Left
+                        intersects.add(new Cell(Math.abs((int)(line.getA() * line.getXbar() / line.getB() + line.getYbar())), 
+                                                0));
+                        
+                        //Right
+                        intersects.add(new Cell(Math.abs((int)(line.getA() * (line.getXbar() - actualWidth) / line.getB() + line.getYbar())),
+                                                actualWidth));
+                    }
+                    else if (Math.abs(line.getB()) < epsilon) //if b = 0 => vertical line
+                    {
+                        //Top
+                        intersects.add(new Cell(0,
+                                                (int)(line.getB() * line.getYbar() / line.getA() + line.getXbar())
+                                ));
+                        
+                        //Bottom
+                        intersects.add(new Cell(actualHeight,
+                                                (int)(line.getB() * (line.getYbar() + actualHeight) / line.getA() + line.getXbar())
+                                ));
+                    }
+                    else //diagonal line; check all four
+                    {
+                        //Left
+                        intersects.add(new Cell(Math.abs((int)(line.getA() * line.getXbar() / line.getB() + line.getYbar())), 
+                                                0) );
+                        
+                        //Right
+                        intersects.add(new Cell(Math.abs((int)(line.getA() * (line.getXbar() - actualWidth) / line.getB() + line.getYbar())),
+                                                actualWidth));
+                        
+                        //Top
+                        intersects.add(new Cell(0,
+                                                (int)(line.getB() * line.getYbar() / line.getA() + line.getXbar())
+                                ));
+                        
+                        //Bottom
+                        intersects.add(new Cell(actualHeight,
+                                                (int)(line.getB() * (line.getYbar() + actualHeight) / line.getA() + line.getXbar())
+                                ));
+                        
+                        ArrayList<Integer> dels = new ArrayList<Integer>();
+                        for (int k = 0; k < 4; ++k)
+                        {
+                            if (intersects.get(k).getRow() > actualHeight || intersects.get(k).getCol() > actualWidth
+                                    || intersects.get(k).getRow() < 0 || intersects.get(k).getCol() < 0)
+                                dels.add(k);
+                        }
+                        
+                        for (int del = 0; del < dels.size(); ++del)
+                            intersects.remove(del);
+                    }
+                        
                     //Converting from sparse grid to dense grid coordinates
                     //and make sure lines is drawn over the entire floor plan
-                    actualWidth /= unitW;
-//                    if (line.getXbar() < actualWidth)
-//                    {
-//                        x1 = (int)(actualWidth * unitW + halfUnitW);
-//                        y1 = (int)((line.getA() * (line.getXbar() - actualWidth) / line.getB() + line.getYbar()) * unitH + halfUnitH);
-//                        System.out.println("Adjusting coor for line #" + (i + 1));
-//                    }
-//                    else
-                    {
-                        x1 = (int)(line.getXbar() * unitW + halfUnitW);
-                        y1 = (int)(line.getYbar() * unitH + halfUnitH);
-                    }
-
-
-                    x2 = 0;
-                    y2 = (int)((line.getA() * line.getXbar() / line.getB() + line.getYbar()) * unitW + halfUnitW);
 
                     System.out.printf("drawing line #%d: a = %f; b = %f; xbar = %f; ybar = %f\n",
                                         (i + 1),
@@ -234,6 +284,10 @@ public class AnnotPanel extends JPanel
                                         line.getB(),
                                         line.getXbar(),
                                         line.getYbar());
+                    x1 = (int)(intersects.get(0).getCol() * unitW + halfUnitW);
+                    y1 = (int)(intersects.get(0).getRow() * unitH + halfUnitH);
+                    x2 = (int)(intersects.get(1).getCol() * unitW + halfUnitW);
+                    y2 = (int)(intersects.get(1).getRow() * unitH + halfUnitH);
                     System.out.printf("thru p1(%d, %d) and p2(%d, %d)\n",
                                         x1,
                                         y1,
