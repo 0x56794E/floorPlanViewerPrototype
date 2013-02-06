@@ -35,9 +35,7 @@ public class Cell
     private long id;
     
     private boolean isDead;
-    private int x;
-    private int y;
-
+  
     private int row;
     private int col;
     
@@ -82,8 +80,6 @@ public class Cell
     {
         this.row = r;
         this.col = c;
-        this.x = c;
-        this.y = -r;
         isDead = false;
     }
     
@@ -92,16 +88,6 @@ public class Cell
         this.isDead = false;
     }
     
-    public int getX()
-    {
-        return x;
-    }
-    
-    public int getY()
-    {
-        return y;
-        
-    }
     
     public int getRow()
     {
@@ -134,7 +120,7 @@ public class Cell
         else
         {
             Cell rhsCell = (Cell) rhs;
-            return rhsCell.x == this.x && rhsCell.y == this.y;
+            return rhsCell.col == this.col && rhsCell.row == this.row;
         }
     }
 
@@ -142,14 +128,14 @@ public class Cell
     public int hashCode()
     {
         int hash = 3;
-        hash = 83 * hash + (int) (this.x ^ (this.x >>> 32));
-        hash = 83 * hash + (int) (this.y ^ (this.y >>> 32));
+        hash = 83 * hash + (int) (this.col ^ (this.col >>> 32));
+        hash = 83 * hash + (int) (this.row ^ (this.row >>> 32));
         return hash;
     }
     
     public String toString()
     {
-        return String.format("(%d, %d)", x, y); 
+        return String.format("(%d, %d)", col, row); 
     }
     
 }

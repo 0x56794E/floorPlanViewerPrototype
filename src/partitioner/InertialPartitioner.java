@@ -115,8 +115,8 @@ public class InertialPartitioner
         
         for (Cell node : nodes)
         {
-            xbar += node.getX();
-            ybar += node.getY();
+            xbar += node.getCol();
+            ybar += node.getRow();
         }
         
         xbar /= N;
@@ -127,8 +127,8 @@ public class InertialPartitioner
         double xDif = 0, yDif = 0;
         for (Cell node : nodes)
         {
-            xDif = node.getX() - xbar;
-            yDif = node.getY() - ybar;
+            xDif = node.getCol() - xbar;
+            yDif = node.getRow() - ybar;
             x1 += xDif * xDif;
             x3 += yDif * yDif;
             x2 += xDif * yDif;
@@ -345,10 +345,10 @@ public class InertialPartitioner
      */
     public static boolean areOnSameSide(Line line, Cell node1, Cell node2)
     {
-        double prod = ( (line.getA() * (node1.getX() - line.getXbar())
-                         + line.getB() * (node1.getX() - line.getYbar()))
-                      * (line.getA() * (node2.getX() - line.getXbar())
-                         + line.getB() * (node2.getY() - line.getYbar())));
+        double prod = ( (line.getA() * (node1.getCol() - line.getXbar())
+                         + line.getB() * (node1.getRow() - line.getYbar()))
+                      * (line.getA() * (node2.getCol() - line.getXbar())
+                         + line.getB() * (node2.getRow() - line.getYbar())));
         
         return (prod >= 0 ? true : false);
     }

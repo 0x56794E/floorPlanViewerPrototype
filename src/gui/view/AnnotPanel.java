@@ -198,11 +198,12 @@ public class AnnotPanel extends JPanel
            
                 ArrayList<Line> lines = InertialPartitioner.getLines(nodes, 4);
                 
-                g.setColor(Color.orange);
+               
                 g.setFont(new Font("arial", Font.BOLD, 15));
+                g.setColor(Color.orange);
                 Graphics2D g2D = (Graphics2D) g;      
-                g2D.setStroke(new BasicStroke(10F));  // set stroke width of 10
-
+                
+ 
                 double halfUnitW = unitW / 2, halfUnitH = unitH / 2,
                        epsilon = 0.00001;
                 int actualWidth = (int)(mainFr.getCurrentFloorPlan().getWidth() / unitW);
@@ -211,6 +212,11 @@ public class AnnotPanel extends JPanel
                 Line line;
                 for (int i = 0; i < lines.size(); ++i)
                 {
+                //if (i == 3)
+               // {
+                    g2D.setColor(Color.orange);
+                    g2D.setStroke(new BasicStroke(10F));  // set stroke width of 10
+                    
                     //Line L: a(x - xbar) + b(y - ybar) = 0;
                     line = lines.get(i);
                     
@@ -295,8 +301,35 @@ public class AnnotPanel extends JPanel
                                         y2);
 
                     g2D.drawLine(x1, y1, x2, y2);
+                    
+                    //Draw line whose directional vector u = (a, b) and crosses thru (xbar, ybar)
+                    g2D.setColor(Color.blue);
+                    g2D.setStroke(new BasicStroke(5F));  // set stroke width of 10
+                    
+                    int[] p2 = new int[2];
+                    if (line.getA() < epsilon) //if a is 0
+                    {
+                        p2[0] = (int)(line.getXbar() * unitW + halfUnitW); //x
+                        p2[1] = (int)(actualHeight * unitH + halfUnitH); //y
+                    }
+                    else if (line.getB() < epsilon) //if b is 0
+                    {
+                        p2[0] = (int)(actualWidth * unitW + halfUnitW); //x
+                        p2[1] = (int)(line.getYbar() * unitH + halfUnitH); //y
+                    }
+                    else
+                    {
+                        p2[0] = (int)halfUnitW;
+                        p2[1] = (int)((line.getYbar() - line.getB() * line.getXbar() / line.getA()) * unitH + halfUnitH);
+                    }
+                    
+                    g2D.drawLine((int)(line.getXbar() * unitW + halfUnitW), 
+                                 (int)(line.getYbar() * unitH + halfUnitH), 
+                                 p2[0],
+                                 p2[1]);
+                    
                 }
-                
+            //}   
             }
             catch (Exception e)
             {
