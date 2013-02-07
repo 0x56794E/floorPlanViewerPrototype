@@ -28,6 +28,11 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
 
 /**
+ * Bug: when open an old file, new cells are created instead, if a cell is marked dead, 
+ * a this one will be persisted as new cell. Similarly, if a cell is enabled,
+ * it may visually appear that the cell is not dead, but in fact, the dead cell
+ * is not removed.
+ * 
  * @author              Vy Thuy Nguyen
  * @version             1.0 Jan 16, 2013
  * Last modified:       
@@ -186,84 +191,47 @@ public class AnnotFloorPlan implements Serializable
      */
     private void removeEdges(int row, int col)
     {
-        System.out.printf("Node at (%d, %d) has %d edges\n",
-                          row,
-                          col,
-                          g.edgesOf(cellContainer[row][col]).size());
-        //g.removeAllEdges(g.edgesOf(cellContainer[row][col]));
         
          //North
         if (row > 0)
-        {
-            
-            System.out.println("Removing N neighbor at " + cellContainer[row - 1][col]);
+        {   
             g.removeAllEdges(cellContainer[row][col], cellContainer[row - 1][col]);
             
             //NE
             if (col < colCount - 1)
-            {
-                System.out.println("Removing NE neighbor at row=" + row + "col=" + col + ": " + cellContainer[row - 1][col + 1]);
                 g.removeAllEdges(cellContainer[row][col], cellContainer[row - 1][col + 1]);
-            }                
+                            
         }
 
         //East
         if (col < colCount - 1)
         {
             g.removeAllEdges(cellContainer[row][col], cellContainer[row][col + 1]);
-            System.out.println("Removing E neighbor at " + cellContainer[row][col + 1]);
             
             //SE
             if (row < rowCount - 1)
-            {
                 g.removeAllEdges(cellContainer[row][col], cellContainer[row + 1][col + 1]);     
-                System.out.println("Removing SE neighbor at " + cellContainer[row + 1][col + 1]);     
-            }
+            
         }
 
         //South
         if (row < rowCount - 1)
         {
             g.removeAllEdges(cellContainer[row][col], cellContainer[row + 1][col]);
-            System.out.println("Removing S neighbor at " + cellContainer[row + 1][col]);
             
             //SW
             if (col > 0)
-            {
                 g.removeAllEdges(cellContainer[row][col], cellContainer[row + 1][col - 1]);
-                
-                System.out.println("Removing SW neighbor at " + cellContainer[row + 1][col - 1]);
-            }              
         }
 
         //West
         if (col > 0)
         {
             g.removeAllEdges(cellContainer[row][col], cellContainer[row][col - 1]);
-            System.out.println("Removing SW neighbor at " + cellContainer[row][col - 1]);
             
             //NW
             if (row > 0)
-            {
                 g.removeAllEdges(cellContainer[row][col], cellContainer[row - 1][col - 1]);
-                System.out.println("Removing NW neighbor at " + cellContainer[row - 1][col - 1]);
-            }
-                
-        }
-        
-        System.out.printf("After removing; Node at (%d, %d) has %d edges\nThese are: \n",
-                          row,
-                          col,
-                          g.edgesOf(cellContainer[row][col]).size());
-        for (DefaultWeightedEdge e : g.edgesOf(cellContainer[row][col]))
-        {
-            System.out.printf("Source: %s; Target: %s;",
-                              g.getEdgeSource(e),
-                              g.getEdgeTarget(e));
-            System.out.println("  This and edge with opp source and target are equal? " 
-                    + g.getEdge(g.getEdgeSource(e), g.getEdgeTarget(e)).equals(
-                      g.getEdge(g.getEdgeTarget(e), g.getEdgeSource(e))
-                    ));
         }
     }
     
@@ -365,10 +333,6 @@ public class AnnotFloorPlan implements Serializable
         
         //removing all edges touching this cell
         removeEdges(row, col);
-        
-        //Color all pixels within this cell
-        c.setMinX(col * unitW);
-        c.setMinY(row * unitH);
     }
     
     public void enabbleCell(int x, int y)
@@ -381,10 +345,6 @@ public class AnnotFloorPlan implements Serializable
         
         //add edges to all cells touching this cell
        addEdges(row, col);
-        
-        //Set minX and minY
-        c.setMinX(col * unitW);
-        c.setMinY(row * unitH);
     }
 
     public Set<Cell> getDeadCells()
@@ -399,7 +359,9 @@ public class AnnotFloorPlan implements Serializable
     public void updateGraph()
     {
         for (Cell c : deadCells)
+        {
             removeEdges(c.getRow(), c.getCol());
+        }
     }
     
     public int getRowCount()
@@ -484,5 +446,10 @@ public class AnnotFloorPlan implements Serializable
         }
         
         return components.get(largestIndex);
+    }
+    
+    public Cell[][] getAllCells()
+    {
+        return cellContainer;
     }
 }

@@ -63,8 +63,6 @@ public class PointMarkingPanel extends Observable
     public class UI extends JPanel
                     implements FileGUIContainer, ImagePanelContainer
     {
-        //Object state
-        
         /**
         * Reference to the main frame
         */
@@ -583,7 +581,7 @@ public class PointMarkingPanel extends Observable
             em.persist(currentPointSet);
             em.persist(currentFloorPlan);
             em.getTransaction().commit();
-            DatabaseService.cleanup();
+            //DatabaseService.cleanup();
 
             savePointSetBtn.setEnabled(false);
             updatePointSetJList();

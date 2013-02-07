@@ -53,10 +53,8 @@ public class TabbedPanel extends JTabbedPane
         directionPn = new GetDirectionPanel(mf);
         
         pointMarkingPn.addObserver(annotPn);
-        pointMarkingPn.addObserver(directionPn);
-        
+        pointMarkingPn.addObserver(directionPn);        
         renderComponents();
-        
     }
 
     private void renderComponents()

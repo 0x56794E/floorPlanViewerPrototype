@@ -55,7 +55,6 @@ public class MainFrame extends JFrame
     private JMenuItem exportWithDeadCellItem = new JMenuItem("Export Floor Plan with Dead Cells...");
     private JMenuItem showExistItem = new JMenuItem("Show Saved Floor Plans... ");
     
-    
     //Help Menu
     private JMenuItem aboutItem = new JMenuItem("About");
     private JMenuItem reportItem = new JMenuItem("Report Issue");
@@ -326,7 +325,7 @@ public class MainFrame extends JFrame
             em.persist(fp);
             em.getTransaction().commit();
             
-            DatabaseService.cleanup();
+            DatabaseService.closeConnection();
             JOptionPane.showMessageDialog(null, "Successfully Saved To Database");
         }
     }

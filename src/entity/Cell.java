@@ -40,10 +40,6 @@ public class Cell
     private int row;
     private int col;
     
-    private int minX;
-    private int minY;
-    
-    
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     AnnotFloorPlan annotFloorPlan;
     
@@ -52,12 +48,11 @@ public class Cell
     
     public Color getColor(double zoomedIndex)
     {
-       int rgb = (int)(Integer.parseInt(binaryString.toString(), 2) * zoomedIndex);
-      
+       int rgb = (int)(Integer.parseInt(binaryString.toString(), 2) * zoomedIndex); // normalize the range
        int red = (rgb >> 16)  & 0xFF;
        int green = (rgb >> 8) & 0xFF;
        int blue = rgb & 0xFF;
-//                
+       
        return new Color (red, green, blue);
     }
     
@@ -66,8 +61,7 @@ public class Cell
         return binaryString.toString();
     }
     public int getIntVal()
-    {
-        
+    {        
         return Integer.parseInt(binaryString.toString(), 2);
     }
     
@@ -86,25 +80,6 @@ public class Cell
         return this.annotFloorPlan;
     }
     
-    public void setMinX(int x)
-    {
-        minX = x;
-    }
-    
-    public void setMinY(int y)
-    {
-        minY = y;
-    }
-    
-    public int getMinX()
-    {
-        return minX;
-    }
-    
-    public int getMinY()
-    {
-        return minY;
-    }
     
     public Cell(int r, int c)
     {

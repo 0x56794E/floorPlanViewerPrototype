@@ -104,7 +104,7 @@ public class AnnotPanel extends JPanel
                 em.getTransaction().commit();
                 JOptionPane.showMessageDialog(null, "Successfully Save Floor Plan");
                 
-                DatabaseService.cleanup();
+                //DatabaseService.cleanup();
             }
         });        
         
@@ -264,17 +264,31 @@ public class AnnotPanel extends JPanel
         deadCells = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getDeadCells();
         int unitW = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getUnitW();
         int unitH = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getUnitH();
+        int rowCount = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getRowCount(),
+            colCount = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getColCount(),
+            x, y;
+        Cell[][] cells = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getAllCells();
         
-        for (Cell cell : mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getGraph().vertexSet())
-        {   
-            g.setColor(Color.red);
-            g.drawRect(cell.getCol() * unitW, cell.getRow() * unitH, unitW, unitH);
-            
-            if (cell.isDead())
-            {
-                g.setColor(Color.DARK_GRAY);
-                g.fillRect(cell.getMinX(), cell.getMinY(), unitW, unitH);
-            }
+//        for (int r = 0; r < rowCount; ++r )
+//            for (int c = 0; c < colCount; ++c)
+//            {   
+//                x = c * unitW;
+//                y = r * unitH;
+//                g.setColor(Color.red);
+//                g.drawRect(x, y, unitW, unitH);
+//
+//                if (cells[r][c].isDead())
+//                {
+//                    System.out.println("Cell " + cells[r][c] + " is dead");
+//                    g.setColor(Color.DARK_GRAY);
+//                    g.fillRect(x, y, unitW, unitH);
+//                }
+//            }
+        
+        //Paint wall
+        for (Cell dc : mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getDeadCells())
+        {
+            g.fillRect(dc.getCol() * unitW, dc.getRow() * unitH, unitW, unitH);
         }
     }
 
@@ -287,22 +301,30 @@ public class AnnotPanel extends JPanel
         double zoomedIndex = MAX / maxC;
         int unitW = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getUnitW();
         int unitH = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getUnitH();
-                
-        for (Cell cell : mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getGraph().vertexSet())
-        {   
-            if (cell.isDead())
-            {
-                g.setColor(Color.red);
-                g.drawRect(cell.getCol() * unitW, cell.getRow() * unitH, unitW, unitH);
-                g.setColor(Color.DARK_GRAY);
-                g.fillRect(cell.getMinX(), cell.getMinY(), unitW, unitH);
-            }
-            else
-            {
-                g.setColor(cell.getColor(zoomedIndex));
-                g.fillRect(cell.getCol() * unitW, cell.getRow() * unitH, unitW, unitH);
-            }
-        }        
+        int rowCount = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getRowCount(),
+            colCount = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getColCount(),
+            x, y;
+        Cell[][] cells = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getAllCells();
+        
+        for (int r = 0; r < rowCount; ++r )
+            for (int c = 0; c < colCount; ++c)
+            {   
+                x = cells[r][c].getCol() * unitW;
+                y = cells[r][c].getRow() * unitH;
+
+                if (cells[r][c].isDead())
+                {
+                    g.setColor(Color.red);
+                    g.drawRect(x, y, unitW, unitH);
+                    g.setColor(Color.DARK_GRAY);
+                    g.fillRect(x, y, unitW, unitH);
+                }
+                else
+                {
+                    g.setColor(cells[r][c].getColor(zoomedIndex));
+                    g.fillRect(x, y, unitW, unitH);
+                }
+            }        
     }
 
 }

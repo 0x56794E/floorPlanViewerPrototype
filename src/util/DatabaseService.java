@@ -56,11 +56,12 @@ public class DatabaseService
             emf = Persistence.createEntityManagerFactory(partialURL + dbName, properties);
             em = emf.createEntityManager();
         }   
+ 
         
         return em;
     }
     
-    public static void cleanup()
+    public static void closeConnection()
     {
         if (em != null && emf != null && em.isOpen())
         {

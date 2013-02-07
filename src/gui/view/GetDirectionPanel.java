@@ -269,12 +269,11 @@ public class GetDirectionPanel extends JPanel
         AnnotFloorPlan afl = mainFr.getCurrentFloorPlan().getAnnotFloorPlan();
         int unitW = afl.getUnitW();
         int unitH = afl.getUnitH();
-        int halfUnitH = unitH;// / 2;
 
         //Paint wall
         for (Cell dc : afl.getDeadCells())
         {
-            g.fillRect(dc.getMinX(), dc.getMinY(), unitW, halfUnitH);
+            g.fillRect(dc.getCol() * unitW, dc.getRow() * unitH, unitW, unitH);
         }
 
         //Paint from and to pins

@@ -32,8 +32,6 @@ import java.util.*;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
-import org.jgrapht.Graph;
-import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
 
@@ -109,16 +107,15 @@ public class FileService
     public static void exportFloorPlanWithDeadCells(FloorPlan fp) throws IOException
     {
         Set<Cell> deadCells = fp.getAnnotFloorPlan().getDeadCells();
-        int halfUnitW = fp.getAnnotFloorPlan().getUnitW();// / 2;
-        int halfUnitH = fp.getAnnotFloorPlan().getUnitH();// / 2;
-         
+        int unitW = fp.getAnnotFloorPlan().getUnitW();
+        int unitH = fp.getAnnotFloorPlan().getUnitH();     
         File file = new File(fp.getAbsoluteFilePath());
         BufferedImage image = ImageIO.read(file);
         Graphics g = new ImageIcon(image).getImage().getGraphics();
         g.setColor(Color.gray);
         
         for (Cell dc : deadCells)
-            g.fillRect(dc.getMinX(), dc.getMinY(), halfUnitW, halfUnitH);
+            g.fillRect(dc.getCol() * unitW, dc.getRow() * unitH, unitW, unitH);
        
         
         File oFile = new File("annotatedFloorPlan_" + fp.getId() + ".png");

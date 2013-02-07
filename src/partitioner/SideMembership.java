@@ -40,5 +40,4 @@ public enum SideMembership {
     { 
         return this.value;
     }
-
 }
