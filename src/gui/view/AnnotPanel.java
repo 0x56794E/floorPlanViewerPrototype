@@ -23,7 +23,9 @@ package gui.view;
 import entity.AnnotFloorPlan;
 import entity.Cell;
 import gui.util.ImagePanelContainer;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -57,8 +59,8 @@ public class AnnotPanel extends JPanel
     boolean inMarkingMode;
     JButton markEraseBtn;
     JButton saveDeadCellBtn = new JButton("Save");
-    JButton saveDeadCellToFileBtn = new JButton("Save to File");
-    JButton saveGraphBtn = new JButton("Save Floor Plan for Partitioning");
+    JButton saveDeadCellToFileBtn = new JButton("Save Dead Cells to File");
+    JButton saveGraphBtn = new JButton("Save Available Graph Region To File");
     JButton showPartitionBtn = new JButton("Show Partitioning Lines");
     private Set<Cell> deadCells;
     private boolean showPartition = false;
@@ -88,9 +90,10 @@ public class AnnotPanel extends JPanel
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                EntityManager em = DatabaseService.getEntityManager();
+                EntityManager em = DatabaseService.getEntityManager();  
                 em.getTransaction().begin();
                 AnnotFloorPlan afp = mainFr.getCurrentFloorPlan().getAnnotFloorPlan();
+                
                 for (Cell dc : afp.getDeadCells())
                 {
                     dc.setAnnotFloorPlan(afp);
@@ -100,7 +103,8 @@ public class AnnotPanel extends JPanel
                 em.persist(mainFr.getCurrentFloorPlan().getAnnotFloorPlan());
                 em.getTransaction().commit();
                 JOptionPane.showMessageDialog(null, "Successfully Save Floor Plan");
-                //em.close();
+                
+                DatabaseService.cleanup();
             }
         });        
         
@@ -121,6 +125,7 @@ public class AnnotPanel extends JPanel
             }
         
         });
+        
         saveGraphBtn.addActionListener(new ActionListener() {
 
             @Override

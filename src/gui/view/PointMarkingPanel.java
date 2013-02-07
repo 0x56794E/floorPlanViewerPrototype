@@ -145,12 +145,10 @@ public class PointMarkingPanel extends Observable
         
         private FloorPlan currentFloorPlan;
         private PointSet currentPointSet;
-        private EntityManager em = DatabaseService.getEntityManager();
-
+        
         public UI(MainFrame mf)
         {
             mainFr = mf;
-
             initView();
         }
 
@@ -584,8 +582,8 @@ public class PointMarkingPanel extends Observable
             em.getTransaction().begin();
             em.persist(currentPointSet);
             em.persist(currentFloorPlan);
-
             em.getTransaction().commit();
+            DatabaseService.cleanup();
 
             savePointSetBtn.setEnabled(false);
             updatePointSetJList();
@@ -613,6 +611,7 @@ public class PointMarkingPanel extends Observable
         */
         private boolean hasDuplicate(String fileName)
         {
+            EntityManager em = DatabaseService.getEntityManager();
             long count = em.createQuery("SELECT COUNT(f.id) FROM FloorPlan f WHERE f.fileName = :name", Long.class).setParameter("name", fileName).getSingleResult();
             return (count > 0 ? true : false);
         }
@@ -653,6 +652,7 @@ public class PointMarkingPanel extends Observable
          */
         private List<FloorPlan> getExistingFloorPlans(String fileName)
         {
+            EntityManager em = DatabaseService.getEntityManager();
             return em.createQuery("SELECT f FROM FloorPlan f WHERE f.fileName = :name")
                      .setParameter("name", fileName)
                      .getResultList();

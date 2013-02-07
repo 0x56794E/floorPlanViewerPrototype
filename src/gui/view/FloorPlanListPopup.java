@@ -91,10 +91,8 @@ public class FloorPlanListPopup extends JFrame
 
         public TopLevelPanel()
         {
-            for (FloorPlan p : floorPlans)
-            {
-                listModel.addElement(p);
-            }
+            for (FloorPlan p : floorPlans)            
+                listModel.addElement(p);            
 
             fpJList = new JList<FloorPlan>(listModel);
             scrollPane.setViewportView(fpJList);
@@ -108,8 +106,6 @@ public class FloorPlanListPopup extends JFrame
             btnPn.add(openBtn);
             btnPn.add(cancelBtn);
             
-            
-
             this.setLayout(new BorderLayout());
             this.add(scrollPane, BorderLayout.CENTER);
             this.add(btnPn, BorderLayout.SOUTH);

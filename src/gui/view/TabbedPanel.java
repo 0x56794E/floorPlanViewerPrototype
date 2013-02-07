@@ -20,11 +20,6 @@
 
 package gui.view;
 
-import gui.view.AnnotPanel;
-import gui.view.GetDirectionPanel;
-import gui.view.MainFrame;
-import gui.view.PointMarkingPanel;
-import java.awt.image.BufferedImage;
 import javax.swing.JTabbedPane;
 
 /**
@@ -84,7 +79,4 @@ public class TabbedPanel extends JTabbedPane
     {
         return pointMarkingPn;
     }
-    
-    
-    
 }

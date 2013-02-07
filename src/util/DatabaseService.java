@@ -55,13 +55,14 @@ public class DatabaseService
         {
             emf = Persistence.createEntityManagerFactory(partialURL + dbName, properties);
             em = emf.createEntityManager();
-        }        
+        }   
+        
         return em;
     }
     
     public static void cleanup()
     {
-        if (em != null && emf != null)
+        if (em != null && emf != null && em.isOpen())
         {
             em.close();
             emf.close();

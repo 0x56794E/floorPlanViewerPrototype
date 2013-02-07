@@ -79,11 +79,6 @@ public class MainFrame extends JFrame
         //Init Main panel
         mainContent = new TabbedPanel(this);
         
-        
-//        JPanel main = new JPanel();
-//        pointMarkingPn = new PointMarkingPanel(this);   
-//        this.updateImageCanvasSize();
-//        main.add(pointMarkingPn);
         this.add(mainContent, BorderLayout.CENTER);
         this.updateImageCanvasSize();
         
@@ -115,9 +110,7 @@ public class MainFrame extends JFrame
     {
         JFrame.setDefaultLookAndFeelDecorated(false);
         this.setVisible(true);
-        
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        
         this.setSize(880, 700);
         this.setLocationRelativeTo(null);
         this.setTitle("Floor Plan Viewer");
@@ -126,10 +119,7 @@ public class MainFrame extends JFrame
         this.addWindowListener(new WindowListener(){
 
             @Override
-            public void windowOpened(WindowEvent e)
-            {
-             //   throw new UnsupportedOperationException("Not supported yet.");
-            }
+            public void windowOpened(WindowEvent e){}
 
             @Override
             public void windowClosing(WindowEvent e)
@@ -140,8 +130,7 @@ public class MainFrame extends JFrame
                 switch (option)
                 {
                     case JOptionPane.YES_OPTION:
-                        saveCurrentWorkToDB();
-                        //fall thru
+                        saveCurrentWorkToDB();  //fall thru intentionally
                         
                     case JOptionPane.NO_OPTION:
                         MainFrame.this.dispose();
@@ -155,35 +144,19 @@ public class MainFrame extends JFrame
             }
 
             @Override
-            public void windowClosed(WindowEvent e)
-            {
-                //throw new UnsupportedOperationException("Not supported yet.");
-            }
+            public void windowClosed(WindowEvent e){}
 
             @Override
-            public void windowIconified(WindowEvent e)
-            {
-                //throw new UnsupportedOperationException("Not supported yet.");
-            }
+            public void windowIconified(WindowEvent e){}
 
             @Override
-            public void windowDeiconified(WindowEvent e)
-            {
-                ///throw new UnsupportedOperationException("Not supported yet.");
-            }
+            public void windowDeiconified(WindowEvent e){}
 
             @Override
-            public void windowActivated(WindowEvent e)
-            {
-                ///throw new UnsupportedOperationException("Not supported yet.");
-            }
+            public void windowActivated(WindowEvent e){}
 
             @Override
-            public void windowDeactivated(WindowEvent e)
-            {
-                
-                //throw new UnsupportedOperationException("Not supported yet.");
-            }
+            public void windowDeactivated(WindowEvent e){}
         });
     }
     
@@ -194,7 +167,6 @@ public class MainFrame extends JFrame
     
     private void setupMenu()
     {
-        //=======================Menu=================
         JMenuBar menuBar = new JMenuBar();
         MenuListener menuHandler = new MenuListener();
         
@@ -260,9 +232,6 @@ public class MainFrame extends JFrame
         });
         fileMenu.add(saveToDBItem);
         
-        //saveBothItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, ActionEvent.CTRL_MASK));
-        //fileMenu.add(saveBothItem);
-        
         fileMenu.addSeparator();
         exportItem.addActionListener(new ActionListener() {
             @Override
@@ -287,7 +256,6 @@ public class MainFrame extends JFrame
         
         
         exportWithDeadCellItem.addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent e)
             {
@@ -316,8 +284,7 @@ public class MainFrame extends JFrame
             }
         });
         fileMenu.add(exportWithDeadCellItem);
-        menuBar.add(fileMenu);
-        
+        menuBar.add(fileMenu);        
         //end File Menu
         
         //Help Menu
@@ -358,17 +325,10 @@ public class MainFrame extends JFrame
             em.persist(afp);
             em.persist(fp);
             em.getTransaction().commit();
+            
             DatabaseService.cleanup();
-
             JOptionPane.showMessageDialog(null, "Successfully Saved To Database");
         }
-//        else
-//        {
-//            JOptionPane.showMessageDialog(null, 
-//                                            "Please select a floor plan first.", 
-//                                            "No Floor Plan Found", 
-//                                            JOptionPane.ERROR_MESSAGE);
-//        }
     }
     
     private void updateImageCanvasSize()
@@ -392,9 +352,7 @@ public class MainFrame extends JFrame
         public void actionPerformed(ActionEvent e)
         {
             if (e.getSource() == newItem)
-            {
-                //System.out.println("Bringing up file chooser");
-                       
+            {                       
                 //Bring up floor plan chooser popup window
                 if (floorPlanChooserFr == null)
                     floorPlanChooserFr = new FileChooserWindow(mainContent.getPointMarkingPn().getUI(), new ImageFileFilter());

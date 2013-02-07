@@ -22,7 +22,6 @@ package gui.util;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
-import java.util.Observable;
 
 /**
  * @author              Vy Thuy Nguyen

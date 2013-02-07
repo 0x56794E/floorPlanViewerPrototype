@@ -1,23 +1,20 @@
 /**
- * Floor Plan Marker Project
- * Copyright (C) 2013  Vy Thuy Nguyen
+ * Floor Plan Marker Project Copyright (C) 2013 Vy Thuy Nguyen
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Library General Public License for more details.
- * 
- * You should have received a copy of the GNU Library General Public
- * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
- * Boston, MA  02110-1301, USA.
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Library General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option) any
+ * later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Library General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Library General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-
 package gui.view;
 
 import entity.AnnotFloorPlan;
@@ -30,100 +27,91 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import org.jgrapht.graph.DefaultEdge;
-import org.jgrapht.graph.SimpleGraph;
-import java.util.List;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
 
 /**
- * @author              Vy Thuy Nguyen
- * @version             1.0 Jan 17, 2013
- * Last modified:       
+ * @author Vy Thuy Nguyen
+ * @version 1.0 Jan 17, 2013 Last modified:
  */
 public class GetDirectionPanel extends JPanel
-                               implements ImagePanelContainer, Observer
+        implements ImagePanelContainer, Observer
 {
+
     private MainFrame mainFr;
     private ImagePanel imagePanel;
     private JScrollPane ipScrollPane = new JScrollPane();
-    
     private JPanel fromCoorPn = new JPanel();
     private JPanel toCoorPn = new JPanel();
     private TitledBorder fromCoorBorder = new TitledBorder("From");
     private TitledBorder toCoorBorder = new TitledBorder("To");
-    
     private JButton goBtn = new JButton("Go");
     private JTextField fromXField = new JTextField();
     private JTextField fromYField = new JTextField();
     private JTextField toXField = new JTextField();
     private JTextField toYField = new JTextField();
-    
     private int x1 = -1;
     private int y1 = -1;
     private int x2 = -1;
     private int y2 = -1;
     private boolean settingFrom = true;
     private boolean ready = false;
-    
+
     public GetDirectionPanel(MainFrame mf)
     {
         mainFr = mf;
         this.setLayout(new BorderLayout());
-        
+
         //Init components
         initComponents();
-        
+
         //Render components
         //Center pane
-        JPanel imgPn = new JPanel();
         this.add(ipScrollPane, BorderLayout.CENTER);
-        
+
         //Left pane
         JPanel leftPn = new JPanel();
         leftPn.setBorder(new TitledBorder(""));
         leftPn.setMinimumSize(new Dimension(200, 200));
         leftPn.setPreferredSize(new Dimension(200, 200));
-        
+
         leftPn.setAlignmentX(LEFT_ALIGNMENT);
         leftPn.setLayout(new GridLayout(3, 1));
-        
+
         //Row 1
         JPanel r1 = new JPanel();
-        //JLabel fromLb = new JLabel("   From:                          ");
         fromCoorPn.setBorder(fromCoorBorder);
         fromCoorPn.setLayout(new FlowLayout(FlowLayout.LEFT));
         fromCoorPn.add(new JLabel(" x: "));
         fromCoorPn.add(fromXField);
         fromCoorPn.add(new JLabel(" y: "));
         fromCoorPn.add(fromYField);
-        
-        //r1.add(fromLb);
+
         r1.add(fromCoorPn);
         leftPn.add(r1);
-        
+
         //Row 2
         JPanel r2 = new JPanel();
-        //JLabel toLb = new JLabel("   To:                          ");
         toCoorPn.setBorder(toCoorBorder);
         toCoorPn.setLayout(new FlowLayout(FlowLayout.LEFT));
         toCoorPn.add(new JLabel(" x: "));
         toCoorPn.add(toXField);
         toCoorPn.add(new JLabel(" y: "));
         toCoorPn.add(toYField);
-        
-        //r2.add(toLb);
+
         r2.add(toCoorPn);
         leftPn.add(r2);
-        
+
         JPanel r3 = new JPanel();
         r3.add(goBtn);
         leftPn.add(r3);
-        
+
         this.add(leftPn, BorderLayout.EAST);
     }
 
@@ -134,13 +122,15 @@ public class GetDirectionPanel extends JPanel
         fromYField.setPreferredSize(new Dimension(50, 20));
         toXField.setPreferredSize(new Dimension(50, 20));
         toYField.setPreferredSize(new Dimension(50, 20));
-        
+
         //Listener
-        fromXField.addFocusListener(new FocusListener() {
+        fromXField.addFocusListener(new FocusListener()
+        {
 
             @Override
             public void focusGained(FocusEvent e)
-            {}
+            {
+            }
 
             @Override
             public void focusLost(FocusEvent e)
@@ -149,24 +139,28 @@ public class GetDirectionPanel extends JPanel
                 {
                     int x = Integer.parseInt(fromXField.getText());
                     if (isInXRange(x))
+                    {
                         x1 = x;
-                        
+                    }
+
                 }
                 catch (NumberFormatException exc)
                 {
                     JOptionPane.showMessageDialog(null, "Value must be an integer", "INVALID VALUE", JOptionPane.ERROR_MESSAGE);
                     fromXField.setText("0");
                 }
-                
+
                 imagePanel.repaint();
             }
         });
-        
-         toXField.addFocusListener(new FocusListener() {
+
+        toXField.addFocusListener(new FocusListener()
+        {
 
             @Override
             public void focusGained(FocusEvent e)
-            {}
+            {
+            }
 
             @Override
             public void focusLost(FocusEvent e)
@@ -175,24 +169,28 @@ public class GetDirectionPanel extends JPanel
                 {
                     int x = Integer.parseInt(toXField.getText());
                     if (isInXRange(x))
+                    {
                         x2 = x;
-                        
+                    }
+
                 }
                 catch (NumberFormatException exc)
                 {
                     JOptionPane.showMessageDialog(null, "Value must be an integer", "INVALID VALUE", JOptionPane.ERROR_MESSAGE);
                     toXField.setText("0");
                 }
-                
+
                 imagePanel.repaint();
             }
         });
-        
-        fromYField.addFocusListener(new FocusListener() {
+
+        fromYField.addFocusListener(new FocusListener()
+        {
 
             @Override
             public void focusGained(FocusEvent e)
-            {}
+            {
+            }
 
             @Override
             public void focusLost(FocusEvent e)
@@ -201,7 +199,9 @@ public class GetDirectionPanel extends JPanel
                 {
                     int y = Integer.parseInt(fromYField.getText());
                     if (isInYRange(y))
+                    {
                         y1 = y;
+                    }
 
                 }
                 catch (NumberFormatException exc)
@@ -212,12 +212,14 @@ public class GetDirectionPanel extends JPanel
                 imagePanel.repaint();
             }
         });
-        
-        toYField.addFocusListener(new FocusListener() {
+
+        toYField.addFocusListener(new FocusListener()
+        {
 
             @Override
             public void focusGained(FocusEvent e)
-            {}
+            {
+            }
 
             @Override
             public void focusLost(FocusEvent e)
@@ -226,7 +228,9 @@ public class GetDirectionPanel extends JPanel
                 {
                     int y = Integer.parseInt(toYField.getText());
                     if (isInYRange(y))
+                    {
                         y2 = y;
+                    }
 
                 }
                 catch (NumberFormatException exc)
@@ -237,19 +241,22 @@ public class GetDirectionPanel extends JPanel
                 imagePanel.repaint();
             }
         });
-         
-        goBtn.addActionListener(new ActionListener() {
+
+        goBtn.addActionListener(new ActionListener()
+        {
 
             @Override
             public void actionPerformed(ActionEvent e)
             {
                 if (x1 >= 0 && x2 >= 0 && y1 >= 0 && y2 >= 0)
+                {
                     ready = true;
+                }
                 imagePanel.repaint();
             }
         });
     }
-    
+
     @Override
     public void doPaintComponent(Graphics g)
     {
@@ -263,11 +270,13 @@ public class GetDirectionPanel extends JPanel
         int unitW = afl.getUnitW();
         int unitH = afl.getUnitH();
         int halfUnitH = unitH;// / 2;
-       
-      //Paint wall
+
+        //Paint wall
         for (Cell dc : afl.getDeadCells())
-            g.fillRect(dc.getMinX(), dc.getMinY(), unitW, halfUnitH);   
-        
+        {
+            g.fillRect(dc.getMinX(), dc.getMinY(), unitW, halfUnitH);
+        }
+
         //Paint from and to pins
         if (x1 > 0 && y1 > 0)
         {
@@ -275,14 +284,14 @@ public class GetDirectionPanel extends JPanel
             fromXField.setText(x1 + "");
             fromYField.setText(y1 + "");
         }
-        
+
         if (x2 > 0 && y2 > 0)
         {
             g.drawImage(img, x2, y2, null);
             toXField.setText(x2 + "");
             toYField.setText(y2 + "");
         }
-            
+
         //Paint path       
         if (ready)
         {
@@ -292,26 +301,21 @@ public class GetDirectionPanel extends JPanel
             SimpleWeightedGraph graph = afl.getGraph();
             List<DefaultWeightedEdge> edges = afl.getShortestPath(x1, y1, x2, y2);
 
-           int halfW = afl.getUnitW() / 2;
-           int halfH = afl.getUnitH() / 2;
-           
+            int halfW = afl.getUnitW() / 2;
+            int halfH = afl.getUnitH() / 2;
+
             for (DefaultEdge e : edges)
             {
-                
-                Cell source = (Cell)graph.getEdgeSource(e);                
-                Cell target = (Cell)graph.getEdgeTarget(e);
+                Cell source = (Cell) graph.getEdgeSource(e);
+                Cell target = (Cell) graph.getEdgeTarget(e);
 
-                //g2.setColor(Color.ORANGE);
-                //g2.drawRect(source.getCol() * unitW, source.getRow() * unitH, unitW, unitH);
-                //g2.drawRect(target.getCol() * unitW, target.getRow() * unitH, unitW, unitH);
-                
                 g2.setColor(Color.GREEN);
                 g2.drawLine(source.getCol() * unitW + halfW,
                             source.getRow() * unitH + halfH,
-                            target.getCol() * unitW + halfW, 
+                            target.getCol() * unitW + halfW,
                             target.getRow() * unitH + halfH);
             }
-            
+
             ready = false;
         }
     }
@@ -333,9 +337,8 @@ public class GetDirectionPanel extends JPanel
             toCoorBorder.setTitleColor(Color.BLACK);
             fromCoorBorder.setTitleColor(Color.ORANGE);
         }
-        
+
         settingFrom = !settingFrom;
-        //imagePanel.repaint();
         this.repaint();
     }
 
@@ -350,7 +353,7 @@ public class GetDirectionPanel extends JPanel
     {
         try
         {
-            PointMarkingPanel pn = (PointMarkingPanel)arg;
+            PointMarkingPanel pn = (PointMarkingPanel) arg;
             imagePanel = new ImagePanel(pn.getUI().getImageFile(), this);
             ipScrollPane.setViewportView(imagePanel);
         }
@@ -360,15 +363,13 @@ public class GetDirectionPanel extends JPanel
         }
     }
 
-    
     public boolean isInYRange(int y)
     {
         return (y >= 0 && y <= imagePanel.getImageHeight());
     }
-    
+
     public boolean isInXRange(int x)
     {
         return (x >= 0 && x <= imagePanel.getImageWidth());
     }
-
 }

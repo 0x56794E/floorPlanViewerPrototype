@@ -37,6 +37,7 @@ import javax.swing.filechooser.FileFilter;
  */
 public class FileChooserWindow extends JFrame
 {
+    private static final long serialVersionUID = 1L;
     private JFileChooser fileChooser = new JFileChooser();
     private FileGUIContainer fileGUIContainer;
     

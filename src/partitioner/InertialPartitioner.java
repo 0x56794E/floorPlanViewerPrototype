@@ -23,15 +23,11 @@ package partitioner;
 
 import entity.Cell;
 import entity.FloorPlan;
-import entity.Point;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.util.*;
-import org.jgrapht.Graph;
-import org.jgrapht.graph.DefaultWeightedEdge;
-import org.jgrapht.graph.SimpleWeightedGraph;
 
 /**
  * @author              Vy Thuy Nguyen
@@ -145,10 +141,7 @@ public class InertialPartitioner
                                               x1 * x3 - x2 * x2); //c
         if (sols.isEmpty())
             throw new Exception("No eigenvalue found!");
-//        System.out.printf("Done finding eigenvalues; lambda1 = %f, lambda2 = %f\n",
-//                          sols.get(0),
-//                          sols.get(1));
-        
+    
         lambda = Math.min(sols.get(0), sols.get(1));
         System.out.printf("The smallest eigenvalue is: lambda = %f\n", lambda);
         
@@ -199,12 +192,6 @@ public class InertialPartitioner
             }
         }
       
-        //TODO: remove this
-        for (int k = 0; k < sValues.size(); ++k)
-            System.out.printf("%f; ", sValues.get(k));
-        
-        System.out.println();
-        
         size = sValues.size();
         double sbar = (size % 2 == 0 //If even number of elements
                         ? (sValues.get(size / 2) + sValues.get(size / 2 - 1)) / 2 //Take the avg of the two middle elements
@@ -218,100 +205,40 @@ public class InertialPartitioner
         if (k < 1) throw new Exception("k must be >= 1");
         
         ArrayList<Line> lines = new ArrayList<Line>();
-        PriorityQueue<Collection<Cell>> subRegions = new PriorityQueue<Collection<Cell>>(k, new Comparator() {
+        PriorityQueue<Collection<Cell>> subRegions = 
+                new PriorityQueue<Collection<Cell>>(k, new Comparator<Collection<Cell>>() {
             @Override
             /**
              * @return -1 if o1.size > o2.size; 0 if o1.size == o2.size; 1 if o1.size > o2.size
              */
-            public int compare(Object o1, Object o2)
+            public int compare(Collection<Cell> list1, Collection<Cell> list2)
             {
-                Collection<Cell> list1 = (Collection<Cell>)o1;
-                Collection<Cell> list2 = (Collection<Cell>)o2;
                 return (list1.size() > list2.size() ? 
                         -1 :
                         (list1.size() == list2.size() ? 0 : 1));
-            }
-            
+            }            
         });
         
         //Line 1
         Line line = getLine(nodes);
         lines.add(line);
-        
-//For debugging 
-System.out.println("\n\nCurrent state: ");
-for (Collection<Cell> s : subRegions)
-    System.out.println("\t\t- Size = " + s.size());
-//end for debugging
-        
         subRegions.add(line.getLeftNodes());
         subRegions.add(line.getRightNodes());
         k--;
-        
-System.out.println("\nFinding  line #1: " + line);
-System.out.printf("Largest region has %d nodes\n", nodes.size());
-for (Cell n : nodes) System.out.printf("%s; ", n);
-    System.out.println("\n");
-
-System.out.println("\n\tLeft nodes include:");
-System.out.print("\t\t");
-
-for (Cell n : line.getLeftNodes()) 
-{
-    System.out.printf("%s - sj = %f; ", n, line.getSj(n));
-}
-        
-System.out.println();
-System.out.println("\n\tRight nodes include:");
-System.out.print("\t\t");
-for (Cell n : line.getRightNodes()) 
-{
-    System.out.printf("%s - sj = %f; ", n, line.getSj(n));
-}
-System.out.println();
         
         for (int i = 0; i < k; ++i)
         {
             //Find the greatest set
             Collection<Cell> largestList = subRegions.remove();
             
-System.out.println("\n");
-            
             //Line dividing this set
             line = getLine(largestList);
             lines.add(line);
             
             //replace the old large region by two newly partitioned regions            
-System.out.println("\n\nCurrent state: ");
-for (Collection<Cell> s : subRegions)
-    System.out.println("\t\t- Size = " + s.size());
-        
             subRegions.add(line.getLeftNodes());
             subRegions.add(line.getRightNodes());
-            
-System.out.println("\nFinding  line #" + (i + 2) + ": " + line);
-System.out.printf("Largest region has %d nodes\n", largestList.size());
-for (Cell n : largestList) 
-{
-    System.out.printf("%s; ", n);
-}
-System.out.println("\n\tLeft nodes include:");
-System.out.print("\t\t");
-for (Cell n : line.getLeftNodes()) 
-{
-    System.out.printf("%s - sj = %f; ", n, line.getSj(n));
-}
-System.out.println();
-System.out.println("\n\tRight nodes include:");
-System.out.print("\t\t");
-for (Cell n : line.getRightNodes())
-{
-    System.out.printf("%s - sj = %f; ", n, line.getSj(n));
-}
-System.out.println();
-
         }
-        
         return lines;
     }
     
@@ -406,19 +333,10 @@ System.out.println();
         
         return sb.toString();
     }
-    
-    
 }
 
 
-
-/**
- * Save areas got in a binary tree
- * Keep dividing the largest area
- */
-
-
-/**
+/*
  * Read about spectral bisection partitioning graph
  * 
  * Method spec:
