@@ -218,18 +218,18 @@ public class InertialPartitioner
         if (k < 1) throw new Exception("k must be >= 1");
         
         ArrayList<Line> lines = new ArrayList<Line>();
-        TreeSet<Collection<Cell>> subRegions = new TreeSet<Collection<Cell>>(new Comparator() {
+        PriorityQueue<Collection<Cell>> subRegions = new PriorityQueue<Collection<Cell>>(k, new Comparator() {
             @Override
             /**
-             * @return -1 if o1.size < o2.size; 0 if o1.size == o2.size; 1 if o1.size > o2.size
+             * @return -1 if o1.size > o2.size; 0 if o1.size == o2.size; 1 if o1.size > o2.size
              */
             public int compare(Object o1, Object o2)
             {
                 Collection<Cell> list1 = (Collection<Cell>)o1;
                 Collection<Cell> list2 = (Collection<Cell>)o2;
                 return (list1.size() > list2.size() ? 
-                        1 :
-                        (list1.size() == list2.size() ? 0 : -1));
+                        -1 :
+                        (list1.size() == list2.size() ? 0 : 1));
             }
             
         });
@@ -237,68 +237,79 @@ public class InertialPartitioner
         //Line 1
         Line line = getLine(nodes);
         lines.add(line);
+        
+//For debugging 
+System.out.println("\n\nCurrent state: ");
+for (Collection<Cell> s : subRegions)
+    System.out.println("\t\t- Size = " + s.size());
+//end for debugging
+        
         subRegions.add(line.getLeftNodes());
         subRegions.add(line.getRightNodes());
         k--;
         
-        System.out.println("\nFinding  line #1: " + line);
-        System.out.printf("Largest region has %d nodes\n", nodes.size());
-        for (Cell n : nodes) System.out.printf("%s; ", n);
-        System.out.println("\n");
+System.out.println("\nFinding  line #1: " + line);
+System.out.printf("Largest region has %d nodes\n", nodes.size());
+for (Cell n : nodes) System.out.printf("%s; ", n);
+    System.out.println("\n");
+
+System.out.println("\n\tLeft nodes include:");
+System.out.print("\t\t");
+
+for (Cell n : line.getLeftNodes()) 
+{
+    System.out.printf("%s - sj = %f; ", n, line.getSj(n));
+}
         
-        System.out.println("\n\tLeft nodes include:");
-        System.out.print("\t\t");
-        for (Cell n : line.getLeftNodes()) 
-        {
-            System.out.printf("%s - sj = %f; ", n, line.getSj(n));
-        }
-        System.out.println();
-        System.out.println("\n\tRight nodes include:");
-        System.out.print("\t\t");
-        for (Cell n : line.getRightNodes()) 
-        {
-            System.out.printf("%s - sj = %f; ", n, line.getSj(n));
-        }
-        System.out.println();
+System.out.println();
+System.out.println("\n\tRight nodes include:");
+System.out.print("\t\t");
+for (Cell n : line.getRightNodes()) 
+{
+    System.out.printf("%s - sj = %f; ", n, line.getSj(n));
+}
+System.out.println();
         
         for (int i = 0; i < k; ++i)
         {
             //Find the greatest set
-            Collection<Cell> largestList = subRegions.last();
+            Collection<Cell> largestList = subRegions.remove();
             
-            System.out.println("\n");
+System.out.println("\n");
             
             //Line dividing this set
             line = getLine(largestList);
             lines.add(line);
             
-            //replace the old large region by two newly partitioned regions
-            boolean res = subRegions.remove(largestList);
-            System.out.println("removing ok? " + res);
+            //replace the old large region by two newly partitioned regions            
+System.out.println("\n\nCurrent state: ");
+for (Collection<Cell> s : subRegions)
+    System.out.println("\t\t- Size = " + s.size());
+        
             subRegions.add(line.getLeftNodes());
             subRegions.add(line.getRightNodes());
             
-        System.out.println("\nFinding  line #" + (i + 2) + ": " + line);
-        System.out.printf("Largest region has %d nodes\n", largestList.size());
-        for (Cell n : largestList) 
-        {
-            System.out.printf("%s; ", n);
-        }
-        System.out.println("\n\tLeft nodes include:");
-        System.out.print("\t\t");
-        for (Cell n : line.getLeftNodes()) 
-        {
-            System.out.printf("%s - sj = %f; ", n, line.getSj(n));
-        }
-        System.out.println();
-        System.out.println("\n\tRight nodes include:");
-        System.out.print("\t\t");
-        for (Cell n : line.getRightNodes())
-        {
-            System.out.printf("%s - sj = %f; ", n, line.getSj(n));
-        }
-        System.out.println();
-        
+System.out.println("\nFinding  line #" + (i + 2) + ": " + line);
+System.out.printf("Largest region has %d nodes\n", largestList.size());
+for (Cell n : largestList) 
+{
+    System.out.printf("%s; ", n);
+}
+System.out.println("\n\tLeft nodes include:");
+System.out.print("\t\t");
+for (Cell n : line.getLeftNodes()) 
+{
+    System.out.printf("%s - sj = %f; ", n, line.getSj(n));
+}
+System.out.println();
+System.out.println("\n\tRight nodes include:");
+System.out.print("\t\t");
+for (Cell n : line.getRightNodes())
+{
+    System.out.printf("%s - sj = %f; ", n, line.getSj(n));
+}
+System.out.println();
+
         }
         
         return lines;

@@ -27,8 +27,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.*;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.persistence.EntityManager;
 import javax.swing.*;
 import util.DatabaseService;

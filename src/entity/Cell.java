@@ -1,4 +1,4 @@
-/**
+ /**
  * Floor Plan Marker Project
  * Copyright (C) 2013  Vy Thuy Nguyen
  *
@@ -20,6 +20,7 @@
 
 package entity;
 
+import java.awt.Color;
 import javax.persistence.*;
 
 /**
@@ -42,9 +43,38 @@ public class Cell
     private int minX;
     private int minY;
     
+    
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     AnnotFloorPlan annotFloorPlan;
     
+    @Transient
+    StringBuilder binaryString = new StringBuilder("");
+    
+    public Color getColor(double zoomedIndex)
+    {
+       int rgb = (int)(Integer.parseInt(binaryString.toString(), 2) * zoomedIndex);
+      
+       int red = (rgb >> 16)  & 0xFF;
+       int green = (rgb >> 8) & 0xFF;
+       int blue = rgb & 0xFF;
+//                
+       return new Color (red, green, blue);
+    }
+    
+    public String getBinaryString()
+    {
+        return binaryString.toString();
+    }
+    public int getIntVal()
+    {
+        
+        return Integer.parseInt(binaryString.toString(), 2);
+    }
+    
+    public void addChar(char c)
+    {
+        binaryString.append(c);
+    }
     
     public void setAnnotFloorPlan (AnnotFloorPlan afp)
     {

@@ -52,6 +52,8 @@ public class Line
     private ArrayList<Cell> leftNodes;
     private ArrayList<Cell> rightNodes;
     
+    int colorVal = 0;
+    
     public Line(double a, double b, double xbar, double ybar, double sbar, Collection<Cell> nodes)
     {
         this.a = a;
@@ -225,9 +227,15 @@ public class Line
         for (Cell node : nodes)
         {
             if (getSideMembership(node) == SideMembership.LEFT)
+            {
+                node.addChar('0');
                 leftNodes.add(node);
+            }
             else
+            {
+                node.addChar('1');
                 rightNodes.add(node);
+            }
         }
     }
     
