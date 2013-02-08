@@ -129,10 +129,6 @@ public class InertialPartitioner
             x3 += yDif * yDif;
             x2 += xDif * yDif;
         }
-        System.out.printf("Done computing x1, x2 and x3; x1 = %f, x2 = %f, x3 = %f\n",
-                           x1,
-                           x2,
-                           x3);
         
         //Compute a and b
         double a, b, lambda;
@@ -143,7 +139,6 @@ public class InertialPartitioner
             throw new Exception("No eigenvalue found!");
     
         lambda = Math.min(sols.get(0), sols.get(1));
-        System.out.printf("The smallest eigenvalue is: lambda = %f\n", lambda);
         
         //Compute a, b
         if (Math.abs(x2 * x2 - (x1 - lambda) * (x3 - lambda)) > EPSILON) //If the system doesn't have inf. number of solultions

@@ -55,7 +55,7 @@ public class AnnotFloorPlan implements Serializable
     
     
     //Each cell accounts for 1% of the width and the height
-    private final int RATIO = 2; //percent in respect to actual length
+    private final int RATIO = 20; //percent in respect to actual length
     int unitW;
     int unitH;
     int rowCount;
@@ -183,56 +183,10 @@ public class AnnotFloorPlan implements Serializable
             }
     }
      
-    /**
-     * Remove all edges touching the cell at the specified row and col.
-     * 
-     * @param row
-     * @param col 
-     */
-    private void removeEdges(int row, int col)
+    private void addVertexAt(int row, int col)
     {
-        
-         //North
-        if (row > 0)
-        {   
-            g.removeAllEdges(cellContainer[row][col], cellContainer[row - 1][col]);
-            
-            //NE
-            if (col < colCount - 1)
-                g.removeAllEdges(cellContainer[row][col], cellContainer[row - 1][col + 1]);
-                            
-        }
-
-        //East
-        if (col < colCount - 1)
-        {
-            g.removeAllEdges(cellContainer[row][col], cellContainer[row][col + 1]);
-            
-            //SE
-            if (row < rowCount - 1)
-                g.removeAllEdges(cellContainer[row][col], cellContainer[row + 1][col + 1]);     
-            
-        }
-
-        //South
-        if (row < rowCount - 1)
-        {
-            g.removeAllEdges(cellContainer[row][col], cellContainer[row + 1][col]);
-            
-            //SW
-            if (col > 0)
-                g.removeAllEdges(cellContainer[row][col], cellContainer[row + 1][col - 1]);
-        }
-
-        //West
-        if (col > 0)
-        {
-            g.removeAllEdges(cellContainer[row][col], cellContainer[row][col - 1]);
-            
-            //NW
-            if (row > 0)
-                g.removeAllEdges(cellContainer[row][col], cellContainer[row - 1][col - 1]);
-        }
+        g.addVertex(cellContainer[row][col]);
+        addEdges(row, col);
     }
     
     /**
@@ -245,14 +199,14 @@ public class AnnotFloorPlan implements Serializable
     {
         //Add weighted edge
         //North
-        if (row > 0)
+        if (row > 0 && g.containsVertex(cellContainer[row][col]))
         {
             g.addEdge(cellContainer[row][col], cellContainer[row - 1][col]);
             g.setEdgeWeight(g.getEdge(cellContainer[row][col],
                                       cellContainer[row - 1][col]),
                             1);
             //NE
-            if (col < colCount - 1)
+            if (col < colCount - 1 && g.containsVertex(cellContainer[row - 1][col + 1]))
             {
                 g.addEdge(cellContainer[row][col], cellContainer[row - 1][col + 1]);
                 g.setEdgeWeight(g.getEdge(cellContainer[row][col],
@@ -262,7 +216,7 @@ public class AnnotFloorPlan implements Serializable
         }
 
         //East
-        if (col < colCount - 1)
+        if (col < colCount - 1 && g.containsVertex(cellContainer[row][col + 1]))
         {
             g.addEdge(cellContainer[row][col], cellContainer[row][col + 1]);
             g.setEdgeWeight(g.getEdge(cellContainer[row][col],
@@ -271,7 +225,7 @@ public class AnnotFloorPlan implements Serializable
 
 
             //SE
-            if (row < rowCount - 1)
+            if (row < rowCount - 1 && g.containsVertex(cellContainer[row + 1][col + 1]))
             {
                 g.addEdge(cellContainer[row][col], cellContainer[row + 1][col + 1]);
                 g.setEdgeWeight(g.getEdge(cellContainer[row][col],
@@ -282,7 +236,7 @@ public class AnnotFloorPlan implements Serializable
         }
 
         //South
-        if (row < rowCount - 1)
+        if (row < rowCount - 1 && g.containsVertex(cellContainer[row + 1][col]))
         {
             g.addEdge(cellContainer[row][col], cellContainer[row + 1][col]);
             g.setEdgeWeight(g.getEdge(cellContainer[row][col],
@@ -290,7 +244,7 @@ public class AnnotFloorPlan implements Serializable
                             1);
 
             //SW
-            if (col > 0)
+            if (col > 0 && g.containsVertex(cellContainer[row + 1][col - 1]))
             {
                 g.addEdge(cellContainer[row][col], cellContainer[row + 1][col - 1]);
                 g.setEdgeWeight(g.getEdge(cellContainer[row][col],
@@ -300,14 +254,14 @@ public class AnnotFloorPlan implements Serializable
         }
 
         //West
-        if (col > 0)
+        if (col > 0 && g.containsVertex(cellContainer[row][col - 1]))
         {
             g.addEdge(cellContainer[row][col], cellContainer[row][col - 1]);
             g.setEdgeWeight(g.getEdge(cellContainer[row][col], cellContainer[row][col - 1]),
                             1);
 
             //NW
-            if (row > 0)
+            if (row > 0 && g.containsVertex(cellContainer[row - 1][col - 1]))
             {
                 g.addEdge(cellContainer[row][col], cellContainer[row - 1][col - 1]);
                 g.setEdgeWeight(g.getEdge(cellContainer[row][col],
@@ -327,24 +281,22 @@ public class AnnotFloorPlan implements Serializable
     {
         int col = x / unitW;
         int row = y / unitH;
-        Cell c = cellContainer[row][col];
-        c.disableCell();
-        deadCells.add(c);
+        cellContainer[row][col].disableCell();
+        deadCells.add(cellContainer[row][col]);
         
-        //removing all edges touching this cell
-        removeEdges(row, col);
+        //removing this cell from the graph and all of its touching edges
+        g.removeVertex(cellContainer[row][col]);
     }
     
     public void enabbleCell(int x, int y)
     {
         int col = x / unitW;
         int row = y / unitH;
-        Cell c = cellContainer[row][col];
-        c.enabbleCell();
-        deadCells.remove(c);
+        cellContainer[row][col].enabbleCell();
+        deadCells.remove(cellContainer[row][col]);
         
-        //add edges to all cells touching this cell
-       addEdges(row, col);
+        //adding this cell to the graph and connecting it with its neighbors
+        addVertexAt(row, col);
     }
 
     public Set<Cell> getDeadCells()
@@ -359,9 +311,7 @@ public class AnnotFloorPlan implements Serializable
     public void updateGraph()
     {
         for (Cell c : deadCells)
-        {
-            removeEdges(c.getRow(), c.getCol());
-        }
+            g.removeVertex(cellContainer[c.getRow()][c.getCol()]);
     }
     
     public int getRowCount()
@@ -379,10 +329,12 @@ public class AnnotFloorPlan implements Serializable
         return this.cellContainer;
     }
     
-    
+    /**
+     * 
+     * @return the largest connected component of the graph.
+     */
     public ArrayList<Cell> getLargestConnectedComponent()
     {
-        System.out.printf("row = %d, col = %d", rowCount, colCount);
         ArrayList<ArrayList<Cell>> components = new ArrayList<>();
         boolean visited[][] = new boolean[rowCount][colCount];
         for (int row = 0; row < rowCount; ++row)
@@ -393,12 +345,6 @@ public class AnnotFloorPlan implements Serializable
         Cell t = null, u = null;
         for (Cell c : g.vertexSet())
         {
-            if (c.isDead())
-            {
-                visited[c.getRow()][c.getCol()] = true;
-                continue;
-            }
-            
             if (!visited[c.getRow()][c.getCol()])
             {
                 q = new LinkedList<Cell>();
@@ -411,11 +357,8 @@ public class AnnotFloorPlan implements Serializable
                 while (!q.isEmpty())
                 {
                     t = q.remove();
-                    System.out.println("\nedge count = " + g.edgesOf(t).size() + "for " + t);
                     for (DefaultWeightedEdge e : g.edgesOf(t))
                     {
-                        System.out.println("\tsource of e: " + g.getEdgeSource(e));
-                        System.out.println("\ttarget of e: " + g.getEdgeTarget(e));
                         u = t.equals(g.getEdgeSource(e)) ?
                                 g.getEdgeTarget(e) :
                                 g.getEdgeSource(e);
@@ -424,17 +367,14 @@ public class AnnotFloorPlan implements Serializable
                             visited[u.getRow()][u.getCol()] = true;
                             q.add(u);
                             component.add(u);
-                            System.out.println("marking " + u);
                         }
                     }
                 }
                 
-                System.out.println("this compenent has " + component.size() + " cells");
                 components.add(component);
-            } //end if not visited
+            } 
         }
         
-        System.out.println("connected component count = " + components.size());
         int largestSize = 0, largestIndex = 0;
         for (int i = 0; i < components.size(); ++i)
         {
@@ -444,12 +384,29 @@ public class AnnotFloorPlan implements Serializable
                 largestIndex = i;
             }
         }
-        
+
+System.out.println("Total cell: " + (rowCount * colCount));
+System.out.println("Largest component has " + components.get(largestIndex) + " cells");
+
+        filterGraph(components.get(largestIndex));
         return components.get(largestIndex);
     }
     
-    public Cell[][] getAllCells()
+    /**
+     * Remove all nodes which are NOT in cells from graph g
+     * @param cells 
+     */
+    private void filterGraph(ArrayList<Cell> cells)
     {
-        return cellContainer;
+        for (int row = 0; row < rowCount; ++row)
+            for (int col = 0; col < colCount; ++col)
+                if (!cells.contains(cellContainer[row][col]))
+                    g.removeVertex(cellContainer[row][col]);
+    }
+    
+    public SimpleWeightedGraph<Cell, DefaultWeightedEdge> getLargestConnectedComponentAsGraph()
+    {
+        filterGraph(getLargestConnectedComponent());
+        return g;
     }
 }

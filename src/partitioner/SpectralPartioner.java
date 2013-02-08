@@ -21,9 +21,14 @@
 
 package partitioner;
 
+import entity.Cell;
+import java.util.ArrayList;
+import org.jgrapht.graph.DefaultWeightedEdge;
+import org.jgrapht.graph.SimpleWeightedGraph;
+
 /**
  * Algorithm:
- *  - Compute eigenpari (lambda2, q2)
+ *  - Compute eigenpair (lambda2, q2)
  *  - For each node v in G:
  *      + if q2(v) < 0, place v in partition N-
  *      + else, place v in partition N+
@@ -34,5 +39,17 @@ package partitioner;
  */
 public class SpectralPartioner 
 {
-
+    private static int[][] getLaplacianMatrix(SimpleWeightedGraph<Cell, DefaultWeightedEdge> g)
+    {
+//        ArrayList<Integer> matrix = new ArrayList<Integer>();
+//        
+//        
+//        return matrix;
+        throw new UnsupportedOperationException();
+    }
+    
+    private static int[][] getIncidentMatrix(SimpleWeightedGraph<Cell, DefaultWeightedEdge> g)
+    {
+        throw new UnsupportedOperationException();
+    }
 }

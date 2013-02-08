@@ -46,12 +46,26 @@ public class Cell
     @Transient
     StringBuilder binaryString = new StringBuilder("");
     
+    public boolean hasColor()
+    {
+        return binaryString.length() == 0 ? false : true;
+    }
+    
     public Color getColor(double zoomedIndex)
     {
        int rgb = (int)(Integer.parseInt(binaryString.toString(), 2) * zoomedIndex); // normalize the range
        int red = (rgb >> 16)  & 0xFF;
        int green = (rgb >> 8) & 0xFF;
        int blue = rgb & 0xFF;
+       
+//       int third = binaryString.length() / 3;
+//       
+//       char[] temp = new char[third];
+//       binaryString.getChars(0, third, temp, 0);
+//       red = Integer.parseInt(new String(temp.toString()));
+//       
+//       binaryString.getChars(third, 2 * third, temp, 0);
+//
        
        return new Color (red, green, blue);
     }

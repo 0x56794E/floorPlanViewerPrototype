@@ -267,7 +267,7 @@ public class AnnotPanel extends JPanel
         int rowCount = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getRowCount(),
             colCount = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getColCount(),
             x, y;
-        Cell[][] cells = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getAllCells();
+        Cell[][] cells = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getCellContainer();
         
 //        for (int r = 0; r < rowCount; ++r )
 //            for (int c = 0; c < colCount; ++c)
@@ -296,7 +296,7 @@ public class AnnotPanel extends JPanel
     {
         //Get Lines
         ArrayList<Cell> nodes = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getLargestConnectedComponent();
-        ArrayList<Line> lines = InertialPartitioner.getLines(nodes, 100);   
+        ArrayList<Line> lines = InertialPartitioner.getLines(nodes, 4);   
         double maxC = getMaxColorValue(lines);
         double zoomedIndex = MAX / maxC;
         int unitW = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getUnitW();
@@ -304,7 +304,7 @@ public class AnnotPanel extends JPanel
         int rowCount = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getRowCount(),
             colCount = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getColCount(),
             x, y;
-        Cell[][] cells = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getAllCells();
+        Cell[][] cells = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getCellContainer();
         
         for (int r = 0; r < rowCount; ++r )
             for (int c = 0; c < colCount; ++c)
@@ -319,12 +319,11 @@ public class AnnotPanel extends JPanel
                     g.setColor(Color.DARK_GRAY);
                     g.fillRect(x, y, unitW, unitH);
                 }
-                else
+                else if (cells[r][c].hasColor())
                 {
                     g.setColor(cells[r][c].getColor(zoomedIndex));
                     g.fillRect(x, y, unitW, unitH);
                 }
             }        
     }
-
 }
