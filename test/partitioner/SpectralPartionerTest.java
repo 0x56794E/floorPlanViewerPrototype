@@ -39,9 +39,20 @@ public class SpectralPartionerTest
     }
 
     @Test
-    public void testSomeMethod()
+    public void testGetSecondSmallest() throws Exception
     {
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        double[] array = {3, 2, 4, 12, 4, 3, 45};
+        double expected = 3;
+        double actual = SpectralPartitioner.getSecondSmallest(array);
+        assertEquals(expected, actual, 0.0000001);
+    }
+    
+    @Test
+    public void testGetSecondSmallestIndex() throws Exception
+    {
+        double[] array = {3, 2, 4, 12, 4, 3, 45};
+        int expected = 0;
+        int actual = SpectralPartitioner.getSecondSmallestIndex(array);
+        assertEquals(expected, actual);
     }
 }

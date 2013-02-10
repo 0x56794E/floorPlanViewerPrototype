@@ -46,6 +46,31 @@ public class Cell
     @Transient
     StringBuilder binaryString = new StringBuilder("");
     
+    @Transient
+    private int idForSpectralPartition = 0;
+    
+    public Cell(int r, int c)
+    {
+        this.row = r;
+        this.col = c;
+        isDead = false;
+    }
+    
+    public Cell()
+    {
+        this.isDead = false;
+    }
+    
+    public void setIdForSpectralPartition(int val)
+    {
+        this.idForSpectralPartition = val;
+    }
+    
+    public int getIdForSpectralPartitioin()
+    {
+        return this.idForSpectralPartition;
+    }
+    
     public boolean hasColor()
     {
         return binaryString.length() == 0 ? false : true;
@@ -93,20 +118,6 @@ public class Cell
     {
         return this.annotFloorPlan;
     }
-    
-    
-    public Cell(int r, int c)
-    {
-        this.row = r;
-        this.col = c;
-        isDead = false;
-    }
-    
-    public Cell()
-    {
-        this.isDead = false;
-    }
-    
     
     public int getRow()
     {

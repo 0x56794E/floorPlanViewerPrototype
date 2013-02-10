@@ -41,8 +41,10 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import partitioner.InertialPartitioner;
 import partitioner.Line;
+import partitioner.VirtualLine;
 import util.DatabaseService;
 import util.FileService;
+import partitioner.SpectralPartitioner;
 
 /**
  * @author              Vy Thuy Nguyen
@@ -183,12 +185,15 @@ public class AnnotPanel extends JPanel
             try
             {
                 showPartition = false;
-                doPaintComponentWithPartition(g);
+                doPaintComponentWithPartition(g);                
             }
             catch (Exception e)
             {
                 e.printStackTrace();
-                JOptionPane.showMessageDialog(null, "No Partitioniing Has Been Done", "ERROR", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, 
+                                              "Error encountered. No Partitioniing Has Been Done",
+                                              "ERROR", 
+                                              JOptionPane.ERROR_MESSAGE);
             }
         }
         else
@@ -292,11 +297,40 @@ public class AnnotPanel extends JPanel
         }
     }
 
+    /**
+     * Do partitioning using Spectral Method
+     * @param g
+     * @throws Exception 
+     */
     private void doPaintComponentWithPartition(Graphics g) throws Exception
+    {
+        VirtualLine vLine = SpectralPartitioner.getLine(mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getLargestConnectedComponentAsGraph());
+        int unitW = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getUnitW();
+        int unitH = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getUnitH();
+        
+        //N- section
+        g.setColor(Color.ORANGE);
+        for (Cell c : vLine.getNMinus())
+            g.fillRect(c.getCol() * unitW, c.getRow() * unitH, unitW, unitH);
+        
+        //N+ section
+        g.setColor(Color.GREEN);
+        for (Cell c : vLine.getNPlus())
+            g.fillRect(c.getCol() * unitW, c.getRow() * unitH, unitW, unitH);
+        
+    }
+    
+    /**
+     * Do partitioning using Inertial Method
+     * @param g
+     * @param k
+     * @throws Exception 
+     */
+    private void doPaintComponentWithPartition(Graphics g, int k) throws Exception
     {
         //Get Lines
         ArrayList<Cell> nodes = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getLargestConnectedComponent();
-        ArrayList<Line> lines = InertialPartitioner.getLines(nodes, 4);   
+        ArrayList<Line> lines = InertialPartitioner.getLines(nodes, k);   
         double maxC = getMaxColorValue(lines);
         double zoomedIndex = MAX / maxC;
         int unitW = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getUnitW();
@@ -309,8 +343,8 @@ public class AnnotPanel extends JPanel
         for (int r = 0; r < rowCount; ++r )
             for (int c = 0; c < colCount; ++c)
             {   
-                x = cells[r][c].getCol() * unitW;
-                y = cells[r][c].getRow() * unitH;
+                x = c * unitW;
+                y = r * unitH;
 
                 if (cells[r][c].isDead())
                 {

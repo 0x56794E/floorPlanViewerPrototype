@@ -184,7 +184,7 @@ public class FileService
     
     public static void saveLargestConnectedComponent(AnnotFloorPlan annotFp) throws IOException
     {
-        SimpleWeightedGraph<Cell, DefaultWeightedEdge> g = annotFp.getGraph();
+        SimpleWeightedGraph<Cell, WeightedEdge> g = annotFp.getGraph();
         System.out.printf("row = %d, col = %d", annotFp.getRowCount(), annotFp.getColCount());
         ArrayList<List<Cell>> components = new ArrayList<>();
         boolean visited[][] = new boolean[annotFp.getRowCount()][annotFp.getColCount()];
@@ -215,7 +215,7 @@ public class FileService
                 {
                     t = q.remove();
                     System.out.println("\nedge count = " + g.edgesOf(t).size() + "for " + t);
-                    for (DefaultWeightedEdge e : g.edgesOf(t))
+                    for (WeightedEdge e : g.edgesOf(t))
                     {
                         System.out.println("\tsource of e: " + g.getEdgeSource(e));
                         System.out.println("\ttarget of e: " + g.getEdgeTarget(e));

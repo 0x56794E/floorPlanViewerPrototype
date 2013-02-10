@@ -19,6 +19,7 @@ package gui.view;
 
 import entity.AnnotFloorPlan;
 import entity.Cell;
+import entity.WeightedEdge;
 import gui.util.ImagePanelContainer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -298,12 +299,12 @@ public class GetDirectionPanel extends JPanel
             g2.setStroke(new BasicStroke(3));
 
             SimpleWeightedGraph graph = afl.getGraph();
-            List<DefaultWeightedEdge> edges = afl.getShortestPath(x1, y1, x2, y2);
+            List<WeightedEdge> edges = afl.getShortestPath(x1, y1, x2, y2);
 
             int halfW = afl.getUnitW() / 2;
             int halfH = afl.getUnitH() / 2;
 
-            for (DefaultEdge e : edges)
+            for (WeightedEdge e : edges)
             {
                 Cell source = (Cell) graph.getEdgeSource(e);
                 Cell target = (Cell) graph.getEdgeTarget(e);

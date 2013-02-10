@@ -24,7 +24,6 @@ import java.io.Serializable;
 import java.util.*;
 import javax.persistence.*;
 import org.jgrapht.alg.DijkstraShortestPath;
-import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
 
 /**
@@ -55,7 +54,7 @@ public class AnnotFloorPlan implements Serializable
     
     
     //Each cell accounts for 1% of the width and the height
-    private final int RATIO = 20; //percent in respect to actual length
+    private final int RATIO = 30; //percent in respect to actual length
     int unitW;
     int unitH;
     int rowCount;
@@ -65,7 +64,7 @@ public class AnnotFloorPlan implements Serializable
     private boolean graphInitialized = false;
     
     @Transient
-    private SimpleWeightedGraph<Cell, DefaultWeightedEdge> g;
+    private SimpleWeightedGraph<Cell, WeightedEdge> g;
     
     @Transient
     private Cell[][] cellContainer;
@@ -85,7 +84,7 @@ public class AnnotFloorPlan implements Serializable
         cellContainer = new Cell[rowCount][colCount];
          
         //Init the graph
-        g = new SimpleWeightedGraph<Cell, DefaultWeightedEdge>(DefaultWeightedEdge.class);
+        g = new SimpleWeightedGraph<Cell, WeightedEdge>(WeightedEdge.class);
         
         initGraph();
     }
@@ -102,7 +101,7 @@ public class AnnotFloorPlan implements Serializable
         cellContainer = new Cell[rowCount][colCount];
         
         //init the graph
-        g = new SimpleWeightedGraph<Cell, DefaultWeightedEdge>(DefaultWeightedEdge.class);
+        g = new SimpleWeightedGraph<Cell, WeightedEdge>(WeightedEdge.class);
         
         initGraph();
         //generateVertices();
@@ -124,7 +123,7 @@ public class AnnotFloorPlan implements Serializable
         return unitH;
     }
     
-    public SimpleWeightedGraph<Cell, DefaultWeightedEdge> getGraph()
+    public SimpleWeightedGraph<Cell, WeightedEdge> getGraph()
     {
         return g;
     }
@@ -152,7 +151,7 @@ public class AnnotFloorPlan implements Serializable
      * @param y2 the actual "to" y coordinate (ditto)
      * @return the list of edges representing the shortest path from P1 to P2
      */
-    public List<DefaultWeightedEdge> getShortestPath(int x1, int y1, int x2, int y2)
+    public List<WeightedEdge> getShortestPath(int x1, int y1, int x2, int y2)
     {
         //int x1 = 158, y1 = 109, x2 = 108, y2 = 489;
         int row1 = y1 / unitH, col1 = x1 / unitW, row2 = y2 / unitH, col2 = x2 / unitW;
@@ -357,7 +356,7 @@ public class AnnotFloorPlan implements Serializable
                 while (!q.isEmpty())
                 {
                     t = q.remove();
-                    for (DefaultWeightedEdge e : g.edgesOf(t))
+                    for (WeightedEdge e : g.edgesOf(t))
                     {
                         u = t.equals(g.getEdgeSource(e)) ?
                                 g.getEdgeTarget(e) :
@@ -386,7 +385,7 @@ public class AnnotFloorPlan implements Serializable
         }
 
 System.out.println("Total cell: " + (rowCount * colCount));
-System.out.println("Largest component has " + components.get(largestIndex) + " cells");
+System.out.println("Largest component has " + components.get(largestIndex).size() + " cells");
 
         filterGraph(components.get(largestIndex));
         return components.get(largestIndex);
@@ -404,7 +403,7 @@ System.out.println("Largest component has " + components.get(largestIndex) + " c
                     g.removeVertex(cellContainer[row][col]);
     }
     
-    public SimpleWeightedGraph<Cell, DefaultWeightedEdge> getLargestConnectedComponentAsGraph()
+    public SimpleWeightedGraph<Cell, WeightedEdge> getLargestConnectedComponentAsGraph()
     {
         filterGraph(getLargestConnectedComponent());
         return g;

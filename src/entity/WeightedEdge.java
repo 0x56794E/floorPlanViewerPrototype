@@ -19,37 +19,32 @@
  */
 
 
-package partitioner;
+package entity;
 
-import entity.Cell;
-import java.util.ArrayList;
 import org.jgrapht.graph.DefaultWeightedEdge;
-import org.jgrapht.graph.SimpleWeightedGraph;
 
 /**
- * Algorithm:
- *  - Compute eigenpair (lambda2, q2)
- *  - For each node v in G:
- *      + if q2(v) < 0, place v in partition N-
- *      + else, place v in partition N+
- * 
  * @author              Vy Thuy Nguyen
- * @version             1.0 Feb 6, 2013
+ * @version             1.0 Feb 8, 2013
  * Last modified:       
  */
-public class SpectralPartioner 
+public class WeightedEdge extends DefaultWeightedEdge
 {
-    private static int[][] getLaplacianMatrix(SimpleWeightedGraph<Cell, DefaultWeightedEdge> g)
+    private int idForSpectralPartition;
+    
+    public WeightedEdge()
     {
-//        ArrayList<Integer> matrix = new ArrayList<Integer>();
-//        
-//        
-//        return matrix;
-        throw new UnsupportedOperationException();
+        super();
+        idForSpectralPartition = 0;
     }
     
-    private static int[][] getIncidentMatrix(SimpleWeightedGraph<Cell, DefaultWeightedEdge> g)
+    public void setIdForSpectralPartition(int val)
     {
-        throw new UnsupportedOperationException();
+        this.idForSpectralPartition = val;
+    }
+    
+    public int getIdForSpectralPartitioin()
+    {
+        return this.idForSpectralPartition;
     }
 }
