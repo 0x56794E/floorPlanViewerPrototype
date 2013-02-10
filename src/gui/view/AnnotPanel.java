@@ -308,6 +308,11 @@ public class AnnotPanel extends JPanel
         int unitW = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getUnitW();
         int unitH = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getUnitH();
         
+        //Dead cells
+        g.setColor(Color.darkGray);
+        for (Cell c : deadCells)
+            g.fillRect(c.getCol() * unitW, c.getRow() * unitH, unitW, unitH);
+        
         //N- section
         g.setColor(Color.ORANGE);
         for (Cell c : vLine.getNMinus())

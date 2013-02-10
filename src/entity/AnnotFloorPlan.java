@@ -54,7 +54,7 @@ public class AnnotFloorPlan implements Serializable
     
     
     //Each cell accounts for 1% of the width and the height
-    private final int RATIO = 30; //percent in respect to actual length
+    private final int RATIO = 2; //percent in respect to actual length
     int unitW;
     int unitH;
     int rowCount;

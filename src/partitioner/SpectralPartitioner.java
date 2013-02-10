@@ -46,7 +46,7 @@ public class SpectralPartitioner
         for (int r = 0; r < laplacianM.getRowDimension(); ++r)
         {    
             for (int c = 0; c < laplacianM.getColumnDimension(); ++c)
-                System.out.printf("%f; ", laplacianM.get(r, c));
+                System.out.printf("%-12f; ", laplacianM.get(r, c));
             System.out.println();
         }
         System.out.println("");
@@ -73,21 +73,29 @@ public class SpectralPartitioner
      *    of λi equal to 0. In particular, λ2 != 0 if and only if G is connected.
      *    Definition: λ2(L(G)) is the algebraic connectivity of G
      * 
-     * @param g whose vertices have already bean IDed - idForSpectralPartitioning has been set
+     * @param g
      * @return 
      */
     private static Matrix getLaplacianMatrix(SimpleWeightedGraph<Cell, WeightedEdge> g)
     {
-        int nodeCount = g.vertexSet().size();
-        //int[][] laplacianM = new int[nodeCount][nodeCount];
+        int nodeCount = g.vertexSet().size(), vertexId = 0;
         Matrix matrix = new Matrix(nodeCount, nodeCount);
+        
+        //Setting the vertex's ID
+        for (Cell c : g.vertexSet())
+        {
+            c.setIdForSpectralPartition(vertexId);
+            vertexId++;
+        }
         
         for (Cell i : g.vertexSet())
         {
+            //(i, i)
             matrix.set(i.getIdForSpectralPartitioin(),
                        i.getIdForSpectralPartitioin(),
                        g.degreeOf(i));
-            //laplacianM[i.getIdForSpectralPartitioin()][i.getIdForSpectralPartitioin()] = (byte)g.degreeOf(i);
+            
+            //(i,j)
             for (Cell j : g.vertexSet())
             {
                 if (i.getIdForSpectralPartitioin() != j.getIdForSpectralPartitioin()
@@ -154,8 +162,25 @@ public class SpectralPartitioner
         
     private static Matrix getV2(Matrix matrix) throws Exception
     {
-        int lambda2Index = getSecondSmallestIndex(matrix.eig().getRealEigenvalues());
-        return matrix.eig().getV().getMatrix(0,                             //init row index
+        double[] eigenvalues = matrix.eig().getRealEigenvalues();
+        System.out.println("Eigenvalues: ");
+        for (int i = 0; i < eigenvalues.length; ++i)
+            System.out.printf("%-12f; ", eigenvalues[i]);
+        int lambda2Index = getSecondSmallestIndex(eigenvalues);
+        Matrix eigenvectors = matrix.eig().getV();
+        
+        
+        System.out.println("\n\nEigenvectors");
+        for (int r = 0; r < eigenvectors.getRowDimension(); ++r)
+        {
+            for (int c = 0; c < eigenvectors.getColumnDimension(); ++c)
+                System.out.printf("%-12f; ", eigenvectors.get(r, c));
+            
+            System.out.println();
+        }
+        
+        System.out.println("V2 index = " + lambda2Index);
+        return eigenvectors.getMatrix(0,                             //init row index
                                              matrix.getColumnDimension() - 1,   //final row index
                                              lambda2Index,                       //init col index
                                              lambda2Index);                      //final col index
@@ -164,6 +189,7 @@ public class SpectralPartitioner
     public static int getSecondSmallestIndex(double[] array) throws Exception
     {
         int len = array.length;
+       
         switch (len)
         {
             case 0:
@@ -171,7 +197,7 @@ public class SpectralPartitioner
                 throw new Exception("Not enough values");
             default:
                 double min = array[0];
-                int secondIndex = 0, minIndex = 0;
+                int secondIndex = 1, minIndex = 0;
                 for (int i = 1; i < len; ++i)
                 {
                     if (array[i] < min)
