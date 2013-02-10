@@ -399,7 +399,7 @@ System.out.println("Largest component has " + components.get(largestIndex).size(
     {
         for (int row = 0; row < rowCount; ++row)
             for (int col = 0; col < colCount; ++col)
-                if (!cells.contains(cellContainer[row][col]))
+                if (cells.contains(cellContainer[row][col]))
                     g.removeVertex(cellContainer[row][col]);
     }
     

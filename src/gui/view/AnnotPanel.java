@@ -273,23 +273,7 @@ public class AnnotPanel extends JPanel
             colCount = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getColCount(),
             x, y;
         Cell[][] cells = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getCellContainer();
-        
-//        for (int r = 0; r < rowCount; ++r )
-//            for (int c = 0; c < colCount; ++c)
-//            {   
-//                x = c * unitW;
-//                y = r * unitH;
-//                g.setColor(Color.red);
-//                g.drawRect(x, y, unitW, unitH);
-//
-//                if (cells[r][c].isDead())
-//                {
-//                    System.out.println("Cell " + cells[r][c] + " is dead");
-//                    g.setColor(Color.DARK_GRAY);
-//                    g.fillRect(x, y, unitW, unitH);
-//                }
-//            }
-        
+               
         //Paint wall
         for (Cell dc : mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getDeadCells())
         {
@@ -304,7 +288,10 @@ public class AnnotPanel extends JPanel
      */
     private void doPaintComponentWithPartition(Graphics g) throws Exception
     {
-        VirtualLine vLine = SpectralPartitioner.getLine(mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getLargestConnectedComponentAsGraph());
+        ArrayList<VirtualLine> lines = 
+                SpectralPartitioner.getLines(mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getLargestConnectedComponentAsGraph(), 
+                                             4);
+        //VirtualLine vLine = SpectralPartitioner.getLine(mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getLargestConnectedComponentAsGraph());
         int unitW = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getUnitW();
         int unitH = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getUnitH();
         
@@ -313,18 +300,28 @@ public class AnnotPanel extends JPanel
         for (Cell c : deadCells)
             g.fillRect(c.getCol() * unitW, c.getRow() * unitH, unitW, unitH);
         
-        //N- section
-        g.setColor(Color.ORANGE);
-        for (Cell c : vLine.getNMinus())
-            g.fillRect(c.getCol() * unitW, c.getRow() * unitH, unitW, unitH);
+        int colorIndex = 0;
+        System.out.println("\n\nLINE COUNT = " + lines.size());
         
-        //N+ section
-        g.setColor(Color.GREEN);
-        for (Cell c : vLine.getNPlus())
-            g.fillRect(c.getCol() * unitW, c.getRow() * unitH, unitW, unitH);
-        
+        for (VirtualLine vLine : lines)
+        {
+            //N- section
+            g.setColor(colors[colorIndex]);
+            for (Cell c : vLine.getNMinus())
+                g.fillRect(c.getCol() * unitW, c.getRow() * unitH, unitW, unitH);
+            colorIndex++;
+            //N+ section
+            g.setColor(colors[colorIndex]);
+            for (Cell c : vLine.getNPlus())
+                g.fillRect(c.getCol() * unitW, c.getRow() * unitH, unitW, unitH);
+            colorIndex++;
+        }
     }
     
+    private Color[] colors = {Color.ORANGE, Color.GREEN, 
+                              Color.YELLOW, Color.BLUE, 
+                              Color.CYAN, Color.PINK,
+                              Color.RED, Color.MAGENTA};
     /**
      * Do partitioning using Inertial Method
      * @param g
@@ -345,24 +342,48 @@ public class AnnotPanel extends JPanel
             x, y;
         Cell[][] cells = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getCellContainer();
         
-        for (int r = 0; r < rowCount; ++r )
-            for (int c = 0; c < colCount; ++c)
-            {   
-                x = c * unitW;
-                y = r * unitH;
-
-                if (cells[r][c].isDead())
-                {
-                    g.setColor(Color.red);
-                    g.drawRect(x, y, unitW, unitH);
-                    g.setColor(Color.DARK_GRAY);
-                    g.fillRect(x, y, unitW, unitH);
-                }
-                else if (cells[r][c].hasColor())
-                {
-                    g.setColor(cells[r][c].getColor(zoomedIndex));
-                    g.fillRect(x, y, unitW, unitH);
-                }
-            }        
+        
+        //Dead cells
+        g.setColor(Color.darkGray);
+        for (Cell c : deadCells)
+            g.fillRect(c.getCol() * unitW, c.getRow() * unitH, unitW, unitH);
+        
+        //Paint partitioning
+        for (Line line : lines)
+        {
+            //Left
+            for (Cell lcell : line.getLeftNodes())
+            {
+                g.setColor(lcell.getColor(zoomedIndex));
+                g.fillRect(lcell.getCol() * unitW, lcell.getRow() * unitH, unitW, unitH);
+            }
+            
+            //Right
+            for (Cell rcell : line.getRightNodes())
+            {
+                g.setColor(rcell.getColor(zoomedIndex));
+                g.fillRect(rcell.getCol() * unitW, rcell.getRow() * unitH, unitW, unitH);
+            }
+        }
+        
+//        for (int r = 0; r < rowCount; ++r )
+//            for (int c = 0; c < colCount; ++c)
+//            {   
+//                x = c * unitW;
+//                y = r * unitH;
+//
+//                if (cells[r][c].isDead())
+//                {
+//                    g.setColor(Color.red);
+//                    g.drawRect(x, y, unitW, unitH);
+//                    g.setColor(Color.DARK_GRAY);
+//                    g.fillRect(x, y, unitW, unitH);
+//                }
+//                else if (cells[r][c].hasColor())
+//                {
+//                    g.setColor(cells[r][c].getColor(zoomedIndex));
+//                    g.fillRect(x, y, unitW, unitH);
+//                }
+//            }        
     }
 }

@@ -24,6 +24,10 @@ package partitioner;
 import Jama.Matrix;
 import entity.Cell;
 import entity.WeightedEdge;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.PriorityQueue;
 import org.jgrapht.graph.SimpleWeightedGraph;
 
 /**
@@ -55,6 +59,48 @@ public class SpectralPartitioner
         
         return new VirtualLine(v2, g);
     }
+    
+    public static ArrayList<VirtualLine> getLines(SimpleWeightedGraph<Cell, WeightedEdge> nodes, int k) throws Exception
+    {
+        if (k < 1) throw new Exception("k must be >= 1");
+        
+        ArrayList<VirtualLine> lines = new ArrayList<VirtualLine>();
+        PriorityQueue<SimpleWeightedGraph<Cell, WeightedEdge>> subRegions = 
+                new PriorityQueue<SimpleWeightedGraph<Cell, WeightedEdge>>(k, new Comparator<SimpleWeightedGraph<Cell, WeightedEdge>>() {
+            
+            @Override
+            public int compare(SimpleWeightedGraph<Cell, WeightedEdge> o1, SimpleWeightedGraph<Cell, WeightedEdge> o2)
+            {
+                return (o1.vertexSet().size() > o2.vertexSet().size())
+                        ? -1
+                        : (o1.vertexSet().size() == o2.vertexSet().size() ? 0 : 1);
+            }
+        });
+        
+        //Line 1
+        VirtualLine line = getLine(nodes);
+        lines.add(line);
+        subRegions.add(line.getNMinusGraph());
+        subRegions.add(line.getNPlusGraph());
+        k--;
+        
+        for (int i = 0; i < k; ++i)
+        {
+            //Find the largest region
+            SimpleWeightedGraph<Cell, WeightedEdge> largestList = subRegions.remove();
+            
+            //Line dividing this region
+            line = getLine(largestList);
+            lines.add(line);
+            
+            //replace the old large region by two newly partitioned regions            
+            subRegions.add(line.getNMinusGraph());
+            subRegions.add(line.getNPlusGraph());
+        }
+        return lines;
+    }
+    
+    
     
     /**
      * Definition: The Laplacian matrix L(G) of a graph G(N,E) 
