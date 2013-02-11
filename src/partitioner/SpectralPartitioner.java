@@ -46,14 +46,15 @@ public class SpectralPartitioner
     public static VirtualLine getLine(SimpleWeightedGraph<Cell, WeightedEdge> g) throws Exception
     {
         Matrix laplacianM = getLaplacianMatrix(g);
-        System.out.println("Laplacian Matrix = " );
-        for (int r = 0; r < laplacianM.getRowDimension(); ++r)
-        {    
-            for (int c = 0; c < laplacianM.getColumnDimension(); ++c)
-                System.out.printf("%-12f; ", laplacianM.get(r, c));
-            System.out.println();
-        }
-        System.out.println("");
+        
+//        System.out.println("Laplacian Matrix = " );
+//        for (int r = 0; r < laplacianM.getRowDimension(); ++r)
+//        {    
+//            for (int c = 0; c < laplacianM.getColumnDimension(); ++c)
+//                System.out.printf("%-12f; ", laplacianM.get(r, c));
+//            System.out.println();
+//        }
+//        System.out.println("");
         
         Matrix v2 = getV2(laplacianM);
         
@@ -84,6 +85,10 @@ public class SpectralPartitioner
         subRegions.add(line.getNPlusGraph());
         k--;
         
+        System.out.println("Largest component has " + nodes.vertexSet().size());
+        System.out.println("NMinusGraph has " + line.getNMinusGraph().vertexSet().size());
+        System.out.println("NPlusGraph has " + line.getNPlusGraph().vertexSet().size() + "\n");
+        
         for (int i = 0; i < k; ++i)
         {
             //Find the largest region
@@ -96,6 +101,11 @@ public class SpectralPartitioner
             //replace the old large region by two newly partitioned regions            
             subRegions.add(line.getNMinusGraph());
             subRegions.add(line.getNPlusGraph());
+            
+            
+        System.out.println("Largest component has " + largestList.vertexSet().size());
+        System.out.println("NMinusGraph has " + line.getNMinusGraph().vertexSet().size());
+        System.out.println("NPlusGraph has " + line.getNPlusGraph().vertexSet().size() + "\n");
         }
         return lines;
     }
@@ -209,23 +219,26 @@ public class SpectralPartitioner
     private static Matrix getV2(Matrix matrix) throws Exception
     {
         double[] eigenvalues = matrix.eig().getRealEigenvalues();
+        
         System.out.println("Eigenvalues: ");
         for (int i = 0; i < eigenvalues.length; ++i)
             System.out.printf("%-12f; ", eigenvalues[i]);
+        System.out.println();
+        
         int lambda2Index = getSecondSmallestIndex(eigenvalues);
         Matrix eigenvectors = matrix.eig().getV();
         
         
-        System.out.println("\n\nEigenvectors");
-        for (int r = 0; r < eigenvectors.getRowDimension(); ++r)
-        {
-            for (int c = 0; c < eigenvectors.getColumnDimension(); ++c)
-                System.out.printf("%-12f; ", eigenvectors.get(r, c));
-            
-            System.out.println();
-        }
-        
-        System.out.println("V2 index = " + lambda2Index);
+//        System.out.println("\n\nEigenvectors");
+//        for (int r = 0; r < eigenvectors.getRowDimension(); ++r)
+//        {
+//            for (int c = 0; c < eigenvectors.getColumnDimension(); ++c)
+//                System.out.printf("%-12f; ", eigenvectors.get(r, c));
+//            
+//            System.out.println();
+//        }
+//        
+//        System.out.println("V2 index = " + lambda2Index);
         return eigenvectors.getMatrix(0,                             //init row index
                                              matrix.getColumnDimension() - 1,   //final row index
                                              lambda2Index,                       //init col index
