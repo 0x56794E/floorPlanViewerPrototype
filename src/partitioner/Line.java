@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import partitioner.Constant.SideMembership;
 
 /**
  * Represents a line L such that 
@@ -37,7 +38,7 @@ import java.util.List;
  TODO: includes sideMembership determining in this class, NOT as static method in inertialPartitioner
  */
 
-public class Line
+public class Line 
 {
     private double a;
     private double b;
@@ -50,13 +51,14 @@ public class Line
     
     int colorVal = 0;
     
-    public Line(double a, double b, double xbar, double ybar, double sbar, Collection<Cell> nodes)
+    public Line(ArrayList<Cell> nodes, double[] data)
     {
-        this.a = a;
-        this.b = b;
-        this.xbar = xbar;
-        this.ybar = ybar;
-        this.sbar = sbar;
+        
+        this.a = data[0];
+        this.b = data[1];
+        this.xbar = data[2];
+        this.ybar = data[3];
+        this.sbar = data[4];
         
         leftNodes = new ArrayList<Cell>();
         rightNodes = new ArrayList<Cell>();
@@ -235,14 +237,14 @@ public class Line
         }
     }
     
-    public List<Cell> getLeftNodes()
+    public ArrayList<Cell> getLeftNodes()
     {
-        return Collections.unmodifiableList(leftNodes);
+        return leftNodes;
     }
     
-    public List<Cell> getRightNodes()
+    public ArrayList<Cell> getRightNodes()
     {
-        return Collections.unmodifiableList(rightNodes);
+        return rightNodes;
     }
     
     public String toString()

@@ -23,21 +23,10 @@ package partitioner;
 
 /**
  * @author              Vy Thuy Nguyen
- * @version             1.0 Jan 24, 2013
+ * @version             1.0 Feb 10, 2013
  * Last modified:       
  */
-public enum SideMembership {
-    LEFT ((byte)0), RIGHT ((byte)1);
-    
-    private final byte value;
-    
-    private SideMembership(byte value)
-    {
-        this.value = value;
-    }
-    
-    public byte getValue()
-    { 
-        return this.value;
-    }
+public class Config
+{
+    //public static volatile Partitioner DEFAULT_PARTITIONER = InertialPartitioner.INSTANCE;
 }

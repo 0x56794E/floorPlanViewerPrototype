@@ -243,27 +243,38 @@ public class AnnotPanel extends JPanel
      */
     private double getMaxColorValue(ArrayList<Line> lines)
     {
-        double marC = 0;
+        double maxC = 0;
         
         for (Line l : lines)
         {
-            for (int i = 0; i < l.getLeftNodes().size(); ++i)
-            {
-                if (l.getLeftNodes().get(i).getIntVal() > marC)
-                    marC = l.getLeftNodes().get(i).getIntVal();
-                break;
-            }
+             if (l.getLeftNodes().size() > 0
+                     && l.getLeftNodes().get(0).getIntVal() > maxC)
+                maxC = l.getLeftNodes().get(0).getIntVal();
             
-            for (int i = 0; i < l.getRightNodes().size(); ++i)
-            {
-                if (l.getRightNodes().get(i).getIntVal() > marC)
-                    marC = l.getRightNodes().get(i).getIntVal();
-                break;
-            }
+            if (l.getRightNodes().size() > 0
+                    && l.getRightNodes().get(0).getIntVal() > maxC)
+                maxC = l.getRightNodes().get(0).getIntVal();
         }
-        return marC;
+        return maxC;
     }
 
+    private double getMaxColorValueG(ArrayList<VirtualLine> lines)
+    {
+        double maxC = 0;
+        for (VirtualLine l : lines)
+        {
+             if (l.getNMinus().size() > 0 
+                     && l.getNMinus().get(0).getIntVal() > maxC)
+                maxC = l.getNMinus().get(0).getIntVal();
+             
+             if (l.getNPlus().size() > 0
+                     && l.getNPlus().get(0).getIntVal() > maxC)
+                 maxC = l.getNPlus().get(0).getIntVal();
+            
+        }
+        return maxC;
+    }
+    
     private void doPaintComponentWithoutPartition(Graphics g)
     {
         deadCells = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getDeadCells();
@@ -290,7 +301,9 @@ public class AnnotPanel extends JPanel
     {
         ArrayList<VirtualLine> lines = 
                 SpectralPartitioner.getLines(mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getLargestConnectedComponentAsGraph(), 
-                                             4);
+                                             100);
+        double maxC = getMaxColorValueG(lines);
+        double zoomedIndex = MAX / maxC;
         //VirtualLine vLine = SpectralPartitioner.getLine(mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getLargestConnectedComponentAsGraph());
         int unitW = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getUnitW();
         int unitH = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getUnitH();
@@ -300,28 +313,26 @@ public class AnnotPanel extends JPanel
         for (Cell c : deadCells)
             g.fillRect(c.getCol() * unitW, c.getRow() * unitH, unitW, unitH);
         
-        int colorIndex = 0;
         System.out.println("\n\nLINE COUNT = " + lines.size());
         
         for (VirtualLine vLine : lines)
         {
             //N- section
-            g.setColor(colors[colorIndex]);
             for (Cell c : vLine.getNMinus())
+            {
+                g.setColor(c.getColor(zoomedIndex));
                 g.fillRect(c.getCol() * unitW, c.getRow() * unitH, unitW, unitH);
-            colorIndex++;
+            }
+            
             //N+ section
-            g.setColor(colors[colorIndex]);
             for (Cell c : vLine.getNPlus())
+            {
+                g.setColor(c.getColor(zoomedIndex));
                 g.fillRect(c.getCol() * unitW, c.getRow() * unitH, unitW, unitH);
-            colorIndex++;
+            }
         }
     }
     
-    private Color[] colors = {Color.ORANGE, Color.GREEN, 
-                              Color.YELLOW, Color.BLUE, 
-                              Color.CYAN, Color.PINK,
-                              Color.RED, Color.MAGENTA};
     /**
      * Do partitioning using Inertial Method
      * @param g
@@ -337,12 +348,7 @@ public class AnnotPanel extends JPanel
         double zoomedIndex = MAX / maxC;
         int unitW = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getUnitW();
         int unitH = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getUnitH();
-        int rowCount = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getRowCount(),
-            colCount = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getColCount(),
-            x, y;
-        Cell[][] cells = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getCellContainer();
-        
-        
+     
         //Dead cells
         g.setColor(Color.darkGray);
         for (Cell c : deadCells)
@@ -365,25 +371,6 @@ public class AnnotPanel extends JPanel
                 g.fillRect(rcell.getCol() * unitW, rcell.getRow() * unitH, unitW, unitH);
             }
         }
-        
-//        for (int r = 0; r < rowCount; ++r )
-//            for (int c = 0; c < colCount; ++c)
-//            {   
-//                x = c * unitW;
-//                y = r * unitH;
-//
-//                if (cells[r][c].isDead())
-//                {
-//                    g.setColor(Color.red);
-//                    g.drawRect(x, y, unitW, unitH);
-//                    g.setColor(Color.DARK_GRAY);
-//                    g.fillRect(x, y, unitW, unitH);
-//                }
-//                else if (cells[r][c].hasColor())
-//                {
-//                    g.setColor(cells[r][c].getColor(zoomedIndex));
-//                    g.fillRect(x, y, unitW, unitH);
-//                }
-//            }        
+      
     }
 }

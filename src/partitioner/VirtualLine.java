@@ -55,14 +55,14 @@ public class VirtualLine
         partitionGraph(g);
     }
     
-    public Collection<Cell> getNMinus()
+    public ArrayList<Cell> getNMinus()
     {
-        return Collections.unmodifiableList(nMinus);
+        return nMinus;
     }
     
-     public Collection<Cell> getNPlus()
+     public ArrayList<Cell> getNPlus()
     {
-        return Collections.unmodifiableList(nPlus);
+        return nPlus;
     }
     
     
@@ -79,11 +79,14 @@ public class VirtualLine
             {
                 nMinusGraph.addVertex(c);
                 nMinus.add(c);
+                c.addChar('0');
             }
             else
             {
                 nPlusGraph.addVertex(c);
                 nPlus.add(c);
+                c.addChar('1');
+                
             }
         }
         

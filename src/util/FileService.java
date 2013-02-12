@@ -24,16 +24,15 @@ import entity.*;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
+import partitioner.InertialPartitioner;
+import partitioner.Line;
 
 /**
  * @author              Vy Thuy Nguyen
@@ -46,6 +45,38 @@ public class FileService
     {
         for (PointSet ps : fp.getPointSets())
             savePointSetToFile(ps);
+    }
+    
+    public static void printPartitioningLines(FloorPlan fp) throws FileNotFoundException, Exception
+    {
+        ArrayList<Cell> nodes = new ArrayList<Cell>();
+        int k = 4;
+        File file = new File(fp.getFileName() + "_" + fp.getId() + "_availCell.txt");
+        Scanner sc = new Scanner(file);
+        String line;
+        String tokens[];
+        
+        //List of nodes (available nodes)
+        while (sc.hasNextLine())
+        {
+            line = sc.nextLine();
+            tokens = line.split("\\s");
+            nodes.add(new Cell(Integer.parseInt(tokens[1]), Integer.parseInt(tokens[0])));
+        }
+        
+        List<Line> lines = InertialPartitioner.getLines(nodes, k);
+        FileWriter fstream = new FileWriter(fp.getFileName() + "_" + fp.getId() + "_lines.txt");
+        BufferedWriter out = new BufferedWriter(fstream);
+        
+        for (Line l : lines)
+        {
+            out.write(l.getA() + " " + l.getB() + " " + l.getSbar() + " " + l.getXbar() + " " + l.getYbar());
+            out.write("\r\n");
+        }
+
+        //Close the output stream
+        out.close();
+    
     }
     
     public static void savePointSetToFile(PointSet ps) throws IOException

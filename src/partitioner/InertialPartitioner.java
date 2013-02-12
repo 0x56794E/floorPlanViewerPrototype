@@ -21,6 +21,7 @@
 
 package partitioner;
 
+import Jama.Matrix;
 import entity.Cell;
 import entity.FloorPlan;
 import java.io.BufferedWriter;
@@ -34,11 +35,12 @@ import java.util.*;
  * @version             1.0 Jan 22, 2013
  * Last modified:       
  */
-public class InertialPartitioner 
+public class InertialPartitioner extends Partitioner
 {
-    
+//    public static final InertialPartitioner INSTANCE = new InertialPartitioner();
     public static final double EPSILON = 0.001; //to compare to double;
-        
+    private InertialPartitioner() {}
+    
     /**
      * Given a graph, this function returns the line L that partitions the graph
      * into two parts. 
@@ -103,7 +105,7 @@ public class InertialPartitioner
      * @return Line l
      * @throws Exception 
      */
-    public static Line getLine(Collection<Cell> nodes) throws Exception
+    public static Line getLine(ArrayList<Cell> nodes) throws Exception
     {
         //Compute xbar and ybar
         double xbar = 0, ybar = 0;
@@ -192,21 +194,22 @@ public class InertialPartitioner
                         ? (sValues.get(size / 2) + sValues.get(size / 2 - 1)) / 2 //Take the avg of the two middle elements
                         : sValues.get(size / 2 )); //Otherwise, take the middle element
         
-        return new Line(a, b, xbar, ybar, sbar, nodes);
+        double[] data = {a, b, xbar, ybar, sbar};
+        return new Line(nodes, data);
     }
  
-    public static ArrayList<Line> getLines(Collection<Cell> nodes, int k) throws Exception
+    public static ArrayList<Line> getLines(ArrayList<Cell> nodes, int k) throws Exception
     {
         if (k < 1) throw new Exception("k must be >= 1");
         
         ArrayList<Line> lines = new ArrayList<Line>();
-        PriorityQueue<Collection<Cell>> subRegions = 
-                new PriorityQueue<Collection<Cell>>(k, new Comparator<Collection<Cell>>() {
+        PriorityQueue<ArrayList<Cell>> subRegions = 
+                new PriorityQueue<ArrayList<Cell>>(k, new Comparator<ArrayList<Cell>>() {
             @Override
             /**
              * @return -1 if o1.size > o2.size; 0 if o1.size == o2.size; 1 if o1.size > o2.size
              */
-            public int compare(Collection<Cell> list1, Collection<Cell> list2)
+            public int compare(ArrayList<Cell> list1, ArrayList<Cell> list2)
             {
                 return (list1.size() > list2.size() ? 
                         -1 :
@@ -224,7 +227,7 @@ public class InertialPartitioner
         for (int i = 0; i < k; ++i)
         {
             //Find the greatest set
-            Collection<Cell> largestList = subRegions.remove();
+            ArrayList<Cell> largestList = subRegions.remove();
             
             //Line dividing this set
             line = getLine(largestList);
@@ -249,7 +252,7 @@ public class InertialPartitioner
      * @return an arraylist container the solution(s) of the quad-eqn
      * aX^2 + bX + c = 0
      */
-    public static ArrayList<Double> getSolutions(double a, double b, double c)
+    private static ArrayList<Double> getSolutions(double a, double b, double c)
     {
         ArrayList<Double> sols = new ArrayList<Double>();
         
@@ -287,37 +290,6 @@ public class InertialPartitioner
     }
    
 
-    public static void printPartitioningLines(FloorPlan fp) throws FileNotFoundException, Exception
-    {
-        List<Cell> nodes = new ArrayList<Cell>();
-        int k = 4;
-        File file = new File(fp.getFileName() + "_" + fp.getId() + "_availCell.txt");
-        Scanner sc = new Scanner(file);
-        String line;
-        String tokens[];
-        
-        //List of nodes (available nodes)
-        while (sc.hasNextLine())
-        {
-            line = sc.nextLine();
-            tokens = line.split("\\s");
-            nodes.add(new Cell(Integer.parseInt(tokens[1]), Integer.parseInt(tokens[0])));
-        }
-        
-        List<Line> lines = InertialPartitioner.getLines(nodes, k);
-        FileWriter fstream = new FileWriter(fp.getFileName() + "_" + fp.getId() + "_lines.txt");
-        BufferedWriter out = new BufferedWriter(fstream);
-        
-        for (Line l : lines)
-        {
-            out.write(l.getA() + " " + l.getB() + " " + l.getSbar() + " " + l.getXbar() + " " + l.getYbar());
-            out.write("\r\n");
-        }
-
-        //Close the output stream
-        out.close();
-    
-    }
 
     public String getBinaryString(Cell node, List<Line> lines)
     {
@@ -330,13 +302,3 @@ public class InertialPartitioner
     }
 }
 
-
-/*
- * Read about spectral bisection partitioning graph
- * 
- * Method spec:
- * input: k (number of partition), graph g
- * output: lines partitioning 
- * 
- * Laplace matrix
- */

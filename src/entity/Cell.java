@@ -104,6 +104,11 @@ public class Cell
         return Integer.parseInt(binaryString.toString(), 2);
     }
     
+    /**
+     * '0' if node is in the N- or left section
+     * '1' otherwise
+     * @param c 
+     */
     public void addChar(char c)
     {
         binaryString.append(c);
