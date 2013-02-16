@@ -1,5 +1,5 @@
 /**
- * Floor Plan Marker Project
+ * Inertial Partitioning
  * Copyright (C) 2013  Vy Thuy Nguyen
  *
  * This library is free software; you can redistribute it and/or
@@ -18,26 +18,38 @@
  * Boston, MA  02110-1301, USA.
  */
 
-package gui.util;
 
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
+package main;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
 
 /**
  * @author              Vy Thuy Nguyen
- * @version             1.0 Jan 17, 2013
+ * @version             1.0 Feb 14, 2013
  * Last modified:       
  */
-public interface ImagePanelContainer 
+public class ReadFile 
 {
-
-    public void doPaintComponent(Graphics g);
-    
-    public void doPaintComponent(Graphics g, BufferedImage img);
-    
-    public void onMouseClicked(int x, int y);
-    
-    public void onRightClicked(int x, int y);
-    
-    public void updateCurrentPositionLabel(String str);
+    public static void main(String args[]) throws FileNotFoundException
+    {
+        if (args.length < 1)
+        {
+            System.out.println("Not Enough Argument");
+            System.out.println("Usage: RreadFile <fileName>");
+            System.exit(1);
+        }
+        else
+        {
+            File file = new File(args[0]);
+            Scanner sc = new Scanner(file);
+            int count = 0;
+            while (sc.hasNextLine())
+            {
+                System.out.println("line " + count + ": " + sc.nextLine());
+                count++;
+            }
+        }
+    }
 }

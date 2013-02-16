@@ -24,6 +24,7 @@ import gui.view.ImagePanel;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import javax.swing.SwingUtilities;
 
 /**
  * @author Vy Thuy Nguyen
@@ -59,7 +60,12 @@ public class ImagePanelMouseListener implements MouseMotionListener, MouseListen
         ImagePanel ip = (ImagePanel)e.getSource();
         int x = e.getX(), y = e.getY();
         if (x <= ip.getImageWidth() && y <= ip.getImageHeight())
-            ip.onMouseClicked(x, y);
+        {
+            if (SwingUtilities.isLeftMouseButton(e))
+                ip.onMouseClicked(x, y);
+            else if (SwingUtilities.isRightMouseButton(e))
+                ip.onRightClicked(x, y);
+        }
         
     }
 

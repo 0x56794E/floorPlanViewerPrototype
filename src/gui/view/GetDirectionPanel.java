@@ -372,4 +372,10 @@ public class GetDirectionPanel extends JPanel
     {
         return (x >= 0 && x <= imagePanel.getImageWidth());
     }
+
+    @Override
+    public void onRightClicked(int x, int y)
+    {
+        System.out.println("Right click has no use in this context");
+    }
 }

@@ -47,38 +47,6 @@ public class FileService
             savePointSetToFile(ps);
     }
     
-    public static void printPartitioningLines(FloorPlan fp) throws FileNotFoundException, Exception
-    {
-        ArrayList<Cell> nodes = new ArrayList<Cell>();
-        int k = 4;
-        File file = new File(fp.getFileName() + "_" + fp.getId() + "_availCell.txt");
-        Scanner sc = new Scanner(file);
-        String line;
-        String tokens[];
-        
-        //List of nodes (available nodes)
-        while (sc.hasNextLine())
-        {
-            line = sc.nextLine();
-            tokens = line.split("\\s");
-            nodes.add(new Cell(Integer.parseInt(tokens[1]), Integer.parseInt(tokens[0])));
-        }
-        
-        List<Line> lines = InertialPartitioner.getLines(nodes, k);
-        FileWriter fstream = new FileWriter(fp.getFileName() + "_" + fp.getId() + "_lines.txt");
-        BufferedWriter out = new BufferedWriter(fstream);
-        
-        for (Line l : lines)
-        {
-            out.write(l.getA() + " " + l.getB() + " " + l.getSbar() + " " + l.getXbar() + " " + l.getYbar());
-            out.write("\r\n");
-        }
-
-        //Close the output stream
-        out.close();
-    
-    }
-    
     public static void savePointSetToFile(PointSet ps) throws IOException
     {
         FileWriter fstream = new FileWriter(ps.getFloorPlan().getFileName() + "-pointSetID_" + ps.getId() + ".txt");

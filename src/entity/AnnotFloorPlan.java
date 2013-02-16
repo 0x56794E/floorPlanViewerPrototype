@@ -25,6 +25,7 @@ import java.util.*;
 import javax.persistence.*;
 import org.jgrapht.alg.DijkstraShortestPath;
 import org.jgrapht.graph.SimpleWeightedGraph;
+import util.DatabaseService;
 
 /**
  * Bug: when open an old file, new cells are created instead, if a cell is marked dead, 
@@ -69,37 +70,31 @@ public class AnnotFloorPlan implements Serializable
     @Transient
     private Cell[][] cellContainer;
         
+    @Transient
+    private EntityManager em;
+    
     @SuppressWarnings({"unchecked", "unchecked"})
     public AnnotFloorPlan()
     {
+        em = DatabaseService.getEntityManager();
         floorPlan = new FloorPlan();
         deadCells = new HashSet<Cell>();
-        
-        int width = 1200;
-        int height = 1000;
-        unitW = width * RATIO / 100;
-        unitH = height * RATIO / 100;
-        rowCount = height / unitH;
-        colCount = width / unitW;
-        cellContainer = new Cell[rowCount][colCount];
-         
-        //Init the graph
         g = new SimpleWeightedGraph<Cell, WeightedEdge>(WeightedEdge.class);
-        
-        initGraph();
     }
     
     public AnnotFloorPlan(FloorPlan fp)
     {
+        em = DatabaseService.getEntityManager();
         floorPlan = fp;        
         deadCells = new HashSet<Cell>();
         
         unitW = fp.getWidth() * RATIO / 100;
         unitH = fp.getHeight() * RATIO / 100;
-        rowCount = fp.getHeight() / unitH;
-        colCount = fp.getWidth() / unitW;
+        rowCount = fp.getHeight() / unitH + 1;
+        colCount = fp.getWidth() / unitW + 1;
         cellContainer = new Cell[rowCount][colCount];
         
+        System.out.println("In constructor; row = " + rowCount + "; col = " + colCount);
         //init the graph
         g = new SimpleWeightedGraph<Cell, WeightedEdge>(WeightedEdge.class);
         
@@ -168,7 +163,7 @@ public class AnnotFloorPlan implements Serializable
             for (int col = 0; col < colCount; ++col)
             {
                 
-                cellContainer[row][col] = new Cell(row, col);
+                cellContainer[row][col] = new Cell(row, col, this);
                 g.addVertex(cellContainer[row][col]);
             }
     }
@@ -196,6 +191,7 @@ public class AnnotFloorPlan implements Serializable
      */
     private void addEdges(int row, int col)
     {
+        System.out.println("Adding (" + row + ", " + col + ")");
         //Add weighted edge
         //North
         if (row > 0 && g.containsVertex(cellContainer[row][col]))
@@ -280,22 +276,30 @@ public class AnnotFloorPlan implements Serializable
     {
         int col = x / unitW;
         int row = y / unitH;
-        cellContainer[row][col].disableCell();
-        deadCells.add(cellContainer[row][col]);
-        
-        //removing this cell from the graph and all of its touching edges
-        g.removeVertex(cellContainer[row][col]);
+        if (valid(row, col))
+        {
+            cellContainer[row][col].disableCell();
+            deadCells.add(cellContainer[row][col]);
+
+            //removing this cell from the graph and all of its touching edges
+            g.removeVertex(cellContainer[row][col]);
+        }
     }
     
     public void enabbleCell(int x, int y)
     {
         int col = x / unitW;
         int row = y / unitH;
-        cellContainer[row][col].enabbleCell();
-        deadCells.remove(cellContainer[row][col]);
-        
-        //adding this cell to the graph and connecting it with its neighbors
-        addVertexAt(row, col);
+        if (valid(row, col))
+        {
+            cellContainer[row][col].enabbleCell();
+            deadCells.remove(cellContainer[row][col]);
+            em.getTransaction().begin();
+            em.remove(cellContainer[row][col]);
+            em.getTransaction().commit();
+            //adding this cell to the graph and connecting it with its neighbors
+            addVertexAt(row, col);
+        }
     }
 
     public Set<Cell> getDeadCells()
@@ -309,8 +313,13 @@ public class AnnotFloorPlan implements Serializable
      */
     public void updateGraph()
     {
+        cellContainer = new Cell[rowCount][colCount];
+        initGraph();
+
         for (Cell c : deadCells)
+        {            
             g.removeVertex(cellContainer[c.getRow()][c.getCol()]);
+        }
     }
     
     public int getRowCount()
@@ -384,9 +393,6 @@ public class AnnotFloorPlan implements Serializable
             }
         }
 
-System.out.println("Total cell: " + (rowCount * colCount));
-System.out.println("Largest component has " + components.get(largestIndex).size() + " cells");
-
         filterGraph(components.get(largestIndex));
         return components.get(largestIndex);
     }
@@ -407,5 +413,10 @@ System.out.println("Largest component has " + components.get(largestIndex).size(
     {
         filterGraph(getLargestConnectedComponent());
         return g;
+    }
+
+    private boolean valid(int row, int col)
+    {
+        return row >= 0 && row < rowCount && col >= 0 && col < colCount;
     }
 }

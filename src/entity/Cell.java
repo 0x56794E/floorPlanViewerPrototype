@@ -49,10 +49,11 @@ public class Cell
     @Transient
     private int idForSpectralPartition = 0;
     
-    public Cell(int r, int c)
+    public Cell(int r, int c, AnnotFloorPlan afp)
     {
         this.row = r;
         this.col = c;
+        annotFloorPlan = afp;
         isDead = false;
     }
     
@@ -82,16 +83,6 @@ public class Cell
        int red = (rgb >> 16)  & 0xFF;
        int green = (rgb >> 8) & 0xFF;
        int blue = rgb & 0xFF;
-       
-//       int third = binaryString.length() / 3;
-//       
-//       char[] temp = new char[third];
-//       binaryString.getChars(0, third, temp, 0);
-//       red = Integer.parseInt(new String(temp.toString()));
-//       
-//       binaryString.getChars(third, 2 * third, temp, 0);
-//
-       
        return new Color (red, green, blue);
     }
     
@@ -163,14 +154,14 @@ public class Cell
     public int hashCode()
     {
         int hash = 3;
-        hash = 83 * hash + (int) (this.col ^ (this.col >>> 32));
-        hash = 83 * hash + (int) (this.row ^ (this.row >>> 32));
+        hash = 83 * hash + this.col ^ (this.col >>> 32);
+        hash = 83 * hash + this.row ^ (this.row >>> 32);
         return hash;
     }
     
     public String toString()
     {
-        return String.format("(%d, %d)", col, row); 
+        return String.format("%d %d", col, row); 
     }
     
 }

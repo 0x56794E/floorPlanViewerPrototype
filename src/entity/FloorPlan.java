@@ -54,8 +54,6 @@ public class FloorPlan implements Serializable
      */
     private String absFilePath;
     private String fileName;
-    private int originX;
-    private int originY;
     private int width;
     private int height;
     
@@ -69,8 +67,6 @@ public class FloorPlan implements Serializable
     {
         absFilePath = file.getPath();
         fileName = file.getName();
-        originX = x;
-        originY = y;
         this.width = width;
         this.height = height;
         pointSets = new ArrayList<PointSet>();
@@ -120,26 +116,6 @@ public class FloorPlan implements Serializable
     public String getFileName()
     {
         return this.fileName;
-    }
-    
-    public int getOriginX()
-    {
-        return originX;
-    }
-    
-    public void setOriginX(int x)
-    {
-        this.originX = x;
-    }
-    
-    public int getOriginY()
-    {
-        return originY;
-    }
-    
-    public void setOriginY(int y)
-    {
-        this.originY = y;
     }
     
     public List<PointSet> getPointSets()

@@ -663,5 +663,11 @@ public class PointMarkingPanel extends Observable
             removeBtn.setEnabled(false);
             newPointSetBtn.setEnabled(false);
         }
+
+        @Override
+        public void onRightClicked(int x, int y)
+        {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
     }
 }

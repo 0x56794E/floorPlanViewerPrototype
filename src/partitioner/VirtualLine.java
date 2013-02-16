@@ -36,6 +36,11 @@ import org.jgrapht.graph.SimpleWeightedGraph;
  * @version             1.0 Feb 8, 2013
  * Last modified:       
  */
+
+
+//Add centroid point for each sub region
+//
+
 public class VirtualLine 
 {
     Matrix v2;

@@ -58,8 +58,6 @@ public class AnnotPanel extends JPanel
     private MainFrame mainFr;
     private ImagePanel imagePanel;
     private JScrollPane ipScrollPane = new JScrollPane();
-    boolean inMarkingMode;
-    JButton markEraseBtn;
     JButton saveDeadCellBtn = new JButton("Save");
     JButton saveDeadCellToFileBtn = new JButton("Save Dead Cells to File");
     JButton saveGraphBtn = new JButton("Save Available Graph Region To File");
@@ -70,22 +68,6 @@ public class AnnotPanel extends JPanel
     public AnnotPanel(MainFrame mf)
     {
         mainFr = mf;       
-        inMarkingMode = true;
-        markEraseBtn = new JButton("Eraser");
-        markEraseBtn.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e)
-            {
-                if (inMarkingMode)
-                    markEraseBtn.setText("Marker");
-                else
-                    markEraseBtn.setText("Eraser");
-                
-                inMarkingMode = !inMarkingMode;
-            }
-        
-        });
         
         saveDeadCellBtn.addActionListener(new ActionListener() {
 
@@ -163,7 +145,6 @@ public class AnnotPanel extends JPanel
         this.add(ipScrollPane, BorderLayout.CENTER);
         
         JPanel btnPn = new JPanel();
-        btnPn.add(markEraseBtn);
         btnPn.add(saveDeadCellBtn);
         btnPn.add(saveDeadCellToFileBtn);
         btnPn.add(saveGraphBtn);
@@ -185,7 +166,7 @@ public class AnnotPanel extends JPanel
             try
             {
                 showPartition = false;
-                doPaintComponentWithPartition(g);                
+                doSpectralPartitioning(g, 100);                
             }
             catch (Exception e)
             {
@@ -200,19 +181,22 @@ public class AnnotPanel extends JPanel
             doPaintComponentWithoutPartition(g);
         
     }
+    
+    @Override
+    public void onRightClicked(int x, int y)
+    {
+        mainFr.getCurrentFloorPlan().getAnnotFloorPlan().enabbleCell(x, y);     
+        repaint();
+    }
 
     @Override
     public void onMouseClicked(int x, int y)
     {
-        if (inMarkingMode)
-            mainFr.getCurrentFloorPlan().getAnnotFloorPlan().disableCell(x, y);
-       
-        else
-            mainFr.getCurrentFloorPlan().getAnnotFloorPlan().enabbleCell(x, y);                   
-       
+        mainFr.getCurrentFloorPlan().getAnnotFloorPlan().disableCell(x, y);
         repaint();
     }
 
+    
     @Override
     public void updateCurrentPositionLabel(String str)
     {
@@ -297,11 +281,11 @@ public class AnnotPanel extends JPanel
      * @param g
      * @throws Exception 
      */
-    private void doPaintComponentWithPartition(Graphics g) throws Exception
+    private void doSpectralPartitioning(Graphics g, int k) throws Exception
     {
         ArrayList<VirtualLine> lines = 
                 SpectralPartitioner.getLines(mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getLargestConnectedComponentAsGraph(), 
-                                             100);
+                                             k);
         double maxC = getMaxColorValueG(lines);
         double zoomedIndex = MAX / maxC;
         //VirtualLine vLine = SpectralPartitioner.getLine(mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getLargestConnectedComponentAsGraph());
@@ -339,7 +323,7 @@ public class AnnotPanel extends JPanel
      * @param k
      * @throws Exception 
      */
-    private void doPaintComponentWithPartition(Graphics g, int k) throws Exception
+    private void doInertialPartition(Graphics g, int k) throws Exception
     {
         //Get Lines
         ArrayList<Cell> nodes = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getLargestConnectedComponent();
@@ -373,4 +357,6 @@ public class AnnotPanel extends JPanel
         }
       
     }
+
+
 }

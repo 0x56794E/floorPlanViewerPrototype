@@ -98,6 +98,12 @@ public class ImagePanel extends JPanel
         containerPn.onMouseClicked(x, y);
     }
     
+    public void onRightClicked(int x, int y)
+    {
+        containerPn.onRightClicked(x, y);
+    }
+    
+    
     public File getImageFile()
     {
         return imageFile;
