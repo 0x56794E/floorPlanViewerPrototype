@@ -29,10 +29,8 @@ import java.util.*;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
-import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
-import partitioner.InertialPartitioner;
-import partitioner.Line;
+import partitioner.VirtualLine;
 
 /**
  * @author              Vy Thuy Nguyen
@@ -121,6 +119,99 @@ public class FileService
         ImageIO.write(image, "png", oFile);
     }
     
+    public static void exportFloorPlanWithSpectralPartitioning(FloorPlan fp, int k, ArrayList<VirtualLine> lines, double zoomedIndex) throws IOException
+    {
+        Set<Cell> deadCells = fp.getAnnotFloorPlan().getDeadCells();
+        int unitW = fp.getAnnotFloorPlan().getUnitW();
+        int unitH = fp.getAnnotFloorPlan().getUnitH();
+        
+        File file = new File(fp.getAbsoluteFilePath());
+        BufferedImage image = ImageIO.read(file);
+        Graphics g = new ImageIcon(image).getImage().getGraphics();
+        
+        //Draw dead cells
+        g.setColor(Color.DARK_GRAY);
+        for (Cell c : deadCells)
+            g.fillRect(c.getCol() * unitW, c.getRow() * unitH, unitW, unitH);
+        
+        //Draw partitioning
+        for (VirtualLine vLine : lines)
+        {
+            //N- section
+            for (Cell c : vLine.getNMinus())
+            {
+                g.setColor(c.getColor(zoomedIndex));
+                g.fillRect(c.getCol() * unitW, c.getRow() * unitH, unitW, unitH);
+            }
+            
+            //N+ section
+            for (Cell c : vLine.getNPlus())
+            {
+                g.setColor(c.getColor(zoomedIndex));
+                g.fillRect(c.getCol() * unitW, c.getRow() * unitH, unitW, unitH);
+            }
+        }     
+        
+        File oFile = new File("spectral_" + fp.getId() + "k_" + k + ".png");
+        ImageIO.write(image, "png", oFile);
+    }
+    
+    
+    /**
+     * Produce file containing the column position, 
+     * the row position and the binary string corresponding to a given point.
+     * Each line has the following format
+     * <row> <col> <binString>
+     * 
+     * @param afp
+     * @param k
+     * @throws FileNotFoundException
+     * @throws IOException 
+     */
+    public static void savePointsWithBinaryStrings(AnnotFloorPlan afp, int k, String partitionType) throws FileNotFoundException, IOException
+    {
+        //Read coordinates from file and convert pixel coordinate and to same origin
+        //1. Read
+        FileWriter fstream = new FileWriter(afp.getFloorPlan().getFileName() 
+                + "_k" + k + "_" + partitionType + ".txt");
+        BufferedWriter out = new BufferedWriter(fstream);
+        File inFile = new File(afp.getFloorPlan().getFileName() + ".txt");
+        Scanner sc = new Scanner(inFile);
+        String line = "";
+        String[] tokens;
+        int x, y;
+        Cell cell;
+        double widthRatio = afp.getFloorPlan().getWidth() / 75,
+               heightRatio = afp.getFloorPlan().getHeight() / 50;
+        
+        while (sc.hasNextLine())
+        {
+            line = sc.nextLine();
+            if (line.charAt(0) == '#')
+            {  
+                line = line.substring(3);
+                tokens = line.split("\\,");
+                
+                //Convert to px coor
+                cell = afp.getNode(75 - Double.parseDouble(tokens[1]), 
+                                   50 - Double.parseDouble(tokens[0]));
+                
+                if (cell != null)
+                    out.write(String.format("%d %d %s\r\n",
+                                  cell.getRow(),
+                                  cell.getCol(),
+                                  cell.getBinaryString()));
+                else
+                    out.write(String.format("ERROR: Position (%s, %s) doesn't exist in graph\r\n",
+                                            tokens[0],
+                                            tokens[1]));
+            }
+        }
+        
+        out.close();
+        
+    }
+    
     public static void saveDeadCellsToFile(FloorPlan fp) throws IOException
     {
         FileWriter fstream = new FileWriter(fp.getFileName() + "_" + fp.getId() + "_deadCells.txt");
@@ -133,9 +224,7 @@ public class FileService
         }
 
         //Close the output stream
-        out.close();
-        
-        
+        out.close();       
     }
 
     public static void saveDeadCellsToFile(Set<Cell> deadCells) throws IOException
@@ -256,6 +345,23 @@ public class FileService
         {
             out.write(cell.getCol() + " " + cell.getRow());
             out.write("\r\n");
+        }
+        
+        out.close();
+    }
+
+    public static void saveSpectralSubRegion(ArrayList<VirtualLine> lines) throws IOException
+    {
+        FileWriter fstream = new FileWriter("spectral_subregion.txt");
+        BufferedWriter out = new BufferedWriter(fstream);
+        int c = 0;
+        for (VirtualLine line : lines)
+        {
+            out.write("###\r\n");
+            out.write(c + "\r\n"); //Line number
+            out.write(line.getNMinusRegion().toString() + "\r\n"); //N- Region of this line
+            out.write(line.getNPlusRegion().toString() + "\r\n"); //N+ Region of this line
+            c++;
         }
         
         out.close();

@@ -41,10 +41,10 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import partitioner.InertialPartitioner;
 import partitioner.Line;
+import partitioner.SpectralPartitioner;
 import partitioner.VirtualLine;
 import util.DatabaseService;
 import util.FileService;
-import partitioner.SpectralPartitioner;
 
 /**
  * @author              Vy Thuy Nguyen
@@ -264,11 +264,6 @@ public class AnnotPanel extends JPanel
         deadCells = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getDeadCells();
         int unitW = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getUnitW();
         int unitH = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getUnitH();
-        int rowCount = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getRowCount(),
-            colCount = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getColCount(),
-            x, y;
-        Cell[][] cells = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getCellContainer();
-               
         //Paint wall
         for (Cell dc : mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getDeadCells())
         {
@@ -288,7 +283,6 @@ public class AnnotPanel extends JPanel
                                              k);
         double maxC = getMaxColorValueG(lines);
         double zoomedIndex = MAX / maxC;
-        //VirtualLine vLine = SpectralPartitioner.getLine(mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getLargestConnectedComponentAsGraph());
         int unitW = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getUnitW();
         int unitH = mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getUnitH();
         
@@ -315,7 +309,11 @@ public class AnnotPanel extends JPanel
                 g.fillRect(c.getCol() * unitW, c.getRow() * unitH, unitW, unitH);
             }
         }
+        
+        FileService.savePointsWithBinaryStrings(mainFr.getCurrentFloorPlan().getAnnotFloorPlan(), k, "Spectral");
+        FileService.saveSpectralSubRegion(lines);
     }
+    
     
     /**
      * Do partitioning using Inertial Method
@@ -356,6 +354,7 @@ public class AnnotPanel extends JPanel
             }
         }
       
+        FileService.savePointsWithBinaryStrings(mainFr.getCurrentFloorPlan().getAnnotFloorPlan(), k, "Inertial");
     }
 
 

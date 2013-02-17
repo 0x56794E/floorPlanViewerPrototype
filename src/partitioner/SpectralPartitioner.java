@@ -46,18 +46,7 @@ public class SpectralPartitioner
     public static VirtualLine getLine(SimpleWeightedGraph<Cell, WeightedEdge> g) throws Exception
     {
         Matrix laplacianM = getLaplacianMatrix(g);
-        
-//        System.out.println("Laplacian Matrix = " );
-//        for (int r = 0; r < laplacianM.getRowDimension(); ++r)
-//        {    
-//            for (int c = 0; c < laplacianM.getColumnDimension(); ++c)
-//                System.out.printf("%-12f; ", laplacianM.get(r, c));
-//            System.out.println();
-//        }
-//        System.out.println("");
-        
         Matrix v2 = getV2(laplacianM);
-        
         return new VirtualLine(v2, g);
     }
     

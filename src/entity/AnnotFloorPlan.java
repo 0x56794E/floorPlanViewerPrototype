@@ -419,4 +419,40 @@ public class AnnotFloorPlan implements Serializable
     {
         return row >= 0 && row < rowCount && col >= 0 && col < colCount;
     }
+    
+    /**
+     * The coordinate is the top left corner
+     * @param xm x position in meters
+     * @param ym y position in meters
+     * @return [0] contains row; [1] contains col
+     */
+    public int[] getNodePosition(double xm, double ym)
+    {
+        int pxW = floorPlan.getWidth(), pxH = floorPlan.getHeight(),
+            pxX, pxY;
+        double widthRatio = pxW / 75, heightRatio = pxH / 50;
+        pxX = (int) Math.round(xm * widthRatio);
+        pxY = (int) Math.round(ym * heightRatio);
+        
+        int pos[] = new int[2];
+        pos[0] = pxY / unitH;
+        pos[1] = pxX / unitW;
+        return pos;
+    }
+    
+    public Cell getNode(double xm, double ym)
+    {
+        int[] pos = getNodePosition(xm, ym);
+        if (valid(pos[0], pos[1]))
+            return this.cellContainer[pos[0]][pos[1]];
+        else
+        {
+            System.out.printf("Invalid pos, row = %d, col = %d, xm = %f, ym = %f\n",
+                              pos[0],
+                              pos[1],
+                              xm,
+                              ym);
+            return null;
+        }
+    }
 }

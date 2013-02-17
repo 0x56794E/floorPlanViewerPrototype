@@ -43,13 +43,16 @@ import org.jgrapht.graph.SimpleWeightedGraph;
 
 public class VirtualLine 
 {
-    Matrix v2;
-    ArrayList<Cell> nMinus;
-    ArrayList<Cell> nPlus;
+    private Matrix v2;
+    private ArrayList<Cell> nMinus;
+    private ArrayList<Cell> nPlus;
     
-    SimpleWeightedGraph<Cell, WeightedEdge> nMinusGraph;
-    SimpleWeightedGraph<Cell, WeightedEdge> nPlusGraph;
+    SubRegion nMinusRegion = new SubRegion();
+    SubRegion nPlusRegion = new SubRegion();
     
+    private SimpleWeightedGraph<Cell, WeightedEdge> nMinusGraph;
+    private SimpleWeightedGraph<Cell, WeightedEdge> nPlusGraph;
+        
     public VirtualLine(Matrix v2, SimpleWeightedGraph<Cell, WeightedEdge> g)
     {
         this.v2 = v2;
@@ -78,28 +81,58 @@ public class VirtualLine
 
     private void partitionGraph(SimpleWeightedGraph<Cell, WeightedEdge> g)
     {
+        int minusC = 0, minusR = 0, plusC = 0, plusR = 0;
         for (Cell c : g.vertexSet())
         {
             if (v2Ofn(c) < 0)
             {
+                minusC += c.getCol();
+                minusR += c.getRow();
                 nMinusGraph.addVertex(c);
                 nMinus.add(c);
                 c.addChar('0');
+                nMinusRegion.setBinaryString(c.getBinaryString());
             }
             else
             {
+                plusC += c.getCol();
+                plusR += c.getRow();
                 nPlusGraph.addVertex(c);
                 nPlus.add(c);
                 c.addChar('1');
-                
+                nPlusRegion.setBinaryString(c.getBinaryString());
             }
+            
         }
+        
+        //Find centroids
+        nMinusRegion.setColCentroid(minusC / nMinus.size());
+        nMinusRegion.setRowCentroid(minusR / nMinus.size());
+        nPlusRegion.setColCentroid(plusC / nPlus.size());
+        nPlusRegion.setRowCentroid(plusR / nPlus.size());
         
         //Generating edges;
         generateEdges(nMinus, nMinusGraph, g);
         generateEdges(nPlus, nPlusGraph, g);
     }
 
+    /**
+     * 
+     * @return the N- region
+     */
+    public SubRegion getNMinusRegion()
+    {
+        return nMinusRegion;
+    }
+    
+    /**
+     * 
+     * @return return the N+ region
+     */
+    public SubRegion getNPlusRegion()
+    {
+        return nPlusRegion;
+    }
     
     private void generateEdges(Collection<Cell> nodes,
                                SimpleWeightedGraph<Cell, WeightedEdge> g,

@@ -73,11 +73,19 @@ public class FloorPlan implements Serializable
         annotFloorPlan = new AnnotFloorPlan(this);
     }
      
+     /**
+      * 
+      * @return the width in pixels of the image representing the floor plan
+      */
      public int getWidth()
      {
          return width;
      }
      
+     /**
+      * 
+      * @return the height in pixels of the image representing the floor plan
+      */
      public int getHeight()
      {
          return height;

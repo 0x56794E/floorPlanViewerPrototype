@@ -23,7 +23,9 @@ package main;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Scanner;
+import util.FileService;
 
 /**
  * @author              Vy Thuy Nguyen
@@ -32,24 +34,25 @@ import java.util.Scanner;
  */
 public class ReadFile 
 {
-    public static void main(String args[]) throws FileNotFoundException
+    public static void main(String args[]) throws FileNotFoundException, IOException
     {
-        if (args.length < 1)
-        {
-            System.out.println("Not Enough Argument");
-            System.out.println("Usage: RreadFile <fileName>");
-            System.exit(1);
-        }
-        else
-        {
-            File file = new File(args[0]);
-            Scanner sc = new Scanner(file);
-            int count = 0;
-            while (sc.hasNextLine())
-            {
-                System.out.println("line " + count + ": " + sc.nextLine());
-                count++;
-            }
-        }
+        FileService.savePointsWithBinaryStrings(null, 3, "test");
+//        if (args.length < 1)
+//        {
+//            System.out.println("Not Enough Argument");
+//            System.out.println("Usage: RreadFile <fileName>");
+//            System.exit(1);
+//        }
+//        else
+//        {
+//            File file = new File(args[0]);
+//            Scanner sc = new Scanner(file);
+//            int count = 0;
+//            while (sc.hasNextLine())
+//            {
+//                System.out.println("line " + count + ": " + sc.nextLine());
+//                count++;
+//            }
+//        }
     }
 }
