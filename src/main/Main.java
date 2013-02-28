@@ -34,40 +34,5 @@ public class Main
     {
         MainFrame window = new MainFrame();
         
-//        PriorityQueue<Collection<Integer>> q = new PriorityQueue(2, new Comparator() {
-//
-//            @Override
-//            public int compare(Object o1, Object o2)
-//            {
-//                List<Integer> list1 = (List<Integer>)o1;
-//                List<Integer> list2 = (List<Integer>)o2;
-//                return (list1.size() > list2.size()
-//                        ? -1
-//                        : (list1.size() == list2.size() ? 0 : 1));
-//            }
-//        });
-//        
-//        
-//        List<Integer> l1 = new ArrayList<>();
-//        l1.add(3);
-//        l1.add(2);
-//        
-//        List<Integer> l2 = new ArrayList<>();
-//        l2.add(3);
-//        l2.add(2);
-//        l2.add(4);
-//        
-//        List<Integer> l3 = new ArrayList<>();
-//        l3.add(3);
-//        
-//        
-//        q.add(l1);
-//        q.add(l2);
-//        q.add(l3);
-//        
-//        for (Collection<Integer> l : q)
-//            System.out.println("Q's size = " + l.size());
-//        
-//        System.out.println("popped: " + q.remove().size());
     }
 }
