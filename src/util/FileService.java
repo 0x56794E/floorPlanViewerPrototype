@@ -197,13 +197,16 @@ public class FileService
                 Cell cell = afp.getNode(75 - Double.parseDouble(tokens[1]), 
                                    50 - Double.parseDouble(tokens[0]));
                 
-                if (cell != null && !added.contains(cell))
+                if (cell != null)
                 {
-                    added.add(cell);
-                    out.write(String.format("%d %d %s\r\n",
-                                  cell.getRow(),
-                                  cell.getCol(),
-                                  cell.getBinaryString()));
+                    if (!added.contains(cell))
+                    {
+                        added.add(cell);
+                        out.write(String.format("%d %d %s\r\n",
+                                    cell.getRow(),
+                                    cell.getCol(),
+                                    cell.getBinaryString()));   
+                    }
                 }
                 else
                 {
