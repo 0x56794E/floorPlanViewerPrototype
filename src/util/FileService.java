@@ -165,6 +165,7 @@ public class FileService
      * 
      * @param afp
      * @param k
+     * @param partitionType 
      * @throws FileNotFoundException
      * @throws IOException 
      */
@@ -179,10 +180,10 @@ public class FileService
         Scanner sc = new Scanner(inFile);
         String line = "";
         String[] tokens;
-        int x, y;
-        Cell cell;
-        double widthRatio = afp.getFloorPlan().getWidth() / 75,
-               heightRatio = afp.getFloorPlan().getHeight() / 50;
+        
+//        double widthRatio = afp.getFloorPlan().getWidth() / 75,
+//               heightRatio = afp.getFloorPlan().getHeight() / 50;
+        ArrayList<Cell> added = new ArrayList<Cell>();
         
         while (sc.hasNextLine())
         {
@@ -193,23 +194,26 @@ public class FileService
                 tokens = line.split("\\,");
                 
                 //Convert to px coor
-                cell = afp.getNode(75 - Double.parseDouble(tokens[1]), 
+                Cell cell = afp.getNode(75 - Double.parseDouble(tokens[1]), 
                                    50 - Double.parseDouble(tokens[0]));
                 
-                if (cell != null)
+                if (cell != null && !added.contains(cell))
+                {
+                    added.add(cell);
                     out.write(String.format("%d %d %s\r\n",
                                   cell.getRow(),
                                   cell.getCol(),
                                   cell.getBinaryString()));
+                }
                 else
+                {
                     out.write(String.format("ERROR: Position (%s, %s) doesn't exist in graph\r\n",
                                             tokens[0],
                                             tokens[1]));
+                }
             }
         }
-        
         out.close();
-        
     }
     
     public static void saveDeadCellsToFile(FloorPlan fp) throws IOException
