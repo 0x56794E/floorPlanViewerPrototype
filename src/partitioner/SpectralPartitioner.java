@@ -22,12 +22,10 @@
 package partitioner;
 
 import Jama.Matrix;
+import entity.AnnotFloorPlan;
 import entity.Cell;
 import entity.WeightedEdge;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.PriorityQueue;
+import java.util.*;
 import org.jgrapht.graph.SimpleWeightedGraph;
 
 /**
@@ -43,6 +41,9 @@ import org.jgrapht.graph.SimpleWeightedGraph;
  */
 public class SpectralPartitioner 
 {
+    public static AnnotFloorPlan annotFloorPlan;
+    public static HashMap<String, SimpleWeightedGraph<Cell, WeightedEdge>> regionMap;
+    
     public static VirtualLine getLine(SimpleWeightedGraph<Cell, WeightedEdge> g) throws Exception
     {
         Matrix laplacianM = getLaplacianMatrix(g);
@@ -72,7 +73,6 @@ public class SpectralPartitioner
         lines.add(line);
         subRegions.add(line.getNMinusGraph());
         subRegions.add(line.getNPlusGraph());
-        Cell cell = line.getNMinus().get(0);
         k--;
         
         
@@ -91,14 +91,14 @@ public class SpectralPartitioner
             
         }
         
-        //Save the priority queue
-        cell.getAnnotFloorPlan().setSubRegions(subRegions);
+        //Populate the map
+        regionMap = new HashMap<String, SimpleWeightedGraph<Cell, WeightedEdge>>();
+        for (SimpleWeightedGraph<Cell, WeightedEdge> sub : subRegions)
+        ;
         
         //Return partitioning lines
         return lines;
     }
-    
-    
     
     /**
      * Definition: The Laplacian matrix L(G) of a graph G(N,E) 
@@ -269,12 +269,18 @@ public class SpectralPartitioner
     
     /**
      * 
-     * @param c
-     * @param r string representing the position of the region
+     * @param x x coordinate 
+     * @param y y coordinate
+     * @param regionOrder string representing the position of the region
      * @return 
      */
-    public static boolean isInRegion(Cell c, String r)
+    public static boolean isInRegion(int x, int y, String regionOrder )
     {
-        return false;
+        Cell c = annotFloorPlan.getNode(x, y);
+        
+        if (c != null && c.getBinaryString().equals(regionOrder))
+            return true;
+        else
+            return false;
     }
 }

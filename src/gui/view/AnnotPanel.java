@@ -278,6 +278,7 @@ public class AnnotPanel extends JPanel
      */
     private void doSpectralPartitioning(Graphics g, int k) throws Exception
     {
+        SpectralPartitioner.annotFloorPlan = mainFr.getCurrentFloorPlan().getAnnotFloorPlan();
         ArrayList<VirtualLine> lines = 
                 SpectralPartitioner.getLines(mainFr.getCurrentFloorPlan().getAnnotFloorPlan().getLargestConnectedComponentAsGraph(), 
                                              k);
