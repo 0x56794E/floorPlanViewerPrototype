@@ -50,7 +50,7 @@ public class MainFrame extends JFrame
     private JMenuItem newItem = new JMenuItem("New Floor Plan...");
     private JMenuItem saveAllPointSetsToFileItem = new JMenuItem("Save All Point Sets to File");
     private JMenuItem saveToDBItem = new JMenuItem("Save to Database");
-    private JMenuItem setRatioItem = new JMenuItem("Set Ratio");
+    private JMenuItem configureItem = new JMenuItem("Configure...");
     //private JMenuItem saveBothItem = new JMenuItem("Save to Both File and Database");
     private JMenuItem exportItem = new JMenuItem("Export Marked Floor Plan...");
     private JMenuItem exportWithDeadCellItem = new JMenuItem("Export Floor Plan with Dead Cells...");
@@ -67,6 +67,12 @@ public class MainFrame extends JFrame
     
     //Ratio of graph
     private int ratio = 2; //default value
+    
+    //Actual width of the floor plan in real life
+    private int actualW = 1;
+    
+    //Actual height of the floor plan in real life
+    private int actualH = 1;    
     
     //Main content
     TabbedPanel mainContent;
@@ -109,7 +115,7 @@ public class MainFrame extends JFrame
         pack();
         
         ignoreRatioChangeWarning = true;
-        setRatioItem.doClick();
+        configureItem.doClick();
     }
  
     private void initFrame()
@@ -306,8 +312,8 @@ public class MainFrame extends JFrame
         fileMenu.add(exportWithDeadCellItem);
         fileMenu.addSeparator();
         
-        //Set ration item
-        setRatioItem.addActionListener(new ActionListener(){
+        //Set ratio, width, height
+        configureItem.addActionListener(new ActionListener(){
 
             @Override
             public void actionPerformed(ActionEvent e)
@@ -331,17 +337,33 @@ public class MainFrame extends JFrame
                 {
                     //Proceed
                     String strVal = "";
-                    int iVal = ratio;
+                    int irat = ratio, iW = actualW, iH = actualH;
                     boolean isValid = false;
                     while (!isValid)
                     {
                         try
                         {
+                            //ratio
                             strVal = JOptionPane.showInputDialog(null, 
                                                         "Enter new value for the ratio.\nHint: x means the width and height of a cell would be x% the width and height of the floor plan, respectively.\nA reasonable value is between 2 and 5.", 
                                                         "New Ratio", 
                                                         JOptionPane.INFORMATION_MESSAGE);
-                            iVal = Integer.parseInt(strVal);
+                            irat = Integer.parseInt(strVal);
+                            
+                            //width
+                            strVal = JOptionPane.showInputDialog(null, 
+                                                        "Enter the actual width of the floor plan in real life", 
+                                                        "Actual Width", 
+                                                        JOptionPane.INFORMATION_MESSAGE);
+                            iW = Integer.parseInt(strVal);
+                            
+                            //height
+                            strVal = JOptionPane.showInputDialog(null, 
+                                                        "Enter the actual height of the floor plan in real life", 
+                                                        "Actual Height", 
+                                                        JOptionPane.INFORMATION_MESSAGE);
+                            iH = Integer.parseInt(strVal);
+                            
                             isValid = true;
                         }
                         catch (Exception exc)
@@ -351,7 +373,9 @@ public class MainFrame extends JFrame
                         }
                     }
                     
-                    ratio = iVal;
+                    ratio = irat;
+                    actualW = iW;
+                    actualH = iH;
                     
                     //Discard  current work and open new floor plan
                     newItem.doClick();
@@ -363,7 +387,7 @@ public class MainFrame extends JFrame
             }
         
         });
-        fileMenu.add(setRatioItem);
+        fileMenu.add(configureItem);
         menuBar.add(fileMenu); 
         //end File Menu
         
@@ -431,6 +455,15 @@ public class MainFrame extends JFrame
         return ratio;
     }
     
+    public int getActualW()
+    {
+        return actualW;
+    }
+    
+    public int getActualH()
+    {
+        return actualH;
+    }
     private class MenuListener implements ActionListener
     {
         @Override

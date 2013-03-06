@@ -214,7 +214,9 @@ public class PointMarkingPanel extends Observable
                                                  0, 
                                                  imagePanel.getImageWidth(), 
                                                  imagePanel.getImageHeight(),
-                                                 mainFr.getRatio());
+                                                 mainFr.getRatio(),
+                                                 mainFr.getActualW(),
+                                                 mainFr.getActualH());
                 currentPointSet = new PointSet(currentFloorPlan);
                 currentFloorPlan.addPointSet(currentPointSet);
                 ipScrollPane.setViewportView(imagePanel);

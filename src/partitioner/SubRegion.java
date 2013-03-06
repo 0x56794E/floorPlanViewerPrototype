@@ -21,6 +21,10 @@
 
 package partitioner;
 
+import entity.Cell;
+import entity.WeightedEdge;
+import org.jgrapht.graph.SimpleWeightedGraph;
+
 /**
  * @author              Vy Thuy Nguyen
  * @version             1.0 Feb 16, 2013
@@ -31,7 +35,7 @@ public class SubRegion
     private int rowCentroid;
     private int colCentroid;    
     private String binaryString;
-    
+    private SimpleWeightedGraph<Cell, WeightedEdge> graph;
     /**
      * 
      */
@@ -49,6 +53,16 @@ public class SubRegion
     public void setRowCentroid(int r)
     {
         rowCentroid = r;
+    }
+    
+    public void setGraph(SimpleWeightedGraph<Cell, WeightedEdge> graph)
+    {
+        this.graph = graph;
+    }
+    
+    public SimpleWeightedGraph<Cell, WeightedEdge> getGraph()
+    {
+        return this.graph;
     }
     
     /**

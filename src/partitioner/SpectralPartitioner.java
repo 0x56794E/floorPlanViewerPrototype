@@ -42,8 +42,15 @@ import org.jgrapht.graph.SimpleWeightedGraph;
 public class SpectralPartitioner 
 {
     public static AnnotFloorPlan annotFloorPlan;
-    public static HashMap<String, SimpleWeightedGraph<Cell, WeightedEdge>> regionMap;
+    public static HashMap<String, SubRegion> regionMap;
+    public static PriorityQueue<SubRegion> subRegions;
     
+    /**
+     * Return the line partitioning the graph into two sub-regions
+     * @param g
+     * @return
+     * @throws Exception 
+     */
     public static VirtualLine getLine(SimpleWeightedGraph<Cell, WeightedEdge> g) throws Exception
     {
         Matrix laplacianM = getLaplacianMatrix(g);
@@ -51,50 +58,55 @@ public class SpectralPartitioner
         return new VirtualLine(v2, g);
     }
     
+    /**
+     * Return a list of k lines partitioning the graph into (k + 1) sub-regions
+     * @param nodes
+     * @param k
+     * @return
+     * @throws Exception 
+     */
     public static ArrayList<VirtualLine> getLines(SimpleWeightedGraph<Cell, WeightedEdge> nodes, int k) throws Exception
     {
         if (k < 1) throw new Exception("k must be >= 1");
         
         ArrayList<VirtualLine> lines = new ArrayList<VirtualLine>();
-        PriorityQueue<SimpleWeightedGraph<Cell, WeightedEdge>> subRegions = 
-                new PriorityQueue<SimpleWeightedGraph<Cell, WeightedEdge>>(k, new Comparator<SimpleWeightedGraph<Cell, WeightedEdge>>() {
+        subRegions = new PriorityQueue<SubRegion>(k, new Comparator<SubRegion>() {
             
             @Override
-            public int compare(SimpleWeightedGraph<Cell, WeightedEdge> o1, SimpleWeightedGraph<Cell, WeightedEdge> o2)
+            public int compare(SubRegion o1, SubRegion o2)
             {
-                return (o1.vertexSet().size() > o2.vertexSet().size())
+                return (o1.getGraph().vertexSet().size() > o2.getGraph().vertexSet().size())
                             ? -1
-                            : (o1.vertexSet().size() == o2.vertexSet().size() ? 0 : 1);
+                            : (o1.getGraph().vertexSet().size() == o2.getGraph().vertexSet().size() ? 0 : 1);
             }
         });
         
         //Line 1
         VirtualLine line = getLine(nodes);
         lines.add(line);
-        subRegions.add(line.getNMinusGraph());
-        subRegions.add(line.getNPlusGraph());
+        subRegions.add(line.getNMinusRegion());
+        subRegions.add(line.getNPlusRegion());
         k--;
         
         
         for (int i = 0; i < k; ++i)
         {
             //Find the largest region
-            SimpleWeightedGraph<Cell, WeightedEdge> largestList = subRegions.remove();
+            SubRegion largestList = subRegions.remove();
             
             //Line dividing this region
-            line = getLine(largestList);
+            line = getLine(largestList.getGraph());
             lines.add(line);
             
             //replace the old large region by two newly partitioned regions            
-            subRegions.add(line.getNMinusGraph());
-            subRegions.add(line.getNPlusGraph());
-            
+            subRegions.add(line.getNMinusRegion());
+            subRegions.add(line.getNPlusRegion());            
         }
         
         //Populate the map
-        regionMap = new HashMap<String, SimpleWeightedGraph<Cell, WeightedEdge>>();
-        for (SimpleWeightedGraph<Cell, WeightedEdge> sub : subRegions)
-        ;
+        regionMap = new HashMap<String, SubRegion>();
+        for (SubRegion sub : subRegions)
+            regionMap.put(sub.getBinaryString(), sub);
         
         //Return partitioning lines
         return lines;
@@ -282,5 +294,33 @@ public class SpectralPartitioner
             return true;
         else
             return false;
+    }
+    
+    /**
+     * 
+     * @param regionOrder
+     * @return the array containing the coordinates of the centroid of the region specified by the binary string
+     */
+    public static int[] getCentroid(String regionOrder)
+    {
+        int[] ret = null;
+        if (regionMap.containsKey(regionOrder))
+        {
+            ret = new int[2];
+            ret[0] = regionMap.get(regionOrder).getRowCentroid();
+            ret[1] = regionMap.get(regionOrder).getColCentroid();
+        }
+        
+        return ret;
+    }
+    
+    /**
+     * Return a list of sub-regions;
+     * This list has order similar to an in-order tree traversal
+     * @return 
+     */
+    public static PriorityQueue<SubRegion> getSubRegions()
+    {
+        return subRegions;
     }
 }

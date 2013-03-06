@@ -54,16 +54,28 @@ public class AnnotFloorPlan implements Serializable
     private Set<Cell> deadCells;
     
     
-    //Each cell accounts for ratio% of the width and the height
+    /**
+     * Each cell accounts for ratio% of the width and the height
+     */
     int ratio;
     
     /**
-     * Width of the floor plan
+     * Width of the floor plan in real life
+     */
+    int actualW;
+    
+    /**
+     * Height of the floor plan in real life
+     */
+    int actualH;
+    
+    /**
+     * Width of each cell
      */
     int unitW;
     
     /**
-     * Height of the floor plan
+     * Height of each cell
      */
     int unitH;
     
@@ -102,12 +114,14 @@ public class AnnotFloorPlan implements Serializable
         g = new SimpleWeightedGraph<Cell, WeightedEdge>(WeightedEdge.class);
     }
     
-    public AnnotFloorPlan(FloorPlan fp, int ratio)
+    public AnnotFloorPlan(FloorPlan fp, int ratio, int actualW, int actuaLH)
     {
         em = DatabaseService.getEntityManager();
         floorPlan = fp;        
         deadCells = new HashSet<Cell>();
         this.ratio = ratio;
+        this.actualW = actualW;
+        this.actualH = actualH;
         unitW = fp.getWidth() * ratio / 100;
         unitH = fp.getHeight() * ratio / 100;
         rowCount = fp.getHeight() / unitH + 1;
@@ -460,7 +474,7 @@ public class AnnotFloorPlan implements Serializable
     {
         int pxW = floorPlan.getWidth(), pxH = floorPlan.getHeight(),
             pxX, pxY;
-        double widthRatio = pxW / 75, heightRatio = pxH / 50;
+        double widthRatio = pxW / actualW, heightRatio = pxH / actualH;
         pxX = (int) Math.round(xm * widthRatio);
         pxY = (int) Math.round(ym * heightRatio);
         
@@ -470,6 +484,12 @@ public class AnnotFloorPlan implements Serializable
         return pos;
     }
     
+    /**
+     * 
+     * @param xm x coordinate in real life
+     * @param ym
+     * @return 
+     */
     public Cell getNode(double xm, double ym)
     {
         int[] pos = getNodePosition(xm, ym);

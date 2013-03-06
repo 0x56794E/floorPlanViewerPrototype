@@ -47,8 +47,8 @@ public class VirtualLine
     private ArrayList<Cell> nMinus;
     private ArrayList<Cell> nPlus;
     
-    SubRegion nMinusRegion = new SubRegion();
-    SubRegion nPlusRegion = new SubRegion();
+    private SubRegion nMinusRegion = new SubRegion();
+    private SubRegion nPlusRegion = new SubRegion();
     
     private SimpleWeightedGraph<Cell, WeightedEdge> nMinusGraph;
     private SimpleWeightedGraph<Cell, WeightedEdge> nPlusGraph;
@@ -114,6 +114,10 @@ public class VirtualLine
         //Generating edges;
         generateEdges(nMinus, nMinusGraph, g);
         generateEdges(nPlus, nPlusGraph, g);
+        
+        //Set graph to region
+        nMinusRegion.setGraph(nMinusGraph);
+        nPlusRegion.setGraph(nPlusGraph);
     }
 
     /**
@@ -151,14 +155,14 @@ public class VirtualLine
         }
     }
     
-    public SimpleWeightedGraph<Cell, WeightedEdge> getNMinusGraph()
-    {
-        return nMinusGraph;
-    }
-
-    public SimpleWeightedGraph<Cell, WeightedEdge> getNPlusGraph()
-    {
-        return nPlusGraph;
-    }
+//    public SimpleWeightedGraph<Cell, WeightedEdge> getNMinusGraph()
+//    {
+//        return nMinusGraph;
+//    }
+//
+//    public SimpleWeightedGraph<Cell, WeightedEdge> getNPlusGraph()
+//    {
+//        return nPlusGraph;
+//    }
     
 }
