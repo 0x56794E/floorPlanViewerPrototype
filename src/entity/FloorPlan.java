@@ -63,14 +63,14 @@ public class FloorPlan implements Serializable
         pointSets = new ArrayList<PointSet>();   
     }
     
-     public FloorPlan(File file, int x, int y, int width, int height)
+     public FloorPlan(File file, int x, int y, int width, int height, int ratio)
     {
         absFilePath = file.getPath();
         fileName = file.getName();
         this.width = width;
         this.height = height;
         pointSets = new ArrayList<PointSet>();
-        annotFloorPlan = new AnnotFloorPlan(this);
+        annotFloorPlan = new AnnotFloorPlan(this, ratio);
     }
      
      /**

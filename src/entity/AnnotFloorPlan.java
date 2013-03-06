@@ -54,11 +54,27 @@ public class AnnotFloorPlan implements Serializable
     private Set<Cell> deadCells;
     
     
-    //Each cell accounts for 1% of the width and the height
-    private final int RATIO = 2; //percent in respect to actual length
+    //Each cell accounts for ratio% of the width and the height
+    int ratio;
+    
+    /**
+     * Width of the floor plan
+     */
     int unitW;
+    
+    /**
+     * Height of the floor plan
+     */
     int unitH;
+    
+    /**
+     * Number of rows of the matrix
+     */
     int rowCount;
+    
+    /**
+     * Number columns of the matrix
+     */
     int colCount;
     
     @Transient
@@ -73,23 +89,27 @@ public class AnnotFloorPlan implements Serializable
     @Transient
     private EntityManager em;
     
+    @Transient
+    private PriorityQueue<SimpleWeightedGraph<Cell, WeightedEdge>> subRegions;
+    
     @SuppressWarnings({"unchecked", "unchecked"})
     public AnnotFloorPlan()
     {
+        
         em = DatabaseService.getEntityManager();
         floorPlan = new FloorPlan();
         deadCells = new HashSet<Cell>();
         g = new SimpleWeightedGraph<Cell, WeightedEdge>(WeightedEdge.class);
     }
     
-    public AnnotFloorPlan(FloorPlan fp)
+    public AnnotFloorPlan(FloorPlan fp, int ratio)
     {
         em = DatabaseService.getEntityManager();
         floorPlan = fp;        
         deadCells = new HashSet<Cell>();
-        
-        unitW = fp.getWidth() * RATIO / 100;
-        unitH = fp.getHeight() * RATIO / 100;
+        this.ratio = ratio;
+        unitW = fp.getWidth() * ratio / 100;
+        unitH = fp.getHeight() * ratio / 100;
         rowCount = fp.getHeight() / unitH + 1;
         colCount = fp.getWidth() / unitW + 1;
         cellContainer = new Cell[rowCount][colCount];
@@ -103,6 +123,11 @@ public class AnnotFloorPlan implements Serializable
         //generateEdges();
     }
      
+    public void setSubRegions(PriorityQueue<SimpleWeightedGraph<Cell, WeightedEdge>> subs)
+    {
+        subRegions = subs;
+    }
+    
     public FloorPlan getFloorPlan()
     {
         return this.floorPlan;
@@ -116,6 +141,11 @@ public class AnnotFloorPlan implements Serializable
     public int getUnitH()
     {
         return unitH;
+    }
+    
+    public int getRatio()
+    {
+        return ratio;
     }
     
     public SimpleWeightedGraph<Cell, WeightedEdge> getGraph()

@@ -209,7 +209,12 @@ public class PointMarkingPanel extends Observable
             if (createNew == JOptionPane.YES_OPTION)
             {
                 imagePanel = new ImagePanel(file, PointMarkingPanel.UI.this);
-                currentFloorPlan = new FloorPlan(file, 0, 0, imagePanel.getImageWidth(), imagePanel.getImageHeight());
+                currentFloorPlan = new FloorPlan(file, 
+                                                 0, 
+                                                 0, 
+                                                 imagePanel.getImageWidth(), 
+                                                 imagePanel.getImageHeight(),
+                                                 mainFr.getRatio());
                 currentPointSet = new PointSet(currentFloorPlan);
                 currentFloorPlan.addPointSet(currentPointSet);
                 ipScrollPane.setViewportView(imagePanel);

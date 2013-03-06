@@ -25,8 +25,8 @@ import Jama.Matrix;
 import entity.Cell;
 import entity.WeightedEdge;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.PriorityQueue;
 import org.jgrapht.graph.SimpleWeightedGraph;
 
@@ -62,8 +62,8 @@ public class SpectralPartitioner
             public int compare(SimpleWeightedGraph<Cell, WeightedEdge> o1, SimpleWeightedGraph<Cell, WeightedEdge> o2)
             {
                 return (o1.vertexSet().size() > o2.vertexSet().size())
-                        ? -1
-                        : (o1.vertexSet().size() == o2.vertexSet().size() ? 0 : 1);
+                            ? -1
+                            : (o1.vertexSet().size() == o2.vertexSet().size() ? 0 : 1);
             }
         });
         
@@ -72,11 +72,9 @@ public class SpectralPartitioner
         lines.add(line);
         subRegions.add(line.getNMinusGraph());
         subRegions.add(line.getNPlusGraph());
+        Cell cell = line.getNMinus().get(0);
         k--;
         
-        System.out.println("Largest component has " + nodes.vertexSet().size());
-        System.out.println("NMinusGraph has " + line.getNMinusGraph().vertexSet().size());
-        System.out.println("NPlusGraph has " + line.getNPlusGraph().vertexSet().size() + "\n");
         
         for (int i = 0; i < k; ++i)
         {
@@ -91,11 +89,12 @@ public class SpectralPartitioner
             subRegions.add(line.getNMinusGraph());
             subRegions.add(line.getNPlusGraph());
             
-            
-        System.out.println("Largest component has " + largestList.vertexSet().size());
-        System.out.println("NMinusGraph has " + line.getNMinusGraph().vertexSet().size());
-        System.out.println("NPlusGraph has " + line.getNPlusGraph().vertexSet().size() + "\n");
         }
+        
+        //Save the priority queue
+        cell.getAnnotFloorPlan().setSubRegions(subRegions);
+        
+        //Return partitioning lines
         return lines;
     }
     
@@ -149,8 +148,6 @@ public class SpectralPartitioner
                     matrix.set(i.getIdForSpectralPartitioin(),
                                j.getIdForSpectralPartitioin(),
                                -1);
-//                    laplacianM[i.getIdForSpectralPartitioin()][j.getIdForSpectralPartitioin()] = 
-//                           (int)(g.containsEdge(i, j) ? -1 : 0);
                 }
             }
         }
@@ -171,7 +168,6 @@ public class SpectralPartitioner
     private static Matrix getIncidentMatrix(SimpleWeightedGraph<Cell, WeightedEdge> g)
     {
         Matrix matrix = new Matrix(g.vertexSet().size(), g.edgeSet().size());
-        //byte[][] incidentM = new byte[g.vertexSet().size()][g.edgeSet().size()];
         int edgeId = 0, vertexId = 0, r = 0;
         
         for (Cell c : g.vertexSet())
@@ -217,21 +213,10 @@ public class SpectralPartitioner
         int lambda2Index = getSecondSmallestIndex(eigenvalues);
         Matrix eigenvectors = matrix.eig().getV();
         
-        
-//        System.out.println("\n\nEigenvectors");
-//        for (int r = 0; r < eigenvectors.getRowDimension(); ++r)
-//        {
-//            for (int c = 0; c < eigenvectors.getColumnDimension(); ++c)
-//                System.out.printf("%-12f; ", eigenvectors.get(r, c));
-//            
-//            System.out.println();
-//        }
-//        
-//        System.out.println("V2 index = " + lambda2Index);
-        return eigenvectors.getMatrix(0,                             //init row index
-                                             matrix.getColumnDimension() - 1,   //final row index
-                                             lambda2Index,                       //init col index
-                                             lambda2Index);                      //final col index
+        return eigenvectors.getMatrix(0,                                 //init row index
+                                      matrix.getColumnDimension() - 1,   //final row index
+                                      lambda2Index,                       //init col index
+                                      lambda2Index);                      //final col index
     }
     
     public static int getSecondSmallestIndex(double[] array) throws Exception
@@ -280,5 +265,16 @@ public class SpectralPartitioner
                 }
                 return second;
         }
+    }
+    
+    /**
+     * 
+     * @param c
+     * @param r string representing the position of the region
+     * @return 
+     */
+    public static boolean isInRegion(Cell c, String r)
+    {
+        return false;
     }
 }

@@ -32,6 +32,9 @@ public class SubRegion
     private int colCentroid;    
     private String binaryString;
     
+    /**
+     * 
+     */
     public SubRegion()
     {
         rowCentroid =  -1;
@@ -39,31 +42,55 @@ public class SubRegion
         binaryString = "";
     }
     
+    /**
+     * 
+     * @param r
+     */
     public void setRowCentroid(int r)
     {
         rowCentroid = r;
     }
     
+    /**
+     * 
+     * @param c
+     */
     public void setColCentroid(int c)
     {
         colCentroid = c;
     }
     
+    /**
+     * 
+     * @param str
+     */
     public void setBinaryString(String str)
     {
         binaryString = str;
     }
     
+    /**
+     * 
+     * @return
+     */
     public int getRowCentroid()
     {
         return rowCentroid;
     }
     
+    /**
+     * 
+     * @return
+     */
     public int getColCentroid()
     {
         return colCentroid;
     }
     
+    /**
+     * 
+     * @return
+     */
     public String getBinaryString()
     {
         return binaryString;
@@ -77,5 +104,21 @@ public class SubRegion
     public String toString()
     {
         return binaryString + " " + rowCentroid + " " + colCentroid;
+    }
+    
+    public boolean equals(Object rhs)
+    {
+        if (rhs == null || !(rhs instanceof SubRegion))
+            return false;
+        else 
+        {
+            SubRegion rhsSub = (SubRegion)rhs;
+            return binaryString.equals(rhsSub.binaryString);
+        }
+    }
+    
+    public int hashCode()
+    {
+        return binaryString.hashCode();
     }
 }

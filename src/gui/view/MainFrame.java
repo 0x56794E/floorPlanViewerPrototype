@@ -50,10 +50,12 @@ public class MainFrame extends JFrame
     private JMenuItem newItem = new JMenuItem("New Floor Plan...");
     private JMenuItem saveAllPointSetsToFileItem = new JMenuItem("Save All Point Sets to File");
     private JMenuItem saveToDBItem = new JMenuItem("Save to Database");
+    private JMenuItem setRatioItem = new JMenuItem("Set Ratio");
     //private JMenuItem saveBothItem = new JMenuItem("Save to Both File and Database");
     private JMenuItem exportItem = new JMenuItem("Export Marked Floor Plan...");
     private JMenuItem exportWithDeadCellItem = new JMenuItem("Export Floor Plan with Dead Cells...");
     private JMenuItem showExistItem = new JMenuItem("Show Saved Floor Plans... ");
+    boolean ignoreRatioChangeWarning;
     
     //Help Menu
     private JMenuItem aboutItem = new JMenuItem("About");
@@ -63,6 +65,8 @@ public class MainFrame extends JFrame
     //Current cursor pos
     private JTextField currentPos = new JTextField("");
     
+    //Ratio of graph
+    private int ratio = 2; //default value
     
     //Main content
     TabbedPanel mainContent;
@@ -103,6 +107,9 @@ public class MainFrame extends JFrame
         });    
         
         pack();
+        
+        ignoreRatioChangeWarning = true;
+        setRatioItem.doClick();
     }
  
     private void initFrame()
@@ -167,16 +174,27 @@ public class MainFrame extends JFrame
     private void setupMenu()
     {
         JMenuBar menuBar = new JMenuBar();
-        MenuListener menuHandler = new MenuListener();
         
         //File Menu
         JMenu fileMenu = new JMenu("File");
         
-        newItem.addActionListener(menuHandler);
+        //New item
+        newItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {                    
+                //Bring up floor plan chooser popup window
+                if (floorPlanChooserFr == null)
+                    floorPlanChooserFr = new FileChooserWindow(mainContent.getPointMarkingPn().getUI(), new ImageFileFilter());
+                
+                floorPlanChooserFr.setVisible(true);
+            }
+        });
         newItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
         fileMenu.add(newItem);
         fileMenu.addSeparator();
         
+        //Show existing item
         showExistItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
         showExistItem.addActionListener(new ActionListener() {
             @Override
@@ -188,6 +206,7 @@ public class MainFrame extends JFrame
         fileMenu.add(showExistItem);
         fileMenu.addSeparator();
         
+        //Save All point sets item
         saveAllPointSetsToFileItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, ActionEvent.CTRL_MASK));
         saveAllPointSetsToFileItem.addActionListener(new ActionListener() {
 
@@ -220,6 +239,7 @@ public class MainFrame extends JFrame
         });
         fileMenu.add(saveAllPointSetsToFileItem);
         
+        //Save Floor plan to DB
         saveToDBItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, ActionEvent.CTRL_MASK));
         saveToDBItem.addActionListener(new ActionListener() {
 
@@ -230,8 +250,9 @@ public class MainFrame extends JFrame
             }
         });
         fileMenu.add(saveToDBItem);
-        
         fileMenu.addSeparator();
+        
+        //Export floor plan to image file
         exportItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e)
@@ -253,7 +274,7 @@ public class MainFrame extends JFrame
         exportItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.CTRL_MASK));
         fileMenu.add(exportItem);
         
-        
+        //Export floor plan with dead cells
         exportWithDeadCellItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e)
@@ -283,15 +304,75 @@ public class MainFrame extends JFrame
             }
         });
         fileMenu.add(exportWithDeadCellItem);
-        menuBar.add(fileMenu);        
+        fileMenu.addSeparator();
+        
+        //Set ration item
+        setRatioItem.addActionListener(new ActionListener(){
+
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                int result; 
+                if (MainFrame.this.ignoreRatioChangeWarning)
+                {
+                    result = JOptionPane.YES_OPTION;
+                    MainFrame.this.ignoreRatioChangeWarning = false;
+                }
+                else
+                {
+                    result = JOptionPane.showConfirmDialog(null, 
+                                                "Warning: changing ratio may result in unexpected behavior and you would lose all your work on the current floor plan.\nDo you want to continue?",
+                                                "Are you sure?",
+                                                JOptionPane.YES_NO_OPTION,
+                                                JOptionPane.WARNING_MESSAGE);
+                }
+                
+                if (result == JOptionPane.YES_OPTION)
+                {
+                    //Proceed
+                    String strVal = "";
+                    int iVal = ratio;
+                    boolean isValid = false;
+                    while (!isValid)
+                    {
+                        try
+                        {
+                            strVal = JOptionPane.showInputDialog(null, 
+                                                        "Enter new value for the ratio.\nHint: x means the width and height of a cell would be x% the width and height of the floor plan, respectively.\nA reasonable value is between 2 and 5.", 
+                                                        "New Ratio", 
+                                                        JOptionPane.INFORMATION_MESSAGE);
+                            iVal = Integer.parseInt(strVal);
+                            isValid = true;
+                        }
+                        catch (Exception exc)
+                        {
+                            exc.printStackTrace();
+                            isValid = false;
+                        }
+                    }
+                    
+                    ratio = iVal;
+                    
+                    //Discard  current work and open new floor plan
+                    newItem.doClick();
+                }
+                else
+                {
+                    //Does nothing.
+                }
+            }
+        
+        });
+        fileMenu.add(setRatioItem);
+        menuBar.add(fileMenu); 
         //end File Menu
         
         //Help Menu
-        JMenu helpMenu = new JMenu("Help");
-        helpMenu.add(reportItem);
-        helpMenu.add(aboutItem);
-        menuBar.add(helpMenu);
-        
+//        JMenu helpMenu = new JMenu("Help");
+//        helpMenu.add(reportItem);
+//        helpMenu.add(aboutItem);
+//        menuBar.add(helpMenu);
+//        
         this.setJMenuBar(menuBar);    
     }
     
@@ -343,6 +424,11 @@ public class MainFrame extends JFrame
     public FloorPlan getCurrentFloorPlan()
     {
         return mainContent.getPointMarkingPn().getUI().getCurrentFloorPlan();
+    }
+
+    public int getRatio()
+    {
+        return ratio;
     }
     
     private class MenuListener implements ActionListener
