@@ -22,6 +22,7 @@ package gui.view;
 
 import entity.AnnotFloorPlan;
 import entity.Cell;
+import entity.DeadPoint;
 import gui.util.ImagePanelContainer;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -31,9 +32,9 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
@@ -58,11 +59,11 @@ public class AnnotPanel extends JPanel
     private MainFrame mainFr;
     private ImagePanel imagePanel;
     private JScrollPane ipScrollPane = new JScrollPane();
-    JButton saveDeadCellBtn = new JButton("Save");
-    JButton saveDeadCellToFileBtn = new JButton("Save Dead Cells to File");
-    JButton saveGraphBtn = new JButton("Save Available Graph Region To File");
-    JButton showPartitionBtn = new JButton("Show Partitioning Lines");
-    private Set<Cell> deadCells;
+    private JButton saveDeadCellBtn = new JButton("Save");
+    private JButton saveDeadCellToFileBtn = new JButton("Save Dead Cells to File");
+    private JButton saveGraphBtn = new JButton("Save Available Graph Region To File");
+    private JButton showPartitionBtn = new JButton("Show Partitioning Lines");
+    private List<Cell> deadCells;
     private boolean showPartition = false;
     
     public AnnotPanel(MainFrame mf)
@@ -78,10 +79,10 @@ public class AnnotPanel extends JPanel
                 em.getTransaction().begin();
                 AnnotFloorPlan afp = mainFr.getCurrentFloorPlan().getAnnotFloorPlan();
                 
-                for (Cell dc : afp.getDeadCells())
+                for (DeadPoint dp : afp.getDeadPoints())
                 {
-                    dc.setAnnotFloorPlan(afp);
-                    em.persist(dc);
+                    dp.setAnnotFloorPlan(afp);
+                    em.persist(dp);
                 }
                 
                 em.persist(mainFr.getCurrentFloorPlan().getAnnotFloorPlan());
@@ -123,11 +124,12 @@ public class AnnotPanel extends JPanel
                 catch (Exception ex)
                 {
                     JOptionPane.showMessageDialog(null, "Error while saving graph to file", "ERROR", JOptionPane.ERROR_MESSAGE);
-                    ex.printStackTrace();
+                    //ex.printStackTrace();
                 }
             }
         
         });
+        
         showPartitionBtn.addActionListener(new ActionListener() {
 
             @Override
@@ -166,11 +168,11 @@ public class AnnotPanel extends JPanel
             try
             {
                 showPartition = false;
-                doSpectralPartitioning(g, 100);                
+                doSpectralPartitioning(g, 4);                
             }
             catch (Exception e)
             {
-                e.printStackTrace();
+                //e.printStackTrace();
                 JOptionPane.showMessageDialog(null, 
                                               "Error encountered. No Partitioniing Has Been Done",
                                               "ERROR", 
@@ -357,6 +359,4 @@ public class AnnotPanel extends JPanel
       
         FileService.savePointsWithBinaryStrings(mainFr.getCurrentFloorPlan().getAnnotFloorPlan(), k, "Inertial");
     }
-
-
 }

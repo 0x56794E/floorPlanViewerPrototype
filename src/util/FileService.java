@@ -103,7 +103,7 @@ public class FileService
     
     public static void exportFloorPlanWithDeadCells(FloorPlan fp) throws IOException
     {
-        Set<Cell> deadCells = fp.getAnnotFloorPlan().getDeadCells();
+        List<Cell> deadCells = fp.getAnnotFloorPlan().getDeadCells();
         int unitW = fp.getAnnotFloorPlan().getUnitW();
         int unitH = fp.getAnnotFloorPlan().getUnitH();     
         File file = new File(fp.getAbsoluteFilePath());
@@ -121,7 +121,7 @@ public class FileService
     
     public static void exportFloorPlanWithSpectralPartitioning(FloorPlan fp, int k, ArrayList<VirtualLine> lines, double zoomedIndex) throws IOException
     {
-        Set<Cell> deadCells = fp.getAnnotFloorPlan().getDeadCells();
+        List<Cell> deadCells = fp.getAnnotFloorPlan().getDeadCells();
         int unitW = fp.getAnnotFloorPlan().getUnitW();
         int unitH = fp.getAnnotFloorPlan().getUnitH();
         
@@ -234,7 +234,7 @@ public class FileService
         out.close();       
     }
 
-    public static void saveDeadCellsToFile(Set<Cell> deadCells) throws IOException
+    public static void saveDeadCellsToFile(List<Cell> deadCells) throws IOException
     {
         Cell f = deadCells.iterator().next();
         

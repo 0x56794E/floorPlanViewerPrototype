@@ -345,7 +345,7 @@ public class MainFrame extends JFrame
                         {
                             //ratio
                             strVal = JOptionPane.showInputDialog(null, 
-                                                        "Enter new value for the ratio.\nHint: x means the width and height of a cell would be x% the width and height of the floor plan, respectively.\nA reasonable value is between 2 and 5.", 
+                                                        "Enter new value x for the ratio.\nx means the width and height of a cell would be x% the width and height of the floor plan, respectively.\nA reasonable value is between 2 and 5.", 
                                                         "New Ratio", 
                                                         JOptionPane.INFORMATION_MESSAGE);
                             irat = Integer.parseInt(strVal);
@@ -368,7 +368,7 @@ public class MainFrame extends JFrame
                         }
                         catch (Exception exc)
                         {
-                            exc.printStackTrace();
+                           // exc.printStackTrace();
                             isValid = false;
                         }
                     }
@@ -377,14 +377,18 @@ public class MainFrame extends JFrame
                     actualW = iW;
                     actualH = iH;
                     
-                    //Discard  current work and open new floor plan
-                    newItem.doClick();
+                    //update current work if applicable
+                    if (MainFrame.this.hasFloorPlan())
+                    {
+                        MainFrame.this.updateFloorPlanConfig();
+                    }
                 }
                 else
                 {
                     //Does nothing.
                 }
             }
+
         
         });
         fileMenu.add(configureItem);
@@ -420,10 +424,10 @@ public class MainFrame extends JFrame
 
             //Persist deadCells and afp
             AnnotFloorPlan afp = fp.getAnnotFloorPlan();
-            for (Cell dc : afp.getDeadCells())
+            for (DeadPoint dp : afp.getDeadPoints())
             {
-                dc.setAnnotFloorPlan(afp);
-                em.persist(dc);
+                dp.setAnnotFloorPlan(afp);
+                em.persist(dp);
             }
             
             em.persist(afp);
@@ -435,6 +439,9 @@ public class MainFrame extends JFrame
         }
     }
     
+    /**
+     * Update floor plan area based on current window's size
+     */
     private void updateImageCanvasSize()
     {
         mainContent.updateImagePanelScrollPaneSize(this.getWidth() - 350, this.getHeight() - 152);
@@ -464,6 +471,21 @@ public class MainFrame extends JFrame
     {
         return actualH;
     }
+
+    private boolean hasFloorPlan()
+    {
+        return this.mainContent.pointMarkingPn.getUI().getCurrentFloorPlan() != null;
+    }
+
+    /**
+     * Update ratio, actual width, actual height of floor plan.
+     */
+    private void updateFloorPlanConfig()
+    {
+        this.mainContent.pointMarkingPn.getUI().getCurrentFloorPlan().getAnnotFloorPlan().updateConfig(ratio, actualW, actualH);
+        
+    }
+    
     private class MenuListener implements ActionListener
     {
         @Override

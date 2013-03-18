@@ -1,5 +1,5 @@
 /**
- * Floor Plan Marker Project
+ * Inertial Partitioning
  * Copyright (C) 2013  Vy Thuy Nguyen
  *
  * This library is free software; you can redistribute it and/or
@@ -18,56 +18,61 @@
  * Boston, MA  02110-1301, USA.
  */
 
+
 package entity;
 
-import java.io.Serializable;
 import javax.persistence.*;
 
 /**
- * Represent a pin on a floor plan.
  * @author              Vy Thuy Nguyen
- * @version             1.0 Jan 10, 2013
+ * @version             1.0 Mar 18, 2013
  * Last modified:       
  */
 @Entity
-public class Point implements Serializable 
+public class DeadPoint 
 {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue (strategy = GenerationType.AUTO)
     private long id;
     
+    /**
+     * The x coordinate
+     */
+    private int x;
     
-    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    private PointSet pointSet;
-    
-    private int x; //relative to the origin
+    /**
+     * The y coordinate
+     */
     private int y;
 
-    public Point()
+    
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    AnnotFloorPlan annotFloorPlan;
+    
+    public DeadPoint()
     {
         
     }
     
-    public Point(int x, int y)
+    public DeadPoint(int x, int y)
     {
         this.x = x;
         this.y = y;
     }
     
-    public long getId()
+    public void setAnnotFloorPlan(AnnotFloorPlan afp)
     {
-        return id;
+        this.annotFloorPlan = afp;
     }
-
-    /*
-    public void setId(long id)
-    {
-        this.id = id;
-    }
-    */
+    
     public int getX()
     {
         return x;
+    }
+    
+    public int getY()
+    {
+        return y;
     }
     
     public void setX(int x)
@@ -75,50 +80,37 @@ public class Point implements Serializable
         this.x = x;
     }
     
-    public int getY()
-    {
-        return this.y;
-    }
-    
     public void setY(int y)
     {
         this.y = y;
     }
     
-    public PointSet getPointSet()
-    {
-        return this.pointSet;
-    }
     
-    public void setPointSet(PointSet ps)
+    public long getId()
     {
-        this.pointSet = ps;
+        return id;
     }
-    
-    public String toString()
-    {
-        return String.format("(%d, %d)", x, y);
-    }
-    
-    public int hashCode()
-    {
-        String str = this.toString();
-        return str.hashCode();
-    }
-    
+
     @Override
-    public boolean equals (Object rhs)
+    public boolean equals(Object rhs)
     {
-        if (rhs == null || !(rhs instanceof Point))
+        if (rhs == null || !(rhs instanceof DeadPoint))
+        {
             return false;
+        }
         else
         {
-            Point rhsP = (Point)rhs;
-            if (rhsP.x == this.x && rhsP.y == this.y)
-                return true;
-            else
-                return false;
+            DeadPoint dpRhs = (DeadPoint)rhs;
+            return (dpRhs.x == this.x && dpRhs.y == this.y);
         }
-        
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int hash = 7;
+        hash = 67 * hash + this.x;
+        hash = 67 * hash + this.y;
+        return hash;
     }
 }

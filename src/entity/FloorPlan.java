@@ -53,10 +53,21 @@ public class FloorPlan implements Serializable
      * This includes the file name
      */
     private String absFilePath;
-    private String fileName;
-    private int width;
-    private int height;
     
+    /**
+     * The file name without the path
+     */
+    private String fileName;
+    
+    /**
+     * The width of image of the floor plan in pixel
+     */
+    private int width;
+    
+    /**
+     * The height of the image of the floor plan in pixel
+     */
+    private int height;    
     
     public FloorPlan()
     {

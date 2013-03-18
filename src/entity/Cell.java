@@ -24,6 +24,7 @@ import java.awt.Color;
 import javax.persistence.*;
 
 /**
+ * Represent a cell in the matrix that the floor plan is divided into.
  * @author              Vy Thuy Nguyen
  * @version             1.0 Jan 16, 2013
  * Last modified:       
@@ -40,6 +41,9 @@ public class Cell
     private int row;
     private int col;
     
+//    private int x;
+//    private int y;
+    
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     AnnotFloorPlan annotFloorPlan;
     
@@ -53,6 +57,8 @@ public class Cell
     {
         this.row = r;
         this.col = c;
+//        this.x = x;
+//        this.y = y;
         annotFloorPlan = afp;
         isDead = false;
     }
@@ -60,6 +66,16 @@ public class Cell
     public Cell()
     {
         this.isDead = false;
+    }
+    
+    public int getRow()
+    {
+        return this.row;
+    }
+    
+    public int getCol()
+    {
+        return this.col;
     }
     
     public void setIdForSpectralPartition(int val)
@@ -115,14 +131,14 @@ public class Cell
         return this.annotFloorPlan;
     }
     
-    public int getRow()
-    {
-        return this.row;
-    }
-    public int getCol()
-    {
-        return this.col;
-    }
+//    public int getX()
+//    {
+//        return this.x;
+//    }
+//    public int getY()
+//    {
+//        return this.y;
+//    }
     
     public void disableCell()
     {
@@ -134,6 +150,11 @@ public class Cell
         isDead = false;
     }
     
+    
+    /**
+     * 
+     * @return true if the cell is NOT available; false otherwise
+     */
     public boolean isDead()
     {
         return this.isDead;
@@ -161,7 +182,7 @@ public class Cell
     
     public String toString()
     {
-        return String.format("%d %d", col, row); 
+        return String.format("%d %d", row, col); 
     }
     
 }

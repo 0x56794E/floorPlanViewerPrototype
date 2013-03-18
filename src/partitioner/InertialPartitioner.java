@@ -21,13 +21,7 @@
 
 package partitioner;
 
-import Jama.Matrix;
 import entity.Cell;
-import entity.FloorPlan;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.util.*;
 
 /**
@@ -105,13 +99,13 @@ public class InertialPartitioner extends Partitioner
      * @return Line l
      * @throws Exception 
      */
-    public static Line getLine(ArrayList<Cell> nodes) throws Exception
+    public static Line getLine(ArrayList<Cell> cells) throws Exception
     {
         //Compute xbar and ybar
         double xbar = 0, ybar = 0;
-        final int N = nodes.size();
+        final int N = cells.size();
         
-        for (Cell node : nodes)
+        for (Cell node : cells)
         {
             xbar += node.getCol();
             ybar += node.getRow();
@@ -123,7 +117,7 @@ public class InertialPartitioner extends Partitioner
         //Compute sum of squares of distance (x1, x2 and x3)
         double x1 = 0, x3 = 0, x2 = 0;
         double xDif = 0, yDif = 0;
-        for (Cell node : nodes)
+        for (Cell node : cells)
         {
             xDif = node.getCol() - xbar;
             yDif = node.getRow() - ybar;
@@ -162,7 +156,7 @@ public class InertialPartitioner extends Partitioner
         LinkedList<Double> sValues = new LinkedList<Double>();
         double sj = 0;
         int max, min, mid, size;
-        for (Cell node : nodes)
+        for (Cell node : cells)
         {
             sj = Line.getSj(node, a, b, xbar, ybar);
             if (sValues.isEmpty())
@@ -195,7 +189,7 @@ public class InertialPartitioner extends Partitioner
                         : sValues.get(size / 2 )); //Otherwise, take the middle element
         
         double[] data = {a, b, xbar, ybar, sbar};
-        return new Line(nodes, data);
+        return new Line(cells, data);
     }
  
     public static ArrayList<Line> getLines(ArrayList<Cell> nodes, int k) throws Exception

@@ -51,7 +51,7 @@ public class AnnotFloorPlan implements Serializable
     
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.PERSIST}, 
                           fetch = FetchType.EAGER, mappedBy = "annotFloorPlan")
-    private Set<Cell> deadCells;
+    private Set<DeadPoint> deadPoints;
     
     
     /**
@@ -110,31 +110,32 @@ public class AnnotFloorPlan implements Serializable
         
         em = DatabaseService.getEntityManager();
         floorPlan = new FloorPlan();
-        deadCells = new HashSet<Cell>();
+        deadPoints = new HashSet<DeadPoint>();
         g = new SimpleWeightedGraph<Cell, WeightedEdge>(WeightedEdge.class);
     }
     
-    public AnnotFloorPlan(FloorPlan fp, int ratio, int actualW, int actuaLH)
+    public AnnotFloorPlan(FloorPlan fp, int ratio, int actualW, int actualH)
     {
         em = DatabaseService.getEntityManager();
         floorPlan = fp;        
-        deadCells = new HashSet<Cell>();
+        deadPoints = new HashSet<DeadPoint>();
         this.ratio = ratio;
         this.actualW = actualW;
         this.actualH = actualH;
+        
+        //Width and height of each cell
         unitW = fp.getWidth() * ratio / 100;
         unitH = fp.getHeight() * ratio / 100;
+        
+        //Calc the number of rows and columns needed
         rowCount = fp.getHeight() / unitH + 1;
         colCount = fp.getWidth() / unitW + 1;
         cellContainer = new Cell[rowCount][colCount];
         
-        System.out.println("In constructor; row = " + rowCount + "; col = " + colCount);
         //init the graph
         g = new SimpleWeightedGraph<Cell, WeightedEdge>(WeightedEdge.class);
         
         initGraph();
-        //generateVertices();
-        //generateEdges();
     }
      
     public void setSubRegions(PriorityQueue<SimpleWeightedGraph<Cell, WeightedEdge>> subs)
@@ -167,19 +168,15 @@ public class AnnotFloorPlan implements Serializable
         return g;
     }
     
-    public boolean needInitGraph()
-    {
-        return !graphInitialized;
-    }
-    
+//    public boolean needInitGraph()
+//    {
+//        return !graphInitialized;
+//    }
+//    
     public void initGraph()
     {
-        if (!graphInitialized)
-        {
-            generateVertices();
-            generateEdges();
-            graphInitialized = true;
-        }
+        generateVertices();
+        generateEdges();
     }
     
     /**
@@ -199,19 +196,23 @@ public class AnnotFloorPlan implements Serializable
     }
     
     /**
-     * 
+     * Generate vertices for the graph representing the floor plan
      */
     private void generateVertices()
     {
         for (int row = 0; row < rowCount; ++row)
+        {
             for (int col = 0; col < colCount; ++col)
-            {
-                
+            {                
                 cellContainer[row][col] = new Cell(row, col, this);
                 g.addVertex(cellContainer[row][col]);
             }
+        }
     }
     
+    /**
+     * Generate edges for the graph representing the floor plan
+     */
     private void generateEdges()
     {
         for (int row = 0; row < rowCount; ++row)
@@ -221,6 +222,11 @@ public class AnnotFloorPlan implements Serializable
             }
     }
      
+    /**
+     * Insert a vertex to the graph whose row and col coordinates are as given.
+     * @param row
+     * @param col 
+     */
     private void addVertexAt(int row, int col)
     {
         g.addVertex(cellContainer[row][col]);
@@ -311,33 +317,52 @@ public class AnnotFloorPlan implements Serializable
     }
     
     /**
-     * 
-     * @param x the x-coor
-     * @param y the y-coor
-     * @param dc 
+     * Disable the cell containing the given point
+     * @param x
+     * @param y 
      */
     public void disableCell(int x, int y)
     {
-        int col = x / unitW;
-        int row = y / unitH;
-        if (valid(row, col))
+        int col = getCorrespondingCol(x);
+        int row = getCorrespondingRow(y);
+        
+        //If a cell is already dead, it wouldn't be disabled again; Do this to reduce the number of dead points created
+        if (valid(row, col) && !cellContainer[row][col].isDead())
         {
             cellContainer[row][col].disableCell();
-            deadCells.add(cellContainer[row][col]);
+            deadPoints.add(new DeadPoint(x, y));
 
             //removing this cell from the graph and all of its touching edges
             g.removeVertex(cellContainer[row][col]);
         }
     }
     
+    /**
+     * Enable the cell containing the given point
+     * @param x
+     * @param y 
+     */
     public void enabbleCell(int x, int y)
     {
-        int col = x / unitW;
-        int row = y / unitH;
+        int col = getCorrespondingCol(x);
+        int row = getCorrespondingRow(y);
         if (valid(row, col))
         {
             cellContainer[row][col].enabbleCell();
-            deadCells.remove(cellContainer[row][col]);
+            
+            //Remove the whole cell
+            //Even if user doesn't click the exact position as that when the cell is disabled,
+            //as long as it's in the same cell. The cell should be enabled again.
+            ArrayList<DeadPoint> temps = new ArrayList<DeadPoint>();
+            for (DeadPoint dp : deadPoints)
+            {
+                if (isInCell(row, col, dp))
+                    temps.add(dp);
+            }
+            
+            for (DeadPoint dp : temps)
+                deadPoints.remove(dp);
+            
             em.getTransaction().begin();
             em.remove(cellContainer[row][col]);
             em.getTransaction().commit();
@@ -346,26 +371,68 @@ public class AnnotFloorPlan implements Serializable
         }
     }
 
-    public Set<Cell> getDeadCells()
+    /**
+     * 
+     * @return an unmodifiable list of cells containing dead points (aka dead cells)
+     */
+    public List<Cell> getDeadCells()
     {
-        return Collections.unmodifiableSet(deadCells); 
+        ArrayList<Cell> deadCells = new ArrayList<Cell>();
+        int row, col;
+        for (DeadPoint dp : deadPoints)
+        {
+            row = getCorrespondingRow(dp.getY());
+            col = getCorrespondingCol(dp.getX());
+            if (valid(row, col))
+                deadCells.add(cellContainer[row][col]);
+        }
+        return Collections.unmodifiableList(deadCells); 
+    }
+    
+    public Set<DeadPoint> getDeadPoints()
+    {
+        return this.deadPoints;
     }
     
     /**
      * Remove all edges connecting dead cells with others
      * Call this after loading this entity from db
+     * OR after config is changed. (i.e., after ratio or actualW or actualH is changed)
      */
     public void updateGraph()
     {
         cellContainer = new Cell[rowCount][colCount];
         initGraph();
-
-        for (Cell c : deadCells)
+        int row, col;
+        for (DeadPoint dp : deadPoints)
         {            
-            g.removeVertex(cellContainer[c.getRow()][c.getCol()]);
+            col = getCorrespondingCol(dp.getX());
+            row = getCorrespondingRow(dp.getY());
+            if (valid(row, col))
+                g.removeVertex(cellContainer[row][col]);
         }
     }
     
+    public int getCorrespondingCol(DeadPoint dp)
+    {
+        return dp.getX() / unitW;
+    }
+    
+    public int getCorrespondingCol(int x)
+    {
+        return x / unitW;
+    }
+    
+    public int getCorrespondingRow(DeadPoint dp)
+    {
+        return dp.getY() / unitH;
+    }
+    
+    public int getCorrespondingRow(int y)
+    {
+        return y / unitH;
+    }
+        
     public int getRowCount()
     {
         return this.rowCount;
@@ -459,6 +526,12 @@ public class AnnotFloorPlan implements Serializable
         return g;
     }
 
+    /**
+     * 
+     * @param row Row of the cell
+     * @param col Column of the cell
+     * @return true if row and col are within the range
+     */
     private boolean valid(int row, int col)
     {
         return row >= 0 && row < rowCount && col >= 0 && col < colCount;
@@ -504,5 +577,32 @@ public class AnnotFloorPlan implements Serializable
                               ym);
             return null;
         }
+    }
+
+    public void updateConfig(int ratio, int actualW, int actualH)
+    {   
+        this.ratio = ratio;
+        this.actualH = actualH;
+        this.actualW = actualW;
+        
+        //Re-generate graph
+        //Width and height of each cell
+        unitW = floorPlan.getWidth() * ratio / 100;
+        unitH = floorPlan.getHeight() * ratio / 100;
+        
+        //Calc the number of rows and columns needed
+        rowCount = floorPlan.getHeight() / unitH + 1;
+        colCount = floorPlan.getWidth() / unitW + 1;
+        
+        //init the graph
+        g = new SimpleWeightedGraph<Cell, WeightedEdge>(WeightedEdge.class);
+        
+        updateGraph();
+    }
+
+    private boolean isInCell(int row, int col, DeadPoint dp)
+    {
+        return row == getCorrespondingRow(dp.getY())
+                && col == getCorrespondingCol(dp.getX());
     }
 }

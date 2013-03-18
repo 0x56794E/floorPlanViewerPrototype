@@ -56,8 +56,7 @@ public class PointMarkingPanel extends Observable
     
     public UI getUI()
     {
-        return uI;
-        
+        return uI;        
     }
     
     public class UI extends JPanel
