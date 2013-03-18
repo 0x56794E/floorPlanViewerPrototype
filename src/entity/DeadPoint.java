@@ -44,7 +44,6 @@ public class DeadPoint
      * The y coordinate
      */
     private int y;
-
     
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     AnnotFloorPlan annotFloorPlan;
@@ -54,10 +53,11 @@ public class DeadPoint
         
     }
     
-    public DeadPoint(int x, int y)
+    public DeadPoint(int x, int y, AnnotFloorPlan afp)
     {
         this.x = x;
         this.y = y;
+        this.annotFloorPlan = afp;
     }
     
     public void setAnnotFloorPlan(AnnotFloorPlan afp)

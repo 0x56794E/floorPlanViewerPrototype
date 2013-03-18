@@ -330,7 +330,7 @@ public class AnnotFloorPlan implements Serializable
         if (valid(row, col) && !cellContainer[row][col].isDead())
         {
             cellContainer[row][col].disableCell();
-            deadPoints.add(new DeadPoint(x, y));
+            deadPoints.add(new DeadPoint(x, y, this));
 
             //removing this cell from the graph and all of its touching edges
             g.removeVertex(cellContainer[row][col]);

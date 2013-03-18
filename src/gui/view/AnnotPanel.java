@@ -359,4 +359,11 @@ public class AnnotPanel extends JPanel
       
         FileService.savePointsWithBinaryStrings(mainFr.getCurrentFloorPlan().getAnnotFloorPlan(), k, "Inertial");
     }
+
+    void updateConfig(int ratio, int actualW, int actualH)
+    {
+        mainFr.getCurrentFloorPlan().getAnnotFloorPlan().updateConfig(ratio, actualW, actualH);
+        this.repaint();
+        mainFr.validate();
+    }
 }

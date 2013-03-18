@@ -482,8 +482,7 @@ public class MainFrame extends JFrame
      */
     private void updateFloorPlanConfig()
     {
-        this.mainContent.pointMarkingPn.getUI().getCurrentFloorPlan().getAnnotFloorPlan().updateConfig(ratio, actualW, actualH);
-        
+        this.mainContent.annotPn.updateConfig(ratio, actualW, actualH);
     }
     
     private class MenuListener implements ActionListener
