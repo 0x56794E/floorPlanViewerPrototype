@@ -31,22 +31,18 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
+import java.util.*;
+import java.util.Map.Entry;
 import javax.persistence.EntityManager;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import partitioner.InertialPartitioner;
-import partitioner.Line;
-import partitioner.SpectralPartitioner;
-import partitioner.VirtualLine;
+import partitioner.*;
 import util.DatabaseService;
 import util.FileService;
-
+import partitioner.Class;
+import partitioner.ClassFinder;
 /**
  * @author              Vy Thuy Nguyen
  * @version             1.0 Jan 17, 2013
@@ -168,11 +164,12 @@ public class AnnotPanel extends JPanel
             try
             {
                 showPartition = false;
-                doSpectralPartitioning(g, 4);                
+                doSpectralPartitioning(g, 15);                
             }
             catch (Exception e)
             {
-                //e.printStackTrace();
+                e.printStackTrace();
+                System.exit(1);
                 JOptionPane.showMessageDialog(null, 
                                               "Error encountered. No Partitioniing Has Been Done",
                                               "ERROR", 
@@ -295,26 +292,57 @@ public class AnnotPanel extends JPanel
             g.fillRect(c.getCol() * unitW, c.getRow() * unitH, unitW, unitH);
         
         System.out.println("\n\nLINE COUNT = " + lines.size());
-        
-        for (VirtualLine vLine : lines)
+        Map<String, SubRegion> regions = SpectralPartitioner.getSubRegions();
+        Iterator<Entry<String, SubRegion>> iter = regions.entrySet().iterator();
+        SubRegion sub;
+        int regionOrder = 1;
+        int classOrder = 1;
+        System.out.println("Tree has a total of " + regions.size());
+        while (iter.hasNext())
         {
-            //N- section
-            for (Cell c : vLine.getNMinus())
-            {
-                g.setColor(c.getColor(zoomedIndex));
-                g.fillRect(c.getCol() * unitW, c.getRow() * unitH, unitW, unitH);
-            }
+            sub = iter.next().getValue();
             
-            //N+ section
-            for (Cell c : vLine.getNPlus())
+            //If leaf nodes
+            if (sub.isLeafNode())
             {
-                g.setColor(c.getColor(zoomedIndex));
-                g.fillRect(c.getCol() * unitW, c.getRow() * unitH, unitW, unitH);
+                //Export image of the region
+                System.out.println("Region Order " + regionOrder);
+                FileService.exportImageOfRegion(mainFr.getCurrentFloorPlan().getAnnotFloorPlan(),
+                                                 sub,
+                                                 zoomedIndex,
+                                                 regionOrder);                
+                
+                regionOrder++;
+                for (Cell c : sub.getGraph().vertexSet())
+                {
+                    g.setColor(c.getColor(zoomedIndex));
+                    g.fillRect(c.getCol() * unitW, c.getRow() * unitH, unitW, unitH);
+                }
+            }
+            else //If internal node
+            {
+                
+                //Export image of the class
+                System.out.println("finding class for node: " + sub + "; class #" + classOrder);
+                Class clss = ClassFinder.getClass(sub);
+                FileService.exportImageOfClass(mainFr.getCurrentFloorPlan().getAnnotFloorPlan(),
+                                               clss,
+                                               zoomedIndex,
+                                               sub.getBinaryString());
+                classOrder++;
             }
         }
-        
+
+        //The class for the entire floor
+        System.out.println("finding class for node: " + SpectralPartitioner.entireFloor + "; class #" + classOrder);
+        Class clss = ClassFinder.getClass(SpectralPartitioner.entireFloor);
+        FileService.exportImageOfClass(mainFr.getCurrentFloorPlan().getAnnotFloorPlan(),
+                                        clss,
+                                        zoomedIndex,
+                                        "e");
+                
         FileService.savePointsWithBinaryStrings(mainFr.getCurrentFloorPlan().getAnnotFloorPlan(), k, "Spectral");
-        FileService.saveSpectralSubRegion(lines);
+        FileService.saveLines(lines);
     }
     
     

@@ -30,6 +30,8 @@ import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import org.jgrapht.graph.SimpleWeightedGraph;
+import partitioner.Class;
+import partitioner.SubRegion;
 import partitioner.VirtualLine;
 
 /**
@@ -357,9 +359,9 @@ public class FileService
         out.close();
     }
 
-    public static void saveSpectralSubRegion(ArrayList<VirtualLine> lines) throws IOException
+    public static void saveLines(ArrayList<VirtualLine> lines) throws IOException
     {
-        FileWriter fstream = new FileWriter("spectral_subregion.txt");
+        FileWriter fstream = new FileWriter("spectral_lines_k" + lines.size() + ".txt");
         BufferedWriter out = new BufferedWriter(fstream);
         int c = 0;
         for (VirtualLine line : lines)
@@ -372,5 +374,63 @@ public class FileService
         }
         
         out.close();
+    }
+
+    public static void exportImageOfRegion(AnnotFloorPlan annotFloorPlan, 
+                                            SubRegion sub, 
+                                            double zoomIndex,
+                                            int regionOrder) throws IOException
+    {
+        List<Cell> deadCells = annotFloorPlan.getDeadCells();
+        int unitW = annotFloorPlan.getUnitW();
+        int unitH = annotFloorPlan.getUnitH();
+        
+        File file = new File(annotFloorPlan.getFloorPlan().getAbsoluteFilePath());
+        BufferedImage image = ImageIO.read(file);
+        Graphics g = new ImageIcon(image).getImage().getGraphics();
+        
+        //Draw dead cells
+        g.setColor(Color.DARK_GRAY);
+        for (Cell c : deadCells)
+            g.fillRect(c.getCol() * unitW, c.getRow() * unitH, unitW, unitH);
+        
+        //Draw partitioning
+        for (Cell c : sub.getGraph().vertexSet())   
+        {
+                g.setColor(c.getColor(zoomIndex));
+                g.fillRect(c.getCol() * unitW, c.getRow() * unitH, unitW, unitH);
+        }
+        
+        File oFile = new File(annotFloorPlan.getFloorPlan().getId() 
+                              + "_Region_" + regionOrder 
+                              + "_str_" + sub.getBinaryString() + ".png");
+        ImageIO.write(image, "png", oFile);
+    }
+
+    public static void exportImageOfClass(AnnotFloorPlan annotFloorPlan, Class clss, double zoomIndex, String binStr) throws IOException
+    {
+        List<Cell> deadCells = annotFloorPlan.getDeadCells();
+        int unitW = annotFloorPlan.getUnitW();
+        int unitH = annotFloorPlan.getUnitH();
+        
+        File file = new File(annotFloorPlan.getFloorPlan().getAbsoluteFilePath());
+        BufferedImage image = ImageIO.read(file);
+        Graphics g = new ImageIcon(image).getImage().getGraphics();
+        
+        //Draw dead cells
+        g.setColor(Color.DARK_GRAY);
+        for (Cell c : deadCells)
+            g.fillRect(c.getCol() * unitW, c.getRow() * unitH, unitW, unitH);
+        
+        //Draw partitioning
+        for (Cell c : clss.getCells())
+        {
+            g.setColor(c.getColor(zoomIndex));
+            g.fillRect(c.getCol() * unitW, c.getRow() * unitH, unitW, unitH);
+        }
+        
+        File oFile = new File(annotFloorPlan.getFloorPlan().getId() 
+                              + "_Class_" + binStr + ".png");
+        ImageIO.write(image, "png", oFile);
     }
 }

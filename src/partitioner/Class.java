@@ -18,43 +18,47 @@
  * Boston, MA  02110-1301, USA.
  */
 
+package partitioner;
 
-package main;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import entity.Cell;
 import java.util.*;
-import java.util.Map.Entry;
-import util.FileService;
 
 /**
  * @author              Vy Thuy Nguyen
- * @version             1.0 Feb 14, 2013
+ * @version             1.0 Mar 22, 2013
  * Last modified:       
  */
-public class ReadFile 
+public class Class 
 {
-    public static void main(String args[]) throws FileNotFoundException, IOException
+    private HashSet<Cell> cells; //parent's class
+    
+    public Class (SubRegion sub)
     {
+        cells = new HashSet<Cell>();
         
-        TreeMap<String, Integer> intTree = new TreeMap<String, Integer>(new Comparator<String>(){
-
-            @Override
-            public int compare(String o1, String o2)
-            {
-                int b1 = Integer.parseInt(o1, 2);
-                int b2 = Integer.parseInt(o2, 2);
-                return b1 > b2 ? 1 : (b1 == b2 ? 0 : -1);
-            }
-        });
-        
-        
-        intTree.put("00", 1);
-        intTree.put("01", 2);
-        
-        Iterator<Entry<String, Integer>> iter = intTree.entrySet().iterator();
-        while (iter.hasNext())
-            System.out.println(iter.next().getValue());
+        for (Cell c : sub.getGraph().vertexSet())
+            cells.add(c);
+    }
+    
+    public int cellCount()
+    {
+        return cells.size();
+    }
+    
+    public void addRegion(SubRegion sub)
+    {
+        for (Cell c : sub.getGraph().vertexSet())
+            cells.add(c);
+    }
+    
+    public void removeRegion(SubRegion sub)
+    {
+        for (Cell c : sub.getGraph().vertexSet())
+            cells.remove(c);
+    }
+    
+    public Set<Cell> getCells()
+    {
+        return Collections.unmodifiableSet(cells);
     }
 }

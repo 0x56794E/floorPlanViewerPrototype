@@ -44,12 +44,14 @@ import org.jgrapht.graph.SimpleWeightedGraph;
 public class VirtualLine 
 {
     private Matrix v2;
-    private ArrayList<Cell> nMinus;
-    private ArrayList<Cell> nPlus;
     
+    private SimpleWeightedGraph<Cell, WeightedEdge> parent;
     private SubRegion nMinusRegion = new SubRegion();
     private SubRegion nPlusRegion = new SubRegion();
     
+    //Temporary fields for building graphs for sub regions
+    private ArrayList<Cell> nMinus;
+    private ArrayList<Cell> nPlus;
     private SimpleWeightedGraph<Cell, WeightedEdge> nMinusGraph;
     private SimpleWeightedGraph<Cell, WeightedEdge> nPlusGraph;
         
@@ -115,7 +117,7 @@ public class VirtualLine
         generateEdges(nMinus, nMinusGraph, g);
         generateEdges(nPlus, nPlusGraph, g);
         
-        //Set graph to region
+        //Set graphs of sub regions
         nMinusRegion.setGraph(nMinusGraph);
         nPlusRegion.setGraph(nPlusGraph);
     }

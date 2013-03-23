@@ -36,6 +36,8 @@ public class SubRegion
     private int colCentroid;    
     private String binaryString;
     private SimpleWeightedGraph<Cell, WeightedEdge> graph;
+    private boolean isLeaf;
+    
     /**
      * 
      */
@@ -44,6 +46,24 @@ public class SubRegion
         rowCentroid =  -1;
         colCentroid = -1;
         binaryString = "";
+        isLeaf = true;
+    }
+    
+    /**
+     * 
+     * @return true if the region is NOT partitioned
+     */
+    public boolean isLeafNode()
+    {
+        return isLeaf;
+    }
+    
+    /**
+     * Make the node a parent node. (i.e., it'll be partitioned)
+     */
+    public void makeParent()
+    {
+        isLeaf = false;
     }
     
     /**
@@ -54,6 +74,7 @@ public class SubRegion
     {
         rowCentroid = r;
     }
+    
     
     public void setGraph(SimpleWeightedGraph<Cell, WeightedEdge> graph)
     {
