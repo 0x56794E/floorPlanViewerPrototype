@@ -34,7 +34,7 @@ public class ClassFinder
         String key;
         if (binStr.compareTo("") == 0)
         {
-            return new Class(sub); 
+            return new Class(SpectralPartitioner.getSubRegions().get("0")); 
         } 
         else 
         {
