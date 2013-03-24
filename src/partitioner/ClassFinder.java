@@ -22,12 +22,18 @@
 package partitioner;
 
 /**
+ * 
  * @author              Vy Thuy Nguyen
  * @version             1.0 Mar 22, 2013
  * Last modified:       
  */
 public class ClassFinder 
 {
+    /**
+     * Given a region, the function returns the class associating with the region
+     * @param sub
+     * @return 
+     */
     public static Class getClass(SubRegion sub)
     {
         String binStr = sub.getBinaryString();
@@ -43,30 +49,27 @@ public class ClassFinder
                 key = binStr.substring(0, binStr.length() - 1);
                 if (binStr.endsWith("0")) //is left child: ending with 0
                 {
-                    System.out.println("ends with 0: key = " + key);
                     return subtract(getClass(SpectralPartitioner.getSubRegions().get(key)),
-                                    SpectralPartitioner.getSubRegions().get(key + "1"));
+                                    SpectralPartitioner.getSubRegions().get(binStr + "1"));
                 }
                 else
                 {
-                    System.out.println("ends with 1: key = " + key);
                     return union(getClass(SpectralPartitioner.getSubRegions().get(key)),
-                                SpectralPartitioner.getSubRegions().get(key + "0"));
+                                SpectralPartitioner.getSubRegions().get(binStr + "0"));
                 }
             }
             else
             {
-                if (binStr.compareTo("0") == 0) //left node
+                if (binStr.compareTo("0") == 0) //very first left child
                 {
-                    System.out.println("string is 0");
                     return subtract(getClass(SpectralPartitioner.entireFloor),
-                                    SpectralPartitioner.getSubRegions().get("1"));
+                                    SpectralPartitioner.getSubRegions().get("01"));
+                    
                 }
                 else
                 {
-                    System.out.println("string is 1");
                     return union(getClass(SpectralPartitioner.entireFloor),
-                                 SpectralPartitioner.getSubRegions().get("0"));
+                                               SpectralPartitioner.getSubRegions().get("10"));                    
                 }
             }
         }

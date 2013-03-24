@@ -422,7 +422,8 @@ public class FileService
         for (Cell c : deadCells)
             g.fillRect(c.getCol() * unitW, c.getRow() * unitH, unitW, unitH);
         
-        //Draw partitioning
+        //Draw class
+        System.out.println("Class has " + clss.getCells().size());
         for (Cell c : clss.getCells())
         {
             g.setColor(c.getColor(zoomIndex));

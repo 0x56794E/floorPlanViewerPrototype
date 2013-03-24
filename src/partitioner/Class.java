@@ -21,7 +21,9 @@
 package partitioner;
 
 import entity.Cell;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author              Vy Thuy Nguyen
@@ -36,8 +38,11 @@ public class Class
     {
         cells = new HashSet<Cell>();
         
+        System.out.println("\nIn Constructor; parent has " + sub.getGraph().vertexSet().size());
         for (Cell c : sub.getGraph().vertexSet())
             cells.add(c);
+        
+        System.out.println("In constructor; cells.size() = " + cells.size());
     }
     
     public int cellCount()
@@ -47,14 +52,28 @@ public class Class
     
     public void addRegion(SubRegion sub)
     {
+        System.out.println("\nadding to parent; Parent has " + cells.size());
+        int count = 0;
         for (Cell c : sub.getGraph().vertexSet())
+        {
+            System.out.print(c + "; ");
+            if (count % 100 == 0) System.out.println();
+            count++;
             cells.add(c);
+        }
     }
     
     public void removeRegion(SubRegion sub)
     {
+        System.out.println("\nremoving from parent; Parent has " + cells.size());
+        int count = 0;
         for (Cell c : sub.getGraph().vertexSet())
+        {
+            System.out.print(c + "; ");
+            if (count % 100 == 0) System.out.println();
+            count++;
             cells.remove(c);
+        }
     }
     
     public Set<Cell> getCells()

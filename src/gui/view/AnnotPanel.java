@@ -291,13 +291,12 @@ public class AnnotPanel extends JPanel
         for (Cell c : deadCells)
             g.fillRect(c.getCol() * unitW, c.getRow() * unitH, unitW, unitH);
         
-        System.out.println("\n\nLINE COUNT = " + lines.size());
+        //Paint & export images of sub areas and their classes 
         Map<String, SubRegion> regions = SpectralPartitioner.getSubRegions();
         Iterator<Entry<String, SubRegion>> iter = regions.entrySet().iterator();
         SubRegion sub;
         int regionOrder = 1;
         int classOrder = 1;
-        System.out.println("Tree has a total of " + regions.size());
         while (iter.hasNext())
         {
             sub = iter.next().getValue();
@@ -306,7 +305,6 @@ public class AnnotPanel extends JPanel
             if (sub.isLeafNode())
             {
                 //Export image of the region
-                System.out.println("Region Order " + regionOrder);
                 FileService.exportImageOfRegion(mainFr.getCurrentFloorPlan().getAnnotFloorPlan(),
                                                  sub,
                                                  zoomedIndex,
@@ -321,20 +319,18 @@ public class AnnotPanel extends JPanel
             }
             else //If internal node
             {
-                
                 //Export image of the class
-                System.out.println("finding class for node: " + sub + "; class #" + classOrder);
                 Class clss = ClassFinder.getClass(sub);
                 FileService.exportImageOfClass(mainFr.getCurrentFloorPlan().getAnnotFloorPlan(),
                                                clss,
                                                zoomedIndex,
                                                sub.getBinaryString());
                 classOrder++;
+               
             }
         }
 
         //The class for the entire floor
-        System.out.println("finding class for node: " + SpectralPartitioner.entireFloor + "; class #" + classOrder);
         Class clss = ClassFinder.getClass(SpectralPartitioner.entireFloor);
         FileService.exportImageOfClass(mainFr.getCurrentFloorPlan().getAnnotFloorPlan(),
                                         clss,

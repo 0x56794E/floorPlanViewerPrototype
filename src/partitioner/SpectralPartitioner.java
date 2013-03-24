@@ -44,8 +44,8 @@ import util.FileService;
 public class SpectralPartitioner 
 {
     public static AnnotFloorPlan annotFloorPlan;
-    private static TreeMap<String, SubRegion> regionMap;
-    private static PriorityQueue<SubRegion> subRegions;
+    private static TreeMap<String, SubRegion> regionMap = new TreeMap<String, SubRegion>();
+    private static PriorityQueue<SubRegion> subRegions = new PriorityQueue<SubRegion>();
     public static SubRegion entireFloor;
     
     /**
