@@ -96,8 +96,8 @@ public class Cell
     public Color getColor(double zoomedIndex)
     {
        int rgb = (int)(Integer.parseInt(binaryString.toString(), 2) * zoomedIndex); // normalize the range
-       int red = (rgb >> 16)  & 0xFF;
-       int green = (rgb >> 8) & 0xFF;
+       int red = (rgb >> 16)  & 0xAA;
+       int green = (rgb >> 8) & 0xAA;
        int blue = rgb & 0xFF;
        return new Color (red, green, blue);
     }
