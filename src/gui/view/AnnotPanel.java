@@ -164,7 +164,7 @@ public class AnnotPanel extends JPanel
             try
             {
                 showPartition = false;
-                doSpectralPartitioning(g, 15);                
+                doSpectralPartitioning(g, 7);                
             }
             catch (Exception e)
             {
@@ -302,15 +302,18 @@ public class AnnotPanel extends JPanel
             sub = iter.next().getValue();
             
             //If leaf nodes
+            
+            //Export image of all the regions
+            FileService.exportImageOfRegion(mainFr.getCurrentFloorPlan().getAnnotFloorPlan(),
+                                                sub,
+                                                zoomedIndex,
+                                                regionOrder);                
+
+            regionOrder++;
+            
+            
             if (sub.isLeafNode())
             {
-                //Export image of the region
-                FileService.exportImageOfRegion(mainFr.getCurrentFloorPlan().getAnnotFloorPlan(),
-                                                 sub,
-                                                 zoomedIndex,
-                                                 regionOrder);                
-                
-                regionOrder++;
                 for (Cell c : sub.getGraph().vertexSet())
                 {
                     g.setColor(c.getColor(zoomedIndex));
