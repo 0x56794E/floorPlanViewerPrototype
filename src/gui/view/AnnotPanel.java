@@ -55,10 +55,11 @@ public class AnnotPanel extends JPanel
     private MainFrame mainFr;
     private ImagePanel imagePanel;
     private JScrollPane ipScrollPane = new JScrollPane();
-    private JButton saveDeadCellBtn = new JButton("Save");
-    private JButton saveDeadCellToFileBtn = new JButton("Save Dead Cells to File");
-    private JButton saveGraphBtn = new JButton("Save Available Graph Region To File");
+//    private JButton saveDeadCellBtn = new JButton("Save");
+//    private JButton saveDeadCellToFileBtn = new JButton("Save Dead Cells to File");
+//    private JButton saveGraphBtn = new JButton("Save Available Graph Region To File");
     private JButton showPartitionBtn = new JButton("Show Partitioning Lines");
+    private JButton callExternalBtn = new JButton("Call External Program");
     private List<Cell> deadCells;
     private boolean showPartition = false;
     
@@ -66,76 +67,85 @@ public class AnnotPanel extends JPanel
     {
         mainFr = mf;       
         
-        saveDeadCellBtn.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e)
-            {
-                EntityManager em = DatabaseService.getEntityManager();  
-                em.getTransaction().begin();
-                AnnotFloorPlan afp = mainFr.getCurrentFloorPlan().getAnnotFloorPlan();
-                
-                for (DeadPoint dp : afp.getDeadPoints())
-                {
-                    dp.setAnnotFloorPlan(afp);
-                    em.persist(dp);
-                }
-                
-                em.persist(mainFr.getCurrentFloorPlan().getAnnotFloorPlan());
-                em.getTransaction().commit();
-                JOptionPane.showMessageDialog(null, "Successfully Save Floor Plan");
-                
-                //DatabaseService.cleanup();
-            }
-        });        
+//        saveDeadCellBtn.addActionListener(new ActionListener() {
+//
+//            @Override
+//            public void actionPerformed(ActionEvent e)
+//            {
+//                EntityManager em = DatabaseService.getEntityManager();  
+//                em.getTransaction().begin();
+//                AnnotFloorPlan afp = mainFr.getCurrentFloorPlan().getAnnotFloorPlan();
+//                
+//                for (DeadPoint dp : afp.getDeadPoints())
+//                {
+//                    dp.setAnnotFloorPlan(afp);
+//                    em.persist(dp);
+//                }
+//                
+//                em.persist(mainFr.getCurrentFloorPlan().getAnnotFloorPlan());
+//                em.getTransaction().commit();
+//                JOptionPane.showMessageDialog(null, "Successfully Save Floor Plan");
+//                
+//                //DatabaseService.cleanup();
+//            }
+//        });        
         
-        saveDeadCellToFileBtn.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e)
-            {
-                try
-                {
-                    FileService.saveDeadCellsToFile(AnnotPanel.this.deadCells);
-                    JOptionPane.showMessageDialog(null, "Successfully Saved Dead Cells to File");
-                }
-                catch (IOException ex)
-                {
-                    JOptionPane.showMessageDialog(null, "Error while saving dead cells to file", "ERROR", JOptionPane.ERROR_MESSAGE);
-                }
-            }
+//        saveDeadCellToFileBtn.addActionListener(new ActionListener() {
+//
+//            @Override
+//            public void actionPerformed(ActionEvent e)
+//            {
+//                try
+//                {
+//                    FileService.saveDeadCellsToFile(AnnotPanel.this.deadCells);
+//                    JOptionPane.showMessageDialog(null, "Successfully Saved Dead Cells to File");
+//                }
+//                catch (IOException ex)
+//                {
+//                    JOptionPane.showMessageDialog(null, "Error while saving dead cells to file", "ERROR", JOptionPane.ERROR_MESSAGE);
+//                }
+//            }
+//        
+//        });
         
-        });
-        
-        saveGraphBtn.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e)
-            {
-                try
-                {
-                    FileService.saveLargestConnectedComponent(mainFr.getCurrentFloorPlan().getAnnotFloorPlan());                    
-                    JOptionPane.showMessageDialog(null, "Successfully Saved Graph To File");
-                }
-                catch (Exception ex)
-                {
-                    JOptionPane.showMessageDialog(null, "Error while saving graph to file", "ERROR", JOptionPane.ERROR_MESSAGE);
-                    //ex.printStackTrace();
-                }
-            }
-        
-        });
+//        saveGraphBtn.addActionListener(new ActionListener() {
+//
+//            @Override
+//            public void actionPerformed(ActionEvent e)
+//            {
+//                try
+//                {
+//                    FileService.saveLargestConnectedComponent(mainFr.getCurrentFloorPlan().getAnnotFloorPlan());                    
+//                    JOptionPane.showMessageDialog(null, "Successfully Saved Graph To File");
+//                }
+//                catch (Exception ex)
+//                {
+//                    JOptionPane.showMessageDialog(null, "Error while saving graph to file", "ERROR", JOptionPane.ERROR_MESSAGE);
+//                    //ex.printStackTrace();
+//                }
+//            }
+//        
+//        });
         
         showPartitionBtn.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                showPartition = true;
-                
+                showPartition = true;                
                 imagePanel.repaint();
             }
         
+        });
+        
+        callExternalBtn.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                //do something
+                JOptionPane.showMessageDialog(null, "callExternalBtn clicked!");
+            }
         });
         
         //Render components
@@ -143,10 +153,11 @@ public class AnnotPanel extends JPanel
         this.add(ipScrollPane, BorderLayout.CENTER);
         
         JPanel btnPn = new JPanel();
-        btnPn.add(saveDeadCellBtn);
-        btnPn.add(saveDeadCellToFileBtn);
-        btnPn.add(saveGraphBtn);
+//        btnPn.add(saveDeadCellBtn);
+//        btnPn.add(saveDeadCellToFileBtn);
+//        btnPn.add(saveGraphBtn);
         btnPn.add(showPartitionBtn);
+        btnPn.add(callExternalBtn);
         this.add(btnPn, BorderLayout.SOUTH);
     }
 
@@ -164,7 +175,7 @@ public class AnnotPanel extends JPanel
             try
             {
                 showPartition = false;
-                doSpectralPartitioning(g, 7);                
+                doSpectralPartitioning(g, 127);                
             }
             catch (Exception e)
             {
@@ -297,21 +308,12 @@ public class AnnotPanel extends JPanel
         SubRegion sub;
         int regionOrder = 1;
         int classOrder = 1;
+        ClassManager.start(mainFr.getCurrentFloorPlan().getAnnotFloorPlan());
         while (iter.hasNext())
         {
             sub = iter.next().getValue();
             
             //If leaf nodes
-            
-            //Export image of all the regions
-            FileService.exportImageOfRegion(mainFr.getCurrentFloorPlan().getAnnotFloorPlan(),
-                                                sub,
-                                                zoomedIndex,
-                                                regionOrder);                
-
-            regionOrder++;
-            
-            
             if (sub.isLeafNode())
             {
                 for (Cell c : sub.getGraph().vertexSet())
@@ -324,22 +326,44 @@ public class AnnotPanel extends JPanel
             {
                 //Export image of the class
                 Class clss = ClassFinder.getClass(sub);
-                FileService.exportImageOfClass(mainFr.getCurrentFloorPlan().getAnnotFloorPlan(),
+                util.FileService.exportImageOfClass(mainFr.getCurrentFloorPlan().getAnnotFloorPlan(),
                                                clss,
                                                zoomedIndex,
                                                sub.getBinaryString());
                 classOrder++;
-               
+                ClassManager.addClass(sub.getBinaryString(), clss);
             }
         }
 
+        
+        //Export image for all of the regions
+        for (VirtualLine line : lines)
+        {            
+            FileService.exportImageOfRegion(mainFr.getCurrentFloorPlan().getAnnotFloorPlan(),
+                                                line.getNMinusRegion(),
+                                                zoomedIndex,
+                                                regionOrder);    
+            regionOrder++;
+            
+            FileService.exportImageOfRegion(mainFr.getCurrentFloorPlan().getAnnotFloorPlan(),
+                                                line.getNPlusRegion(),
+                                                zoomedIndex,
+                                                regionOrder);    
+            regionOrder++;
+        }
+        
         //The class for the entire floor
         Class clss = ClassFinder.getClass(SpectralPartitioner.entireFloor);
         FileService.exportImageOfClass(mainFr.getCurrentFloorPlan().getAnnotFloorPlan(),
                                         clss,
                                         zoomedIndex,
                                         "e");
-                
+        ClassManager.addClass("e", clss);
+        
+        //Export all the training files
+        ClassManager.exportTrainingFiles();
+        
+        
         FileService.savePointsWithBinaryStrings(mainFr.getCurrentFloorPlan().getAnnotFloorPlan(), k, "Spectral");
         FileService.saveLines(lines);
     }

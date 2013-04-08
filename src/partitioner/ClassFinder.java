@@ -69,7 +69,7 @@ public class ClassFinder
                 else
                 {
                     return union(getClass(SpectralPartitioner.entireFloor),
-                                               SpectralPartitioner.getSubRegions().get("10"));                    
+                                 SpectralPartitioner.getSubRegions().get("10"));                    
                 }
             }
         }

@@ -160,6 +160,19 @@ public class Cell
         return this.isDead;
     }
     
+    
+    /**
+     * 
+     * @param x x location in pixel
+     * @param y y location in pixel
+     * @return 
+     */
+    public boolean containsPoint(int x, int y)
+    {
+        return annotFloorPlan.isInCell(row, col, x, y);
+    }
+    
+    //Oobject class
     public boolean equals (Object rhs)
     {
         if (rhs == null || !(rhs instanceof Cell))
@@ -184,5 +197,4 @@ public class Cell
     {
         return String.format("%d %d", row, col); 
     }
-    
 }

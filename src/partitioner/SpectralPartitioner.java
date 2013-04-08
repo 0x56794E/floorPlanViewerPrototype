@@ -46,7 +46,10 @@ public class SpectralPartitioner
     public static AnnotFloorPlan annotFloorPlan;
     private static TreeMap<String, SubRegion> regionMap = new TreeMap<String, SubRegion>();
     private static PriorityQueue<SubRegion> subRegions = new PriorityQueue<SubRegion>();
+    private static int currentK = 0;
+    private static ArrayList<VirtualLine> currentLines = null;
     public static SubRegion entireFloor;
+    public static boolean hasDonePartitioning = false;
     
     /**
      * Return the line partitioning the graph into two sub-regions
@@ -71,87 +74,74 @@ public class SpectralPartitioner
     public static ArrayList<VirtualLine> getLines(SimpleWeightedGraph<Cell, WeightedEdge> nodes, int k) throws Exception
     {
         if (k < 1) throw new Exception("k must be >= 1");
-        
-        //Entire floor
-        entireFloor = new SubRegion();
-        entireFloor.setGraph(nodes);      
-        entireFloor.setBinaryString("");
-        entireFloor.makeParent();
-        //TODO: can skip centroid for now
-                
-        ArrayList<VirtualLine> lines = new ArrayList<VirtualLine>();
-        subRegions = new PriorityQueue<SubRegion>(k, new Comparator<SubRegion>() {            
-            @Override
-            public int compare(SubRegion o1, SubRegion o2)
-            {
-                return (o1.getGraph().vertexSet().size() > o2.getGraph().vertexSet().size())
-                            ? -1
-                            : (o1.getGraph().vertexSet().size() == o2.getGraph().vertexSet().size() ? 0 : 1);
-            }
-        });
-        
-        //Tree map maps a region's binary string to the region itself
-        regionMap = new TreeMap<String, SubRegion>(new Comparator<String>(){
-
-            /**
-             * @return -1 if o1 < o2; 0 if o1 = o2; +1 if o1 > o2
-             */
-            @Override
-            public int compare(String o1, String o2)
-            {
-                return o1.compareTo(o2);
-            }
-        });        
-        
-        
-        //Line 1
-        VirtualLine line = getLine(nodes);
-        lines.add(line);
-        subRegions.add(line.getNMinusRegion());
-        subRegions.add(line.getNPlusRegion());
-        
-        System.out.println("INSERTING at key " + line.getNMinusRegion().getBinaryString() + "   " + regionMap.put(line.getNMinusRegion().getBinaryString(), line.getNMinusRegion()));
-        System.out.println("INSERTING at key " + line.getNPlusRegion().getBinaryString() + "    " + regionMap.put(line.getNPlusRegion().getBinaryString(), line.getNPlusRegion()));
-        k--;
-        
-        for (int i = 0; i < k; ++i)
+        if (currentK != k || currentLines == null)
         {
-            //Find the largest region
-            SubRegion largestList = subRegions.remove();
-            largestList.makeParent();
-            
-            //Line dividing this region
-            line = getLine(largestList.getGraph());
+            currentK = k;
+            //Entire floor
+            entireFloor = new SubRegion();
+            entireFloor.setGraph(nodes);      
+            entireFloor.setBinaryString("");
+            entireFloor.makeParent();
+            //TODO: can skip centroid for now
+
+            ArrayList<VirtualLine> lines = new ArrayList<VirtualLine>();
+            subRegions = new PriorityQueue<SubRegion>(k, new Comparator<SubRegion>() {            
+                @Override
+                public int compare(SubRegion o1, SubRegion o2)
+                {
+                    return (o1.getGraph().vertexSet().size() > o2.getGraph().vertexSet().size())
+                                ? -1
+                                : (o1.getGraph().vertexSet().size() == o2.getGraph().vertexSet().size() ? 0 : 1);
+                }
+            });
+
+            //Tree map maps a region's binary string to the region itself
+            regionMap = new TreeMap<String, SubRegion>(new Comparator<String>(){
+
+                /**
+                * @return -1 if o1 < o2; 0 if o1 = o2; +1 if o1 > o2
+                */
+                @Override
+                public int compare(String o1, String o2)
+                {
+                    return o1.compareTo(o2);
+                }
+            });        
+
+
+            //Line 1
+            VirtualLine line = getLine(nodes);
             lines.add(line);
-            
-            //replace the old large region by two newly partitioned regions            
             subRegions.add(line.getNMinusRegion());
-            subRegions.add(line.getNPlusRegion());      
-            System.out.println("INSERTING at key " + line.getNMinusRegion().getBinaryString() + "    " 
-                    + regionMap.put(line.getNMinusRegion().getBinaryString(), line.getNMinusRegion()));
-            System.out.println("INSERTING at key " + line.getNPlusRegion().getBinaryString() + "    " 
-                    + regionMap.put(line.getNPlusRegion().getBinaryString(), line.getNPlusRegion()));
+            subRegions.add(line.getNPlusRegion());
+
+            System.out.println("INSERTING at key " + line.getNMinusRegion().getBinaryString() + "   " + regionMap.put(line.getNMinusRegion().getBinaryString(), line.getNMinusRegion()));
+            System.out.println("INSERTING at key " + line.getNPlusRegion().getBinaryString() + "    " + regionMap.put(line.getNPlusRegion().getBinaryString(), line.getNPlusRegion()));
+            k--;
+
+            for (int i = 0; i < k; ++i)
+            {
+                //Find the largest region
+                SubRegion largestList = subRegions.remove();
+                largestList.makeParent();
+
+                //Line dividing this region
+                line = getLine(largestList.getGraph());
+                lines.add(line);
+
+                //replace the old large region by two newly partitioned regions            
+                subRegions.add(line.getNMinusRegion());
+                subRegions.add(line.getNPlusRegion());      
+                System.out.println("INSERTING at key " + line.getNMinusRegion().getBinaryString() + "    " 
+                                    + regionMap.put(line.getNMinusRegion().getBinaryString(), line.getNMinusRegion()));
+                System.out.println("INSERTING at key " + line.getNPlusRegion().getBinaryString() + "    " 
+                                    + regionMap.put(line.getNPlusRegion().getBinaryString(), line.getNPlusRegion()));
+            }
+            currentLines = lines;
         }
         
-        
-        
-//        //Exporting classes
-//        Iterator<Entry<String, SubRegion>> iter = regionMap.entrySet().iterator();
-//        int classCount = 1;
-//        while (iter.hasNext())
-//        {
-//            SubRegion sub = iter.next().getValue();
-//            
-//            if (sub.isLeafNode())
-//            {
-//                Class c = ClassFinder.getClass(sub);
-//                System.out.printf("Class #%d: s = %s; regionCount = %d", classCount, sub.getBinaryString(), c.regionCount());
-//                classCount++;
-//            }
-//        }
-        
         //Return partitioning lines
-        return lines;
+        return currentLines;
     }
     
     /**

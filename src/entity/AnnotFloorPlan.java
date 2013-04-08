@@ -557,6 +557,16 @@ public class AnnotFloorPlan implements Serializable
         return pos;
     }
     
+    public int getActualW()
+    {
+        return actualW;
+    }
+    
+    public int getActualH()
+    {
+        return actualH;
+    }
+    
     /**
      * 
      * @param xm x coordinate in real life
@@ -600,9 +610,29 @@ public class AnnotFloorPlan implements Serializable
         updateGraph();
     }
 
+    /**
+     * 
+     * @param row
+     * @param col
+     * @param dp
+     * @return true if the given dead point is in the cell at specified location
+     */
     private boolean isInCell(int row, int col, DeadPoint dp)
     {
-        return row == getCorrespondingRow(dp.getY())
-                && col == getCorrespondingCol(dp.getX());
+        return row == getCorrespondingRow(dp.getY()) 
+               && col == getCorrespondingCol(dp.getX());
+    }
+    
+    /**
+     * 
+     * @param row
+     * @param col
+     * @param x
+     * @param y
+     * @return true if the position (x, y) (in pixel) is in the cell at given location
+     */
+    public boolean isInCell(int row, int col, int x, int y)
+    {
+        return row == getCorrespondingRow(y) && col == getCorrespondingCol(x);
     }
 }

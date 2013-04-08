@@ -25,6 +25,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.util.Map.Entry;
 import java.util.*;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -174,7 +175,7 @@ public class FileService
     public static void savePointsWithBinaryStrings(AnnotFloorPlan afp, int k, String partitionType) throws FileNotFoundException, IOException
     {
         //Read coordinates from file and convert pixel coordinate and to same origin
-        //1. Read
+      
         FileWriter fstream = new FileWriter(afp.getFloorPlan().getFileName() 
                 + "_k" + k + "_" + partitionType + ".txt");
         BufferedWriter out = new BufferedWriter(fstream);
@@ -183,8 +184,6 @@ public class FileService
         String line = "";
         String[] tokens;
         
-//        double widthRatio = afp.getFloorPlan().getWidth() / 75,
-//               heightRatio = afp.getFloorPlan().getHeight() / 50;
         ArrayList<Cell> added = new ArrayList<Cell>();
         
         while (sc.hasNextLine())
@@ -196,8 +195,8 @@ public class FileService
                 tokens = line.split("\\,");
                 
                 //Convert to px coor
-                Cell cell = afp.getNode(75 - Double.parseDouble(tokens[1]), 
-                                   50 - Double.parseDouble(tokens[0]));
+                Cell cell = afp.getNode(afp.getActualW() - Double.parseDouble(tokens[1]), 
+                                        afp.getActualH() - Double.parseDouble(tokens[0]));
                 
                 if (cell != null)
                 {
@@ -402,8 +401,9 @@ public class FileService
         }
         
         File oFile = new File(annotFloorPlan.getFloorPlan().getId() 
-                              + "_Region_" + regionOrder 
-                              + "_str_" + sub.getBinaryString() + ".png");
+                              //+ "_Region_" + regionOrder 
+                                + "_G_"
+                                + "_str_" + sub.getBinaryString() + ".png");
         ImageIO.write(image, "png", oFile);
     }
 
@@ -433,5 +433,74 @@ public class FileService
         File oFile = new File(annotFloorPlan.getFloorPlan().getId() 
                               + "_Class_" + binStr + ".png");
         ImageIO.write(image, "png", oFile);
+    }
+    
+    /**
+     * 
+     * @param afp
+     * @param classes
+     * @throws IOException 
+     */
+    public static void exportTrainingFiles(AnnotFloorPlan afp, HashMap<String, Class> classes) throws IOException
+    {
+         //Read coordinates from file and convert pixel coordinate and to same origin
+      
+        //Build input array
+        ArrayList<Input> inputs = new ArrayList<Input>();
+        File inFile = new File("train_p0.5.txt_sub_0.02.1.txt"); //Temp  
+        Scanner sc = new Scanner(inFile);
+        //Each line has this format: 2.43892672440343,19.5114137952274#1:-50 2:-73 3:-63 4:-57 5:-95 
+        String line="";
+        String[] tokens;
+        String[] part1;
+        String[] part2;
+        
+        while (sc.hasNextLine())
+        {
+            line = sc.nextLine();
+            tokens = line.split("#");
+            
+            //coordinates 
+            part1 = tokens[0].split(",");
+            System.out.println("toks[0] = " + tokens[0]);
+            //Find corresponding cell, add to input array
+            inputs.add(new Input(afp.getNode(afp.getActualW() - Double.parseDouble(part1[1]), 
+                                             afp.getActualH() - Double.parseDouble(part1[0])),
+                                 tokens[1]));
+        }
+        
+        
+        //Go through each classes
+        Set<Entry<String, Class>> entries = classes.entrySet();
+        for (Entry<String, Class> entry : entries)
+        {
+            FileWriter fstream = new FileWriter("spectral_" + entry.getKey() + ".txt");
+            Class clss = entry.getValue();
+            BufferedWriter out = new BufferedWriter(fstream);
+            for (Input input : inputs)
+            {
+                if (clss.containsPoint(input.cell))
+                    out.write("1 ");
+                else 
+                    out.write("-1 ");
+                
+                out.write(input.readings);
+                out.write("\n");                        
+            }
+            out.close();
+        }
+        
+    }
+    
+    private static class Input
+    {
+        String readings;
+        Cell cell;
+         
+        public Input(Cell cell, String readings)
+        {
+            this.cell = cell;
+            this.readings = readings;
+        }
     }
 }
