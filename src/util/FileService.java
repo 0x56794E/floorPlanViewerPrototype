@@ -220,6 +220,20 @@ public class FileService
         out.close();
     }
     
+    /**
+     * Use interchangeably with savePointsWithBinaryStrings()
+     * But this method show both original and converted coordinates
+     */
+    public static void convertCoordinates()
+    {
+        
+    }
+    
+    /**
+     * This file is for debugging purpose only
+     * @param fp
+     * @throws IOException 
+     */
     public static void saveDeadCellsToFile(FloorPlan fp) throws IOException
     {
         FileWriter fstream = new FileWriter(fp.getFileName() + "_" + fp.getId() + "_deadCells.txt");
@@ -235,6 +249,11 @@ public class FileService
         out.close();       
     }
 
+    /**
+     * This file is for debugging purpose only
+     * @param deadCells
+     * @throws IOException 
+     */
     public static void saveDeadCellsToFile(List<Cell> deadCells) throws IOException
     {
         Cell f = deadCells.iterator().next();
@@ -254,6 +273,11 @@ public class FileService
         out.close();
     }
     
+    /**
+     * This file is for debugging purpose only
+     * @param annotFp
+     * @throws IOException 
+     */
     public static void saveGraph(AnnotFloorPlan annotFp) throws IOException
     {
         FileWriter fstream = new FileWriter(annotFp.getFloorPlan().getFileName() 
@@ -278,6 +302,11 @@ public class FileService
         out.close();
     }
     
+    /**
+     * This file is for debugging purpose only
+     * @param annotFp
+     * @throws IOException 
+     */
     public static void saveLargestConnectedComponent(AnnotFloorPlan annotFp) throws IOException
     {
         SimpleWeightedGraph<Cell, WeightedEdge> g = annotFp.getGraph();
@@ -358,6 +387,11 @@ public class FileService
         out.close();
     }
 
+    /**
+     * Output the list of lines and the sub-regions associated with them.
+     * @param lines
+     * @throws IOException 
+     */
     public static void saveLines(ArrayList<VirtualLine> lines) throws IOException
     {
         FileWriter fstream = new FileWriter("spectral_lines_k" + lines.size() + ".txt");
@@ -375,6 +409,14 @@ public class FileService
         out.close();
     }
 
+    /**
+     * 
+     * @param annotFloorPlan
+     * @param sub
+     * @param zoomIndex
+     * @param regionOrder
+     * @throws IOException 
+     */
     public static void exportImageOfRegion(AnnotFloorPlan annotFloorPlan, 
                                             SubRegion sub, 
                                             double zoomIndex,
@@ -407,6 +449,14 @@ public class FileService
         ImageIO.write(image, "png", oFile);
     }
 
+    /**
+     * 
+     * @param annotFloorPlan
+     * @param clss
+     * @param zoomIndex
+     * @param binStr
+     * @throws IOException 
+     */
     public static void exportImageOfClass(AnnotFloorPlan annotFloorPlan, Class clss, double zoomIndex, String binStr) throws IOException
     {
         List<Cell> deadCells = annotFloorPlan.getDeadCells();
@@ -447,7 +497,9 @@ public class FileService
       
         //Build input array
         ArrayList<Input> inputs = new ArrayList<Input>();
-        File inFile = new File("train_p0.5.txt_sub_0.02.1.txt"); //Temp  
+        //File inFile = new File("train_p0.5.txt_sub_0.02.1.txt"); //Temp  
+        File inFile = new File("test_p0.5.txt"); //Temp  
+        
         Scanner sc = new Scanner(inFile);
         //Each line has this format: 2.43892672440343,19.5114137952274#1:-50 2:-73 3:-63 4:-57 5:-95 
         String line="";
