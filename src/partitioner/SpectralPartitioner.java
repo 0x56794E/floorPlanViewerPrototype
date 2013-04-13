@@ -333,12 +333,12 @@ public class SpectralPartitioner
      * @param regionOrder
      * @return the array containing the coordinates of the centroid of the region specified by the binary string
      */
-    public static int[] getCentroid(String regionOrder)
+    public static double[] getCentroid(String regionOrder)
     {
-        int[] ret = null;
+        double[] ret = null;
         if (regionMap.containsKey(regionOrder))
         {
-            ret = new int[2];
+            ret = new double[2];
             ret[0] = regionMap.get(regionOrder).getRowCentroid();
             ret[1] = regionMap.get(regionOrder).getColCentroid();
         }

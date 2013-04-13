@@ -20,6 +20,7 @@
 
 package partitioner;
 
+import entity.AnnotFloorPlan;
 import entity.Cell;
 import java.util.Collections;
 import java.util.HashSet;
@@ -33,10 +34,12 @@ import java.util.Set;
 public class Class 
 {
     private HashSet<Cell> cells;
+    AnnotFloorPlan afp;
     
-    public Class (SubRegion sub)
+    public Class (SubRegion sub, AnnotFloorPlan afp)
     {
         cells = new HashSet<Cell>();
+        this.afp = afp;
         for (Cell c : sub.getGraph().vertexSet())
             cells.add(c);
         
@@ -95,24 +98,4 @@ public class Class
         return in;
     }
     
-    /**
-     * 
-     * @return the row and col of the centroid
-     */
-    public int[] getCentroid()
-    {
-        int[] centroid = new int[2];
-        centroid[0] = 0; //row
-        centroid[1] = 0; //col
-        for (Cell c : cells)
-        {
-            centroid[0] += c.getRow();
-            centroid[1] += c.getCol();
-        }
-        
-        centroid[0] /= cells.size();
-        centroid[1] /= cells.size();
-        
-        return centroid;
-    }
 }

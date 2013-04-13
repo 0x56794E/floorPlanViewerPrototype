@@ -32,8 +32,8 @@ import org.jgrapht.graph.SimpleWeightedGraph;
  */
 public class SubRegion 
 {
-    private int rowCentroid;
-    private int colCentroid;    
+    private double rowCentroid;
+    private double colCentroid;    
     private String binaryString;
     private SimpleWeightedGraph<Cell, WeightedEdge> graph;
     private boolean isLeaf;
@@ -70,11 +70,19 @@ public class SubRegion
      * 
      * @param r
      */
-    public void setRowCentroid(int r)
+    public void setRowCentroid(double r)
     {
         rowCentroid = r;
     }
-    
+            
+    /**
+     * 
+     * @param c
+     */
+    public void setColCentroid(double c)
+    {
+        colCentroid = c;
+    }
     
     public void setGraph(SimpleWeightedGraph<Cell, WeightedEdge> graph)
     {
@@ -85,15 +93,7 @@ public class SubRegion
     {
         return this.graph;
     }
-    
-    /**
-     * 
-     * @param c
-     */
-    public void setColCentroid(int c)
-    {
-        colCentroid = c;
-    }
+
     
     /**
      * 
@@ -108,7 +108,7 @@ public class SubRegion
      * 
      * @return
      */
-    public int getRowCentroid()
+    public double getRowCentroid()
     {
         return rowCentroid;
     }
@@ -117,7 +117,7 @@ public class SubRegion
      * 
      * @return
      */
-    public int getColCentroid()
+    public double getColCentroid()
     {
         return colCentroid;
     }
@@ -138,7 +138,7 @@ public class SubRegion
      */
     public String toString()
     {
-        return binaryString + " " + rowCentroid + " " + colCentroid;
+        return String.format("%s %f %f", binaryString, rowCentroid, colCentroid);
     }
     
     public boolean equals(Object rhs)

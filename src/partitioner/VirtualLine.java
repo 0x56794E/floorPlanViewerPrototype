@@ -84,6 +84,7 @@ public class VirtualLine
     private void partitionGraph(SimpleWeightedGraph<Cell, WeightedEdge> g)
     {
         int minusC = 0, minusR = 0, plusC = 0, plusR = 0;
+        Cell lastCell = null; //to get annot floor plan
         for (Cell c : g.vertexSet())
         {
             if (v2Ofn(c) < 0)
@@ -104,14 +105,23 @@ public class VirtualLine
                 c.addChar('1');
                 nPlusRegion.setBinaryString(c.getBinaryString());
             }
-            
+            lastCell = c;
         }
         
         //Find centroids
-        nMinusRegion.setColCentroid(minusC / nMinus.size());
-        nMinusRegion.setRowCentroid(minusR / nMinus.size());
-        nPlusRegion.setColCentroid(plusC / nPlus.size());
-        nPlusRegion.setRowCentroid(plusR / nPlus.size());
+        if (lastCell != null)
+        {
+            double[] minusCentroid = lastCell.getAnnotFloorPlan().getCentroiCoordinates(minusR / nMinus.size(),
+                                                                                        minusC / nMinus.size());
+            nMinusRegion.setColCentroid(minusCentroid[0]);
+            nMinusRegion.setRowCentroid(minusCentroid[1]);
+            
+            double[] plusCentroid = lastCell.getAnnotFloorPlan().getCentroiCoordinates(plusR / nPlus.size(),
+                                                                                       plusC / nPlus.size());
+            nMinusRegion.setColCentroid(plusCentroid[0]);
+            nMinusRegion.setRowCentroid(plusCentroid[1]);
+            
+        }
         
         //Generating edges;
         generateEdges(nMinus, nMinusGraph, g);

@@ -641,4 +641,19 @@ public class AnnotFloorPlan implements Serializable
     {
         return row == getCorrespondingRow(y) && col == getCorrespondingCol(x);
     }
+    
+    
+    /**
+     * 
+     * @param rowCentroid the row coordinate of the centroid
+     * @param colCentroid the col coordinate of the centroid
+     * @return array containing [x-coor in meter][y-coor in meter]
+     */
+    public double[] getCentroiCoordinates(double rowCentroid, double colCentroid)
+    {
+        double[] coordinates = new double[2];
+        coordinates[0] = colCentroid * (colCount - 1) / actualW;
+        coordinates[1] = rowCentroid * (rowCount - 1) / actualH;
+        return coordinates;
+    }
 }

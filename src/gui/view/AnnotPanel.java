@@ -325,7 +325,7 @@ public class AnnotPanel extends JPanel
             else //If internal node
             {
                 //Export image of the class
-                Class clss = ClassFinder.getClass(sub);
+                Class clss = ClassFinder.getClass(sub, mainFr.getCurrentFloorPlan().getAnnotFloorPlan());
                 util.FileService.exportImageOfClass(mainFr.getCurrentFloorPlan().getAnnotFloorPlan(),
                                                clss,
                                                zoomedIndex,
@@ -353,7 +353,7 @@ public class AnnotPanel extends JPanel
         }
         
         //The class for the entire floor
-        Class clss = ClassFinder.getClass(SpectralPartitioner.entireFloor);
+        Class clss = ClassFinder.getClass(SpectralPartitioner.entireFloor, mainFr.getCurrentFloorPlan().getAnnotFloorPlan());
         FileService.exportImageOfClass(mainFr.getCurrentFloorPlan().getAnnotFloorPlan(),
                                         clss,
                                         zoomedIndex,
@@ -417,4 +417,5 @@ public class AnnotPanel extends JPanel
         this.repaint();
         mainFr.validate();
     }
+    
 }

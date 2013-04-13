@@ -69,16 +69,16 @@ public class ClassManager
         return classes.get(s).containsPoint(x, y);
     }
     
-    /**
-     * 
-     * @param s
-     * @return the location of the centroid of class with given string
-     */
-    public static int[] getCentroid(String s)
-    {
-         return classes.get(s).getCentroid();
-    }
-    
+//    /**
+//     * 
+//     * @param s
+//     * @return the location of the centroid of class with given string
+//     */
+//    public static double[] getCentroid(String s)
+//    {
+//         return classes.get(s).getCentroid();
+//    }
+//    
     public static void exportTrainingFiles()
     {
         try
