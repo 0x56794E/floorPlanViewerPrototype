@@ -118,8 +118,8 @@ public class VirtualLine
             
             double[] plusCentroid = lastCell.getAnnotFloorPlan().getCentroiCoordinates(plusR / nPlus.size(),
                                                                                        plusC / nPlus.size());
-            nMinusRegion.setColCentroid(plusCentroid[0]);
-            nMinusRegion.setRowCentroid(plusCentroid[1]);
+            nPlusRegion.setColCentroid(plusCentroid[0]);
+            nPlusRegion.setRowCentroid(plusCentroid[1]);
             
         }
         
