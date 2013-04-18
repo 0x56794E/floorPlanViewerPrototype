@@ -131,7 +131,6 @@ public class AnnotFloorPlan implements Serializable
 //        rowCount = fp.getHeight() / unitH + 1;
 //        colCount = fp.getWidth() / unitW + 1;
 
-        //Temp for prof's request
         rowCount = 50;
         colCount = 75;
         unitW = (int)Math.ceil(fp.getWidth() / colCount);

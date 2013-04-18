@@ -174,8 +174,7 @@ public class FileService
      */
     public static void savePointsWithBinaryStrings(AnnotFloorPlan afp, int k, String partitionType) throws FileNotFoundException, IOException
     {
-        //Read coordinates from file and convert pixel coordinate and to same origin
-      
+        //Read coordinates from file and convert pixel coordinate and to same origin      
         FileWriter fstream = new FileWriter(afp.getFloorPlan().getFileName() 
                 + "_k" + k + "_" + partitionType + ".txt");
         BufferedWriter out = new BufferedWriter(fstream);
@@ -219,15 +218,7 @@ public class FileService
         }
         out.close();
     }
-    
-    /**
-     * Use interchangeably with savePointsWithBinaryStrings()
-     * But this method show both original and converted coordinates
-     */
-    public static void convertCoordinates()
-    {
-        
-    }
+
     
     /**
      * This file is for debugging purpose only
