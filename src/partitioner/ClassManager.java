@@ -22,6 +22,8 @@
 package partitioner;
 
 import entity.AnnotFloorPlan;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashMap;
 import util.FileService;
 
@@ -89,6 +91,18 @@ public class ClassManager
         {
             System.out.println("Error while exporting training files.");
             e.printStackTrace();
+        }
+    }
+
+    public static void savePointsWithBinaryStringAndClasses(int k, String spectral) 
+    {
+        try
+        {
+            FileService.savePointsWithBinaryStrings(afp, k, "Spectral", classes);
+        }
+        catch (IOException exc)
+        {
+            System.out.println("Error while printing");
         }
     }
 }

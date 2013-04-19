@@ -363,8 +363,10 @@ public class AnnotPanel extends JPanel
         //Export all the training files
         ClassManager.exportTrainingFiles();
         
+        //Save Points with the binary string of the region it belongs to
+        ClassManager.savePointsWithBinaryStringAndClasses(k, "Spectral");
         
-        FileService.savePointsWithBinaryStrings(mainFr.getCurrentFloorPlan().getAnnotFloorPlan(), k, "Spectral");
+        //Save all the lines
         FileService.saveLines(lines);
     }
     
@@ -408,7 +410,7 @@ public class AnnotPanel extends JPanel
             }
         }
       
-        FileService.savePointsWithBinaryStrings(mainFr.getCurrentFloorPlan().getAnnotFloorPlan(), k, "Inertial");
+        //FileService.savePointsWithBinaryStrings(mainFr.getCurrentFloorPlan().getAnnotFloorPlan(), k, "Inertial"); => method's signature has been changed.
     }
 
     void updateConfig(int ratio, int actualW, int actualH)

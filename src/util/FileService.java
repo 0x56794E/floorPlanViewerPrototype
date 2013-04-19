@@ -164,15 +164,16 @@ public class FileService
      * Produce file containing the column position, 
      * the row position and the binary string corresponding to a given point.
      * Each line has the following format
-     * <row> <col> <binString>
+     * <row> <col> <binString> # <list of binStrs of classes this cell belongs to>
      * 
      * @param afp
      * @param k
      * @param partitionType 
+     * @param classes 
      * @throws FileNotFoundException
      * @throws IOException 
      */
-    public static void savePointsWithBinaryStrings(AnnotFloorPlan afp, int k, String partitionType) throws FileNotFoundException, IOException
+    public static void savePointsWithBinaryStrings(AnnotFloorPlan afp, int k, String partitionType, HashMap<String, Class> classes) throws FileNotFoundException, IOException
     {
         //Read coordinates from file and convert pixel coordinate and to same origin      
         FileWriter fstream = new FileWriter(afp.getFloorPlan().getFileName() 
@@ -202,10 +203,21 @@ public class FileService
                     if (!added.contains(cell))
                     {
                         added.add(cell);
-                        out.write(String.format("%d %d %s\r\n",
+                        
+                        //List of classes this position belongs to
+                        StringBuilder sb = new StringBuilder();
+                        for (Entry<String, Class> entry : classes.entrySet())
+                        {
+                            if (entry.getValue().containsPoint(cell))
+                                sb.append(entry.getKey()).append(" ");
+                        }
+                                                
+                        out.write(String.format("%d %d %s # %s\r\n",
                                     cell.getRow(),
                                     cell.getCol(),
-                                    cell.getBinaryString()));   
+                                    cell.getBinaryString(),
+                                    sb.toString()));   
+                        
                     }
                 }
                 else
@@ -505,7 +517,6 @@ public class FileService
             
             //coordinates 
             part1 = tokens[0].split(",");
-            System.out.println("toks[0] = " + tokens[0]);
             //Find corresponding cell, add to input array
             inputs.add(new Input(afp.getNode(afp.getActualW() - Double.parseDouble(part1[1]), 
                                              afp.getActualH() - Double.parseDouble(part1[0])),
