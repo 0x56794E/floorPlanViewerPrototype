@@ -651,8 +651,8 @@ public class AnnotFloorPlan implements Serializable
     public double[] getCentroiCoordinates(double rowCentroid, double colCentroid)
     {
         double[] coordinates = new double[2];
-        coordinates[0] = colCentroid * (colCount - 1) / actualW;
-        coordinates[1] = rowCentroid * (rowCount - 1) / actualH;
+        coordinates[0] = colCentroid * actualW / colCount;
+        coordinates[1] = rowCentroid * actualH / rowCount;
         return coordinates;
     }
 }
